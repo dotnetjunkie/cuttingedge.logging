@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FxCopProject Version="1.36" Name="My FxCop Project">
+ <ProjectOptions>
+  <SharedProject>True</SharedProject>
+  <Stylesheet Apply="False">c:\program files\microsoft fxcop 1.36\Xml\FxCopReport.xsl</Stylesheet>
+  <SaveMessages>
+   <Project Status="Active, Excluded" NewOnly="False" />
+   <Report Status="Active" NewOnly="False" />
+  </SaveMessages>
+  <ProjectFile Compress="True" DefaultTargetCheck="True" DefaultRuleCheck="True" SaveByRuleGroup="" Deterministic="True" />
+  <EnableMultithreadedLoad>True</EnableMultithreadedLoad>
+  <EnableMultithreadedAnalysis>True</EnableMultithreadedAnalysis>
+  <SourceLookup>True</SourceLookup>
+  <AnalysisExceptionsThreshold>10</AnalysisExceptionsThreshold>
+  <RuleExceptionsThreshold>1</RuleExceptionsThreshold>
+  <Spelling Locale="nl-NL" />
+  <OverrideRuleVisibilities>False</OverrideRuleVisibilities>
+  <CustomDictionaries SearchFxCopDir="True" SearchUserProfile="True" SearchProjectDir="True" />
+  <SearchGlobalAssemblyCache>False</SearchGlobalAssemblyCache>
+  <DeadlockDetectionTimeout>120</DeadlockDetectionTimeout>
+  <IgnoreGeneratedCode>False</IgnoreGeneratedCode>
+ </ProjectOptions>
+ <Targets>
+  <Target Name="$(ProjectDir)/CuttingEdge.Logging.ExampleProviders/bin/Release/CuttingEdge.Logging.ExampleProviders.dll" Analyze="True" AnalyzeAllChildren="True" />
+  <Target Name="$(ProjectDir)/CuttingEdge.Logging/bin/Release/CuttingEdge.Logging.dll" Analyze="True" AnalyzeAllChildren="True" />
+ </Targets>
+ <Rules>
+  <RuleFiles>
+   <RuleFile Name="$(FxCopDir)\Rules\DesignRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\GlobalizationRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\InteroperabilityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\MobilityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\NamingRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\PerformanceRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\PortabilityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\SecurityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\UsageRules.dll" Enabled="True" AllRulesEnabled="True" />
+  </RuleFiles>
+  <Groups />
+  <Settings />
+ </Rules>
+ <FxCopReport Version="1.36">
+  <Targets>
+   <Target Name="$(ProjectDir)/CuttingEdge.Logging.ExampleProviders/bin/Release/CuttingEdge.Logging.ExampleProviders.dll">
+    <Modules>
+     <Module Name="cuttingedge.logging.exampleproviders.dll">
+      <Messages>
+       <Message TypeName="AssembliesShouldHaveValidStrongNames" Category="Microsoft.Design" CheckId="CA2210" Created="2008-10-12 19:30:09Z">
+        <Issue Name="NoStrongName">
+         <Item>'CuttingEdge.Logging.ExampleProviders.dll'</Item>
+        </Issue>
+       </Message>
+      </Messages>
+     </Module>
+    </Modules>
+   </Target>
+   <Target Name="$(ProjectDir)/CuttingEdge.Logging/bin/Release/CuttingEdge.Logging.dll">
+    <Modules>
+     <Module Name="cuttingedge.logging.dll">
+      <Messages>
+       <Message TypeName="AssembliesShouldHaveValidStrongNames" Category="Microsoft.Design" CheckId="CA2210" Created="2008-10-12 19:30:09Z">
+        <Issue Name="NoStrongName">
+         <Item>'CuttingEdge.Logging.dll'</Item>
+        </Issue>
+       </Message>
+      </Messages>
+      <Namespaces>
+       <Namespace Name="CuttingEdge.Logging">
+        <Types>
+         <Type Name="Logger">
+          <Members>
+           <Member Name="#.cctor()">
+            <Messages>
+             <Message TypeName="DoNotRaiseExceptionsInUnexpectedLocations" Category="Microsoft.Design" CheckId="CA1065" Status="Excluded" Created="2008-10-12 19:30:09Z" FixCategory="NonBreaking">
+              <Issue Name="NoAllowedExceptions" Level="Error">
+               <Item>'Logger.Logger()'</Item>
+               <Item>'ConfigurationErrorsException'</Item>
+              </Issue>
+              <Issue Name="NoAllowedExceptions" Level="Error">
+               <Item>'Logger.Logger()'</Item>
+               <Item>'ProviderException'</Item>
+              </Issue>
+              <Issue Name="NoAllowedExceptions" Level="Error">
+               <Item>'Logger.Logger()'</Item>
+               <Item>'ProviderException'</Item>
+              </Issue>
+              <Notes>
+               <User Name="Steven">
+                <Note Id="1" />
+               </User>
+              </Notes>
+             </Message>
+             <Message TypeName="InitializeReferenceTypeStaticFieldsInline" Category="Microsoft.Performance" CheckId="CA1810" Status="Excluded" Created="2008-10-12 19:30:09Z">
+              <Issue>
+               <Item>'Logger'</Item>
+              </Issue>
+              <Notes>
+               <User Name="Steven">
+                <Note Id="0" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="LoggingProviderCollection">
+          <Members>
+           <Member Name="#System.Collections.Generic.ICollection&lt;CuttingEdge.Logging.LoggingProviderBase&gt;.Clear()">
+            <Messages>
+             <Message TypeName="DoNotDeclareVirtualMembersInSealedTypes" Category="Microsoft.Design" CheckId="CA1048" Status="Excluded" Created="2008-10-12 19:30:09Z">
+              <Issue>
+               <Item>'LoggingProviderCollection.System.Collections.Generic.ICollection&lt;CuttingEdge.Logging.LoggingProviderBase&gt;.Clear()'</Item>
+              </Issue>
+              <Notes>
+               <User Name="Steven">
+                <Note Id="2" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+        </Types>
+       </Namespace>
+      </Namespaces>
+     </Module>
+    </Modules>
+   </Target>
+  </Targets>
+  <Notes>
+   <User Name="Steven">
+    <Note Id="0" Modified="2008-10-12 19:30:32Z">The static constructor must be used.</Note>
+    <Note Id="1" Modified="2008-10-12 19:30:43Z">Exceptions must be thrown from the static constructor when configuration errors exist.</Note>
+    <Note Id="2" Modified="2008-10-12 19:30:57Z">This seems to be a bug in FxCop. The Clear() method is not declared virtual and is declared in a base type.</Note>
+   </User>
+  </Notes>
+  <Rules>
+   <Rule TypeName="AssembliesShouldHaveValidStrongNames" Category="Microsoft.Design" CheckId="CA2210">
+    <Resolution Name="NoStrongName">Sign {0} with a strong name key.</Resolution>
+   </Rule>
+   <Rule TypeName="DoNotDeclareVirtualMembersInSealedTypes" Category="Microsoft.Design" CheckId="CA1048">
+    <Resolution Name="Default">'{0}' is a virtual member declared in a sealed type. Mark the member non-virtual or, if the type should be extensible, unseal it.</Resolution>
+   </Rule>
+   <Rule TypeName="DoNotRaiseExceptionsInUnexpectedLocations" Category="Microsoft.Design" CheckId="CA1065">
+    <Resolution Name="NoAllowedExceptions">{0} creates an exception of type {1}. Exceptions should not be raised in this type of method. If this exception instance might be raised, change this method's logic so it no longer raises an exception.</Resolution>
+   </Rule>
+   <Rule TypeName="InitializeReferenceTypeStaticFieldsInline" Category="Microsoft.Performance" CheckId="CA1810">
+    <Resolution Name="Default">Initialize all static fields in {0} when those fields are declared and remove the explicit static constructor.</Resolution>
+   </Rule>
+  </Rules>
+ </FxCopReport>
+</FxCopProject>
