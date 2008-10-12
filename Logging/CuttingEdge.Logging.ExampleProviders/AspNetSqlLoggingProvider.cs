@@ -167,9 +167,6 @@ namespace CuttingEdge.Logging.ExampleProviders
 
             internal RequestLogData(HttpContext context, bool logQueryString, bool logFormData)
             {
-                this.QueryString = null;
-                this.Form = null;
-
                 if (context != null && context.Request != null)
                 {
                     HttpRequest request = context.Request;
