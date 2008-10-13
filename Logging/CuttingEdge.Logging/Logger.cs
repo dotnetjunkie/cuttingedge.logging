@@ -152,9 +152,10 @@ namespace CuttingEdge.Logging
         /// a null reference (Nothing in VB).</exception>
         public static object Log(Exception exception)
         {
-            Validator.ValidateExceptionIsNotNull(exception);
+            LoggingHelper.ValidateExceptionIsNotNull(exception);
 
-            return provider.Log(EventType.Error, GetExceptionMessage(exception), null, exception);
+            string message = LoggingHelper.GetExceptionMessage(exception);
+            return ((ILogger)provider).Log(EventType.Error, message, null, exception);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -167,10 +168,10 @@ namespace CuttingEdge.Logging
         /// a null reference (Nothing in VB) or the supplied <paramref name="message"/> is a null reference.</exception>
         public static object Log(string message, Exception exception)
         {
-            Validator.ValidateMessageNotNullOrEmpty(message);
-            Validator.ValidateExceptionIsNotNull(exception);
+            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
+            LoggingHelper.ValidateExceptionIsNotNull(exception);
 
-            return provider.Log(EventType.Error, message, null, exception);
+            return ((ILogger)provider).Log(EventType.Error, message, null, exception);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -181,11 +182,12 @@ namespace CuttingEdge.Logging
         /// the <paramref name="source"/> are null references (Nothing in VB).</exception>
         public static object Log(Exception exception, MethodBase source)
         {
-            Validator.ValidateExceptionIsNotNull(exception);
-            Validator.ValidateSourceIsNotNull(source);
+            LoggingHelper.ValidateExceptionIsNotNull(exception);
+            LoggingHelper.ValidateSourceIsNotNull(source);
 
-            return provider.Log(EventType.Error, GetExceptionMessage(exception), BuildMethodName(source), 
-                exception);
+            string message = LoggingHelper.GetExceptionMessage(exception);
+            string methodName = LoggingHelper.BuildMethodName(source);
+            return ((ILogger)provider).Log(EventType.Error, message, methodName, exception);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -199,11 +201,12 @@ namespace CuttingEdge.Logging
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         public static object Log(string message, Exception exception, MethodBase source)
         {
-            Validator.ValidateMessageNotNullOrEmpty(message);
-            Validator.ValidateExceptionIsNotNull(exception);
-            Validator.ValidateSourceIsNotNull(source);
+            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
+            LoggingHelper.ValidateExceptionIsNotNull(exception);
+            LoggingHelper.ValidateSourceIsNotNull(source);
 
-            return provider.Log(EventType.Error, message, BuildMethodName(source), exception);
+            string methodName = LoggingHelper.BuildMethodName(source);
+            return ((ILogger)provider).Log(EventType.Error, message, methodName, exception);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -217,11 +220,11 @@ namespace CuttingEdge.Logging
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         public static object Log(string message, Exception exception, string source)
         {
-            Validator.ValidateMessageNotNullOrEmpty(message);
-            Validator.ValidateExceptionIsNotNull(exception);
-            Validator.ValidateSourceNotNullOrEmpty(source);
+            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
+            LoggingHelper.ValidateExceptionIsNotNull(exception);
+            LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 
-            return provider.Log(EventType.Error, message, source, exception);
+            return ((ILogger)provider).Log(EventType.Error, message, source, exception);
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
@@ -238,12 +241,13 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(EventType type, string message, Exception exception, MethodBase source)
         {
-            Validator.ValidateTypeInValidRange(type);
-            Validator.ValidateMessageNotNullOrEmpty(message);
-            Validator.ValidateExceptionIsNotNull(exception);
-            Validator.ValidateSourceIsNotNull(source);
+            LoggingHelper.ValidateTypeInValidRange(type);
+            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
+            LoggingHelper.ValidateExceptionIsNotNull(exception);
+            LoggingHelper.ValidateSourceIsNotNull(source);
 
-            return provider.Log(type, message, BuildMethodName(source), exception);
+            string methodName = LoggingHelper.BuildMethodName(source);
+            return ((ILogger)provider).Log(type, message, methodName, exception);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -260,12 +264,12 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(EventType type, string message, Exception exception, string source)
         {
-            Validator.ValidateTypeInValidRange(type);
-            Validator.ValidateMessageNotNullOrEmpty(message);
-            Validator.ValidateExceptionIsNotNull(exception);
-            Validator.ValidateSourceNotNullOrEmpty(source);
+            LoggingHelper.ValidateTypeInValidRange(type);
+            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
+            LoggingHelper.ValidateExceptionIsNotNull(exception);
+            LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 
-            return provider.Log(type, message, source, exception);
+            return ((ILogger)provider).Log(type, message, source, exception);
         }
 
         /// <summary>Logs an information event to the default <see cref="Provider"/>.</summary>
@@ -277,9 +281,9 @@ namespace CuttingEdge.Logging
         /// null reference.</exception>
         public static object Log(string message)
         {
-            Validator.ValidateMessageNotNullOrEmpty(message);
+            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
 
-            return provider.Log(EventType.Information, message, null, null);
+            return ((ILogger)provider).Log(EventType.Information, message, null, null);
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
@@ -293,10 +297,10 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(EventType type, string message)
         {
-            Validator.ValidateMessageNotNullOrEmpty(message);
-            Validator.ValidateTypeInValidRange(type);
+            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
+            LoggingHelper.ValidateTypeInValidRange(type);
 
-            return provider.Log(type, message, null, null);
+            return ((ILogger)provider).Log(type, message, null, null);
         }
 
         /// <summary>Logs an information event to the default <see cref="Provider"/>.</summary>
@@ -309,10 +313,11 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
         public static object Log(string message, MethodBase source)
         {
-            Validator.ValidateMessageNotNullOrEmpty(message);
-            Validator.ValidateSourceIsNotNull(source);
+            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
+            LoggingHelper.ValidateSourceIsNotNull(source);
 
-            return provider.Log(EventType.Information, message, BuildMethodName(source), null);
+            string methodName = LoggingHelper.BuildMethodName(source);
+            return ((ILogger)provider).Log(EventType.Information, message, methodName, null);
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
@@ -328,11 +333,12 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(EventType type, string message, MethodBase source)
         {
-            Validator.ValidateTypeInValidRange(type);
-            Validator.ValidateMessageNotNullOrEmpty(message);
-            Validator.ValidateSourceIsNotNull(source);
+            LoggingHelper.ValidateTypeInValidRange(type);
+            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
+            LoggingHelper.ValidateSourceIsNotNull(source);
 
-            return provider.Log(type, message, BuildMethodName(source), null);
+            string methodName = LoggingHelper.BuildMethodName(source);
+            return ((ILogger)provider).Log(type, message, methodName, null);
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
@@ -348,11 +354,11 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(EventType type, string message, string source)
         {
-            Validator.ValidateMessageNotNullOrEmpty(message);
-            Validator.ValidateTypeInValidRange(type);
-            Validator.ValidateSourceNotNullOrEmpty(source);
+            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
+            LoggingHelper.ValidateTypeInValidRange(type);
+            LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 
-            return provider.Log(type, message, source, null);
+            return ((ILogger)provider).Log(type, message, source, null);
         }
 
         // The fallback providers must be initialized from within the this Logger class. It can't be done
@@ -424,129 +430,6 @@ namespace CuttingEdge.Logging
 
             // post: No circular reference found.
             return false;
-        }
-
-        private static string BuildMethodName(MethodBase method)
-        {
-            if (method == null)
-            {
-                return null;
-            }
-
-            ParameterInfo[] parameters = method.GetParameters();
-
-            int initialCapacity =
-                method.DeclaringType.FullName.Length +
-                method.Name.Length + (15 * parameters.Length) +
-                20;
-
-            StringBuilder methodName = new StringBuilder(initialCapacity);
-
-           methodName
-                .Append(method.DeclaringType.FullName)
-                .Append(".")
-                .Append(method.Name)
-                .Append("(");
-
-            for (int index = 0; index < parameters.Length; index++)
-            {
-                ParameterInfo parameter = parameters[index];
-
-                if (index > 0)
-                {
-                    methodName.Append(", ");
-                }
-
-                if (parameter.IsOut == true)
-                {
-                    methodName.Append("out ");
-                }
-
-                if (parameter.IsRetval == true)
-                {
-                    methodName.Append("ret ");
-                    methodName.Insert(0, " ");
-                    methodName.Insert(0, parameter.ParameterType.Name);
-                }
-                else
-                {
-                    methodName.Append(parameter.ParameterType.Name);
-                }
-            }
-
-            methodName.Append(")");
-
-            return methodName.ToString();
-        }
-
-        private static string GetExceptionMessage(Exception exception)
-        {
-            string message = exception.Message;
-
-            return String.IsNullOrEmpty(message) ? exception.GetType().Name : message;
-        }
-
-        /// <summary>Validates arguments.</summary>
-        private static class Validator
-        {
-            internal static void ValidateExceptionIsNotNull(Exception exception)
-            {
-                if (exception == null)
-                {
-                    throw new ArgumentNullException("exception");
-                }
-            }
-
-            internal static void ValidateMessageNotNullOrEmpty(string message)
-            {
-                if (String.IsNullOrEmpty(message))
-                {
-                    if (message != null)
-                    {
-                        throw new ArgumentException(SR.GetString(SR.ArgumentMustNotBeNullOrEmptyString), 
-                            "message");
-                    }
-                    else
-                    {
-                        throw new ArgumentNullException("message", 
-                            SR.GetString(SR.ArgumentMustNotBeNullOrEmptyString));
-                    }
-                }
-            }
-
-            internal static void ValidateTypeInValidRange(EventType type)
-            {
-                int eventType = (int)type;
-                if (eventType < 0 || eventType > 2)
-                {
-                    throw new InvalidEnumArgumentException("type", eventType, typeof(EventType));
-                }
-            }
-
-            internal static void ValidateSourceIsNotNull(MethodBase source)
-            {
-                if (source == null)
-                {
-                    throw new ArgumentNullException("source");
-                }
-            }
-
-            internal static void ValidateSourceNotNullOrEmpty(string source)
-            {
-                if (String.IsNullOrEmpty(source))
-                {
-                    if (source != null)
-                    {
-                        throw new ArgumentException(SR.GetString(SR.ArgumentMustNotBeNullOrEmptyString), 
-                            "source");
-                    }
-                    else
-                    {
-                        throw new ArgumentNullException("source", 
-                            SR.GetString(SR.ArgumentMustNotBeNullOrEmptyString));
-                    }
-                }
-            }
         }
     }
 }

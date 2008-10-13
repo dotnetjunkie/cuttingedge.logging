@@ -48,6 +48,7 @@
     <Compile Include="Helpers\InvalidLoggingTypes.cs" />
     <Compile Include="Helpers\LoggingEvent.cs" />
     <Compile Include="Helpers\StubLoggingProvider.cs" />
+    <Compile Include="LoggerWrapperTests.cs" />
     <Compile Include="LoggingProviderBaseTests.cs" />
     <Compile Include="Helpers\LoggingProviderTestingScope.cs" />
     <Compile Include="EventTypeTests.cs" />

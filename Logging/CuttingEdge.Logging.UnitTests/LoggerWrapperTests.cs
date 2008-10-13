@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Configuration.Provider;
 using System.Reflection;
 
 using CuttingEdge.Logging.UnitTests.Helpers;
@@ -10,151 +8,140 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.Logging.UnitTests
 {
-    /// <summary>
-    /// Tests the <see cref="LoggingProviderBase"/> class.
-    /// </summary>
-    [TestClass]
-    public class LoggingProviderBaseTests
+    using System.Collections.Specialized;
+    using System.Configuration.Provider;
+    using System.IO;
+
+
+    public class FileLoggingProvider : LoggingProviderBase
     {
-        private static readonly LoggingProviderBase StubLogger = new StubLoggingProvider();
+        private string path;
 
-        [TestMethod]
-        public void LoggingProviderBaseLogShouldSucceedWithValidArguments()
+        public string Path
         {
-            ILogger tester = new StubLoggingProvider();
-
-            tester.Log(EventType.Error, "message", "source", new Exception());
+            get { return this.path; }
         }
 
-        [TestMethod]
-        public void LoggingProviderBaseLogShouldFailOnInvalidEventType()
+        public override void Initialize(string name, NameValueCollection config)
         {
-            ILogger tester = new StubLoggingProvider();
-
-            foreach (EventType type in EventTypeEnumerator.GetInvalidValues())
+            if (config == null)
             {
-                try
-                {
-                    tester.Log(type, "message", "source", new Exception());
-                    Assert.Fail();
-                }
-                catch (InvalidEnumArgumentException)
-                {
-                    // An InvalidEnumArgumentException should be thrown.
-                }
+                throw new ArgumentNullException("config");
             }
+
+            this.InitializeFileName(config);
+
+            base.Initialize(name, config);
         }
 
-        [TestMethod]
-        public void LoggingProviderBaseLogShouldSucceedOnValidEventType()
+        private void InitializeFileName(NameValueCollection config)
         {
-            ILogger tester = new StubLoggingProvider();
+            string path = config["path"];
 
-            foreach (EventType type in EventTypeEnumerator.GetValidValues())
+            config.Remove("path");
+
+            if (!String.IsNullOrEmpty(path))
             {
-                tester.Log(type, "message", "source", new Exception());
+                throw new ProviderException(String.Format(
+                    "Empty or missing path attribute in provider " +
+                    "'{0}' in config file.", this.Name));
             }
+
+            //try
+            //{
+            //    if (!File.Exists(path))
+            //    {
+            //        string header = String.Format("{0}\t{1}\t{2}",
+            //            "type", "message", "exception");
+
+            //        File.WriteAllLines(path, new string[] { header });
+            //    }
+            //    else
+            //    {
+            //        using (Stream stream = File.OpenWrite(path))
+            //        {
+            //        }
+            //    }
+            //}
+            //catch (IOException ioex)
+            //{
+            //    throw new ProviderException(String.Format(
+            //        "Error creating or opening file '{0}' for provider " +
+            //        "'{1}' in config file. {2}", path, this.Name, ioex.Message), ioex);
+            //}
+
+            this.path = path;
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void LoggingProviderBaseLogShouldFailOnInvalidMessage1()
+        protected override object LogInternal(EventType type, string message, Exception exception, 
+            string source)
         {
-            ILogger tester = new StubLoggingProvider();
+            string exceptionMessage = exception != null ? exception.Message : null;
 
-            tester.Log(EventType.Error, null, "source", new Exception());
+            string line = String.Format("{0}\t{1}\t{2}\n", type, message, exceptionMessage);
+
+            File.AppendAllText(this.Path, line);
+
+            return null;
         }
+    }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void LoggingProviderBaseLogShouldFailOnInvalidMessage2()
+
+    [TestClass]
+    public class LoggerWrapperTests
+    {
+        void a()
         {
-            ILogger tester = new StubLoggingProvider();
+            /* Log an information event to the default provider. */
+            Logger.Log("Operation completed successfully.");
 
-            tester.Log(EventType.Error, String.Empty, "source", new Exception());
-        }
+            /* Log a warning to the default provider. */
+            Logger.Log(EventType.Warning, "Server is currently under high load");
 
-        [TestMethod]
-        public void LoggingProviderBaseLogShouldSucceedOnNullSource()
-        {
-            ILogger tester = new StubLoggingProvider();
-
-            tester.Log(EventType.Error, "message", null, new Exception());
-        }
-
-        [TestMethod]
-        public void LoggingProviderBaseLogShouldSucceedOnEmptySource()
-        {
-            ILogger tester = new StubLoggingProvider();
-
-            tester.Log(EventType.Error, "message", string.Empty, new Exception());
-        }
-
-        [TestMethod]
-        public void LoggingProviderBaseLogShouldSucceedOnNullException()
-        {
-            ILogger tester = new StubLoggingProvider();
-
-            tester.Log(EventType.Error, "message", "source", null);
-        }
-
-        [TestMethod]
-        public void InitializeShouldSucceed()
-        {
-            StubLoggingProvider tester = new StubLoggingProvider();
-
-            tester.Initialize("MyProvider", new NameValueCollection());
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void InitializeShouldFailWhenConfigIsNull()
-        {
-            StubLoggingProvider tester = new StubLoggingProvider();
-
-            tester.Initialize("MyProvider", null);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void InitializeShouldFailWhenNameIsNull()
-        {
-            StubLoggingProvider tester = new StubLoggingProvider();
-
-            tester.Initialize(null, new NameValueCollection());
-        }
-
-        [TestMethod]
-        public void InitializeShouldFailWhenUnrecognizedAttributesAreFound()
-        {
-            StubLoggingProvider tester = new StubLoggingProvider();
-
-            NameValueCollection config = new NameValueCollection();
-            config.Add("badAttribute", "some value");
+            /* Log an error event with source location to the default provider. */
+            Logger.Log(EventType.Error,
+                "Something went wrong.", MethodBase.GetCurrentMethod());
 
             try
             {
-                tester.Initialize("MyProvider", config);
+                this.DoSomeAction();
             }
-            catch (ProviderException pex)
+            catch (Exception ex)
             {
-                Assert.AreEqual(typeof(ProviderException), pex.GetType());
+                /* Log an exception to the default provider. */
+                Logger.Log(ex);
+                throw;
+            }
 
-                Assert.IsTrue(pex.Message.Contains("badAttribute"));
+            /* Log an information event to the default provider. */
+            Logger.Provider.Log("Success!", MethodBase.GetCurrentMethod());
+
+            /* Log to an alternative provider */
+            LoggingProviderBase xmlProvider = Logger.Providers["XmlLogProvider"];
+            xmlProvider.Log("Success!");
+
+            /* Display all configured providers */
+            foreach (LoggingProviderBase loggingProvider in Logger.Providers)
+            {
+                Console.WriteLine(loggingProvider.Name);
+            }
+
+            /* Logging providers can be chained. Using fallback providers. */
+            /* This way you can ensure a event is being logged, even if the */
+            /* default provider fails. */
+            LoggingProviderBase fallbackProvider = Logger.Provider.FallbackProvider;
+            if (fallbackProvider != null)
+            {
+                fallbackProvider.Log(EventType.Warning, "This is a warning."); 
             }
         }
 
-        [TestMethod]
-        public void InitializationOfTheFallbackProviderShouldWork1()
+        private void DoSomeAction()
         {
-            StubLoggingProvider tester = new StubLoggingProvider();
-
-            NameValueCollection config = new NameValueCollection();
-
-            tester.Initialize("MyProvider", config);
-
-            Assert.AreEqual(null, tester.FallbackProvider);
+            throw new NotImplementedException();
         }
+
+        private static readonly LoggerWrapper Decorator = new LoggerWrapper(new StubLoggingProvider());
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -162,7 +149,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             Exception exception = null;
 
-            StubLogger.Log(exception);
+            Decorator.Log(exception);
         }
 
         [TestMethod]
@@ -170,7 +157,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             Exception unthrownException = new InvalidOperationException();
 
-            StubLogger.Log(unthrownException);
+            Decorator.Log(unthrownException);
         }
 
         [TestMethod]
@@ -186,7 +173,7 @@ namespace CuttingEdge.Logging.UnitTests
                 thrownException = ex;
             }
 
-            StubLogger.Log(thrownException);
+            Decorator.Log(thrownException);
         }
 
         [TestMethod]
@@ -194,7 +181,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             InMemoryLogger memoryLogger = new InMemoryLogger();
             LoggerWrapper logger = new LoggerWrapper(memoryLogger);
-
+            
             Exception exception = new InvalidOperationException();
 
             logger.Log(exception);
@@ -248,7 +235,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = null;
 
-            StubLogger.Log(message);
+            Decorator.Log(message);
         }
 
         [TestMethod]
@@ -257,14 +244,14 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = String.Empty;
 
-            StubLogger.Log(message);
+            Decorator.Log(message);
         }
 
         [TestMethod]
         public void CanCallLogMessageWithNonEmptyString()
         {
             string message = "message";
-            StubLogger.Log(message);
+            Decorator.Log(message);
         }
 
         [TestMethod]
@@ -272,7 +259,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             InMemoryLogger memoryLogger = new InMemoryLogger();
             LoggerWrapper logger = new LoggerWrapper(memoryLogger);
-
+            
             logger.Log("message");
 
             Assert.AreEqual(EventType.Information, memoryLogger.FirstLoggedEvent.Type);
@@ -299,7 +286,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             Exception exception = null;
             MethodBase method = null;
-            StubLogger.Log(exception, method);
+            Decorator.Log(exception, method);
         }
 
         [TestMethod]
@@ -308,7 +295,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             Exception exception = new Exception();
             MethodBase method = null;
-            StubLogger.Log(exception, method);
+            Decorator.Log(exception, method);
         }
 
         [TestMethod]
@@ -316,7 +303,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             Exception exception = new Exception();
             MethodBase method = MethodBase.GetCurrentMethod();
-            StubLogger.Log(exception, method);
+            Decorator.Log(exception, method);
         }
 
         [TestMethod]
@@ -348,7 +335,7 @@ namespace CuttingEdge.Logging.UnitTests
             {
                 try
                 {
-                    StubLogger.Log(type, "message");
+                    Decorator.Log(type, "message");
                     Assert.Fail();
                 }
                 catch (InvalidEnumArgumentException)
@@ -363,7 +350,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMesssageWithNullMessage()
         {
             string message = null;
-            StubLogger.Log(EventType.Error, message);
+            Decorator.Log(EventType.Error, message);
         }
 
         [TestMethod]
@@ -371,13 +358,13 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMesssageWithEmptyMessage()
         {
             string message = string.Empty;
-            StubLogger.Log(EventType.Error, message);
+            Decorator.Log(EventType.Error, message);
         }
 
         [TestMethod]
         public void CanCallLogEventTypeMesssage()
         {
-            StubLogger.Log(EventType.Error, "Nice message.");
+            Decorator.Log(EventType.Error, "Nice message.");
         }
 
         [TestMethod]
@@ -416,7 +403,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = null;
 
-            StubLogger.Log(message, new Exception());
+            Decorator.Log(message, new Exception());
         }
 
         [TestMethod]
@@ -425,7 +412,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = String.Empty;
 
-            StubLogger.Log(message, new Exception());
+            Decorator.Log(message, new Exception());
         }
 
         [TestMethod]
@@ -433,13 +420,13 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogMessageExceptionWithNullException()
         {
             Exception exception = null;
-            StubLogger.Log("message", exception);
+            Decorator.Log("message", exception);
         }
 
         [TestMethod]
         public void CanCallLogMessageException()
         {
-            StubLogger.Log("message", new Exception());
+            Decorator.Log("message", new Exception());
         }
 
         [TestMethod]
@@ -465,7 +452,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = null;
 
-            StubLogger.Log(message, MethodBase.GetCurrentMethod());
+            Decorator.Log(message, MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -474,7 +461,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = String.Empty;
 
-            StubLogger.Log(message, MethodBase.GetCurrentMethod());
+            Decorator.Log(message, MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -482,13 +469,13 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogMessageMethodBaseWithNullSource()
         {
             MethodBase method = null;
-            StubLogger.Log("message", method);
+            Decorator.Log("message", method);
         }
 
         [TestMethod]
         public void CanCallLogMessageMethodBase()
         {
-            StubLogger.Log("message", MethodBase.GetCurrentMethod());
+            Decorator.Log("message", MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -516,7 +503,7 @@ namespace CuttingEdge.Logging.UnitTests
             {
                 try
                 {
-                    StubLogger.Log(type, "message", method);
+                    Decorator.Log(type, "message", method);
                     Assert.Fail();
                 }
                 catch (InvalidEnumArgumentException)
@@ -532,7 +519,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = null;
 
-            StubLogger.Log(EventType.Error, message, MethodBase.GetCurrentMethod());
+            Decorator.Log(EventType.Error, message, MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -541,7 +528,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = String.Empty;
 
-            StubLogger.Log(EventType.Error, message, MethodBase.GetCurrentMethod());
+            Decorator.Log(EventType.Error, message, MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -549,13 +536,13 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageMethodBaseWithNullSource()
         {
             MethodBase method = null;
-            StubLogger.Log(EventType.Error, "message", method);
+            Decorator.Log(EventType.Error, "message", method);
         }
 
         [TestMethod]
         public void CanCallLogEventTypeMessageMethodBase()
         {
-            StubLogger.Log(EventType.Error, "message", MethodBase.GetCurrentMethod());
+            Decorator.Log(EventType.Error, "message", MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -578,7 +565,7 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void CanCallLogEventTypeMessageString()
         {
-            StubLogger.Log(EventType.Error, "message", "source");
+            Decorator.Log(EventType.Error, "message", "source");
         }
 
         [TestMethod]
@@ -589,7 +576,7 @@ namespace CuttingEdge.Logging.UnitTests
             {
                 try
                 {
-                    StubLogger.Log(type, "message", source);
+                    Decorator.Log(type, "message", source);
                     Assert.Fail();
                 }
                 catch (InvalidEnumArgumentException)
@@ -605,7 +592,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = null;
 
-            StubLogger.Log(EventType.Error, message, "source");
+            Decorator.Log(EventType.Error, message, "source");
         }
 
         [TestMethod]
@@ -614,7 +601,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = String.Empty;
 
-            StubLogger.Log(EventType.Error, message, "source");
+            Decorator.Log(EventType.Error, message, "source");
         }
 
         [TestMethod]
@@ -622,7 +609,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageStringWithNullSource()
         {
             string source = null;
-            StubLogger.Log(EventType.Error, "message", source);
+            Decorator.Log(EventType.Error, "message", source);
         }
 
         [TestMethod]
@@ -630,7 +617,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageStringWithEmptySource()
         {
             string source = string.Empty;
-            StubLogger.Log(EventType.Error, "message", source);
+            Decorator.Log(EventType.Error, "message", source);
         }
 
         [TestMethod]
@@ -653,7 +640,7 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void CanCallMessageExceptionMethodBase()
         {
-            StubLogger.Log("message", new Exception(), MethodBase.GetCurrentMethod());
+            Decorator.Log("message", new Exception(), MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -661,7 +648,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogMessageExceptionMethodBaseWithNullMessage()
         {
             string message = null;
-            StubLogger.Log(message, new Exception(), MethodBase.GetCurrentMethod());
+            Decorator.Log(message, new Exception(), MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -669,7 +656,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogMessageExceptionMethodBaseWithEmptyMessage()
         {
             string message = string.Empty;
-            StubLogger.Log(message, new Exception(), MethodBase.GetCurrentMethod());
+            Decorator.Log(message, new Exception(), MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -677,7 +664,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogMessageExceptionMethodBaseWithNullException()
         {
             Exception exception = null;
-            StubLogger.Log("message", exception, MethodBase.GetCurrentMethod());
+            Decorator.Log("message", exception, MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -685,7 +672,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallMessageExceptionMethodBaseWithNullSource()
         {
             MethodBase source = null;
-            StubLogger.Log("message", new Exception(), source);
+            Decorator.Log("message", new Exception(), source);
         }
 
         [TestMethod]
@@ -710,7 +697,7 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void CanCallMessageExceptionString()
         {
-            StubLogger.Log("message", new Exception(), "source");
+            Decorator.Log("message", new Exception(), "source");
         }
 
         [TestMethod]
@@ -718,7 +705,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogMessageExceptionStringWithNullMessage()
         {
             string message = null;
-            StubLogger.Log(message, new Exception(), "source");
+            Decorator.Log(message, new Exception(), "source");
         }
 
         [TestMethod]
@@ -726,7 +713,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogMessageExceptionStringWithEmptyMessage()
         {
             string message = string.Empty;
-            StubLogger.Log(message, new Exception(), "source");
+            Decorator.Log(message, new Exception(), "source");
         }
 
         [TestMethod]
@@ -734,7 +721,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogMessageExceptionStringWithNullException()
         {
             Exception exception = null;
-            StubLogger.Log("message", exception, "source");
+            Decorator.Log("message", exception, "source");
         }
 
         [TestMethod]
@@ -742,7 +729,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallMessageExceptionStringWithNullSource()
         {
             string source = null;
-            StubLogger.Log("message", new Exception(), source);
+            Decorator.Log("message", new Exception(), source);
         }
 
         [TestMethod]
@@ -750,7 +737,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallMessageExceptionStringWithEmptySource()
         {
             string source = string.Empty;
-            StubLogger.Log("message", new Exception(), source);
+            Decorator.Log("message", new Exception(), source);
         }
 
         [TestMethod]
@@ -775,7 +762,7 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void CanCallEventTypeMessageExceptionMethodBase()
         {
-            StubLogger.Log(EventType.Warning, "message", new Exception(), MethodBase.GetCurrentMethod());
+            Decorator.Log(EventType.Warning, "message", new Exception(), MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -786,7 +773,7 @@ namespace CuttingEdge.Logging.UnitTests
             {
                 try
                 {
-                    StubLogger.Log(type, "message", new Exception(), source);
+                    Decorator.Log(type, "message", new Exception(), source);
                     Assert.Fail();
                 }
                 catch (InvalidEnumArgumentException)
@@ -801,7 +788,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionMethodBaseWithNullMessage()
         {
             string message = null;
-            StubLogger.Log(EventType.Warning, message, new Exception(), MethodBase.GetCurrentMethod());
+            Decorator.Log(EventType.Warning, message, new Exception(), MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -809,7 +796,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionMethodBaseWithEmptyMessage()
         {
             string message = string.Empty;
-            StubLogger.Log(EventType.Warning, message, new Exception(), MethodBase.GetCurrentMethod());
+            Decorator.Log(EventType.Warning, message, new Exception(), MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -817,7 +804,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionMethodBaseWithNullException()
         {
             Exception exception = null;
-            StubLogger.Log(EventType.Warning, "message", exception, MethodBase.GetCurrentMethod());
+            Decorator.Log(EventType.Warning, "message", exception, MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -825,7 +812,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionMethodBaseWithNullSource()
         {
             MethodBase source = null;
-            StubLogger.Log(EventType.Warning, "message", new Exception(), source);
+            Decorator.Log(EventType.Warning, "message", new Exception(), source);
         }
 
         [TestMethod]
@@ -850,7 +837,7 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void CanCallEventTypeMessageExceptionString()
         {
-            StubLogger.Log(EventType.Warning, "message", new Exception(), "source");
+            Decorator.Log(EventType.Warning, "message", new Exception(), "source");
         }
 
         [TestMethod]
@@ -861,7 +848,7 @@ namespace CuttingEdge.Logging.UnitTests
             {
                 try
                 {
-                    StubLogger.Log(type, "message", new Exception(), source);
+                    Decorator.Log(type, "message", new Exception(), source);
                     Assert.Fail();
                 }
                 catch (InvalidEnumArgumentException)
@@ -876,7 +863,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionStringWithNullMessage()
         {
             string message = null;
-            StubLogger.Log(EventType.Warning, message, new Exception(), "source");
+            Decorator.Log(EventType.Warning, message, new Exception(), "source");
         }
 
         [TestMethod]
@@ -884,7 +871,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionStringWithEmptyMessage()
         {
             string message = string.Empty;
-            StubLogger.Log(EventType.Warning, message, new Exception(), "source");
+            Decorator.Log(EventType.Warning, message, new Exception(), "source");
         }
 
         [TestMethod]
@@ -892,7 +879,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionStringWithNullException()
         {
             Exception exception = null;
-            StubLogger.Log(EventType.Warning, "message", exception, "source");
+            Decorator.Log(EventType.Warning, "message", exception, "source");
         }
 
         [TestMethod]
@@ -900,7 +887,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionStringWithNullSource()
         {
             string source = null;
-            StubLogger.Log(EventType.Warning, "message", new Exception(), source);
+            Decorator.Log(EventType.Warning, "message", new Exception(), source);
         }
 
         [TestMethod]
@@ -908,7 +895,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionStringWithEmptySource()
         {
             string source = string.Empty;
-            StubLogger.Log(EventType.Warning, "message", new Exception(), source);
+            Decorator.Log(EventType.Warning, "message", new Exception(), source);
         }
 
         [TestMethod]
