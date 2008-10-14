@@ -95,8 +95,8 @@ namespace CuttingEdge.Logging
             // Throw exception when null
             if (section == null)
             {
-                throw new ProviderException(SR.GetString(SR.LoggingSectionMissingFromConfigSettings, 
-                    SectionName));
+                throw new ProviderException(SR.GetString(SR.LoggingSectionMissingFromConfigSettings,
+                    typeof(LoggingSection).FullName, typeof(LoggingSection).Assembly.GetName().Name));
             }
 
             LoggingSection config = section as LoggingSection;
@@ -120,8 +120,10 @@ namespace CuttingEdge.Logging
 
             if (provider == null)
             {
+                PropertyInformation property = config.ElementInformation.Properties["defaultProvider"];
+
                 throw new ConfigurationErrorsException(SR.GetString(SR.NoDefaultLoggingProviderFound, 
-                    SectionName));
+                    SectionName), property.Source, property.LineNumber);
             }
 
             InitializeFallbackProviders(providerCollection);
