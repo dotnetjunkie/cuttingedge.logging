@@ -28,9 +28,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Configuration.Provider;
-using System.Globalization;
 using System.Reflection;
-using System.Text;
 using System.Web.Configuration;
 
 namespace CuttingEdge.Logging
@@ -152,10 +150,7 @@ namespace CuttingEdge.Logging
         /// a null reference (Nothing in VB).</exception>
         public static object Log(Exception exception)
         {
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-
-            string message = LoggingHelper.GetExceptionMessage(exception);
-            return ((ILogger)provider).Log(EventType.Error, message, null, exception);
+            return provider.Log(exception);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -168,10 +163,7 @@ namespace CuttingEdge.Logging
         /// a null reference (Nothing in VB) or the supplied <paramref name="message"/> is a null reference.</exception>
         public static object Log(string message, Exception exception)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-
-            return ((ILogger)provider).Log(EventType.Error, message, null, exception);
+            return provider.Log(message, exception);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -182,12 +174,7 @@ namespace CuttingEdge.Logging
         /// the <paramref name="source"/> are null references (Nothing in VB).</exception>
         public static object Log(Exception exception, MethodBase source)
         {
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-            LoggingHelper.ValidateSourceIsNotNull(source);
-
-            string message = LoggingHelper.GetExceptionMessage(exception);
-            string methodName = LoggingHelper.BuildMethodName(source);
-            return ((ILogger)provider).Log(EventType.Error, message, methodName, exception);
+            return provider.Log(exception, source);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -201,12 +188,7 @@ namespace CuttingEdge.Logging
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         public static object Log(string message, Exception exception, MethodBase source)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-            LoggingHelper.ValidateSourceIsNotNull(source);
-
-            string methodName = LoggingHelper.BuildMethodName(source);
-            return ((ILogger)provider).Log(EventType.Error, message, methodName, exception);
+            return provider.Log(message, exception, source);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -220,11 +202,7 @@ namespace CuttingEdge.Logging
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         public static object Log(string message, Exception exception, string source)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-            LoggingHelper.ValidateSourceNotNullOrEmpty(source);
-
-            return ((ILogger)provider).Log(EventType.Error, message, source, exception);
+            return provider.Log(message, exception, source);
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
@@ -241,13 +219,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(EventType type, string message, Exception exception, MethodBase source)
         {
-            LoggingHelper.ValidateTypeInValidRange(type);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-            LoggingHelper.ValidateSourceIsNotNull(source);
-
-            string methodName = LoggingHelper.BuildMethodName(source);
-            return ((ILogger)provider).Log(type, message, methodName, exception);
+            return provider.Log(type, message, exception, source);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -264,12 +236,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(EventType type, string message, Exception exception, string source)
         {
-            LoggingHelper.ValidateTypeInValidRange(type);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-            LoggingHelper.ValidateSourceNotNullOrEmpty(source);
-
-            return ((ILogger)provider).Log(type, message, source, exception);
+            return provider.Log(type, message, exception, source);
         }
 
         /// <summary>Logs an information event to the default <see cref="Provider"/>.</summary>
@@ -281,9 +248,7 @@ namespace CuttingEdge.Logging
         /// null reference.</exception>
         public static object Log(string message)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-
-            return ((ILogger)provider).Log(EventType.Information, message, null, null);
+            return provider.Log(message);
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
@@ -297,10 +262,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(EventType type, string message)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateTypeInValidRange(type);
-
-            return ((ILogger)provider).Log(type, message, null, null);
+            return provider.Log(type, message);
         }
 
         /// <summary>Logs an information event to the default <see cref="Provider"/>.</summary>
@@ -313,11 +275,7 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
         public static object Log(string message, MethodBase source)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateSourceIsNotNull(source);
-
-            string methodName = LoggingHelper.BuildMethodName(source);
-            return ((ILogger)provider).Log(EventType.Information, message, methodName, null);
+            return provider.Log(message, source);
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
@@ -333,12 +291,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(EventType type, string message, MethodBase source)
         {
-            LoggingHelper.ValidateTypeInValidRange(type);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateSourceIsNotNull(source);
-
-            string methodName = LoggingHelper.BuildMethodName(source);
-            return ((ILogger)provider).Log(type, message, methodName, null);
+            return provider.Log(type, message, source);
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
@@ -354,11 +307,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(EventType type, string message, string source)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateTypeInValidRange(type);
-            LoggingHelper.ValidateSourceNotNullOrEmpty(source);
-
-            return ((ILogger)provider).Log(type, message, source, null);
+            return provider.Log(type, message, source);
         }
 
         // The fallback providers must be initialized from within the this Logger class. It can't be done
