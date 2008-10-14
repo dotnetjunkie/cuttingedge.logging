@@ -115,7 +115,7 @@ namespace CuttingEdge.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The section &apos;{0}&apos; is missing from the &lt;configSections&gt; in the config file..
+        ///   Looks up a localized string similar to The Logger hasn&apos;t been configured properly. Please register the logger as &lt;section&gt; in the &lt;configSections&gt; of your configurations file as follows: &lt;configSections&gt;&lt;section name=&quot;logging&quot; type=&quot;{0}, {1}&quot; allowDefinition=&quot;MachineToApplication&quot; /&gt;&lt;/configSections&gt;..
         /// </summary>
         internal static string LoggingSectionMissingFromConfigSettings {
             get {
@@ -142,7 +142,7 @@ namespace CuttingEdge.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No default Logging provider was found in the &apos;{0}&apos; section of the the configuration&apos;s &lt;configSections&gt;..
+        ///   Looks up a localized string similar to No default Logging provider was found in the &lt;{0}&gt; section of the the configuration file or the &lt;{0}&gt; section was missing. Please provide a default provider as follows: &lt;{0} defaultProvider=&quot;[NameOfYourDefaultProvider]&quot;&gt;&lt;add name=&quot;[NameOfYourDefaultProvider]&quot; type=&quot;[ProviderType]&quot; /&gt;&lt;/{0}&gt;..
         /// </summary>
         internal static string NoDefaultLoggingProviderFound {
             get {

@@ -136,7 +136,7 @@
     <value>There was an error in the '{0}' section of the the configuration file. The given {1} with name '{2}' has a 'fallbackProvider' property with a value of '{3}'. No provider with that name could be found. The given fallbackProvider must be an item in the list of logging providers. Please check the configuration file for errors.</value>
   </data>
   <data name="LoggingSectionMissingFromConfigSettings" xml:space="preserve">
-    <value>The section '{0}' is missing from the &lt;configSections&gt; in the config file.</value>
+    <value>The Logger hasn't been configured properly. Please register the logger as &lt;section&gt; in the &lt;configSections&gt; of your configurations file as follows: &lt;configSections&gt;&lt;section name="logging" type="{0}, {1}" allowDefinition="MachineToApplication" /&gt;&lt;/configSections&gt;.</value>
   </data>
   <data name="MissingConnectionStringAttribute" xml:space="preserve">
     <value>Empty or missing connectionStringName attribute in provider '{0}' in config file.</value>
@@ -145,7 +145,7 @@
     <value>Missing connection string '{0}' in &lt;connectionStrings&gt; section of the config file.</value>
   </data>
   <data name="NoDefaultLoggingProviderFound" xml:space="preserve">
-    <value>No default Logging provider was found in the '{0}' section of the the configuration's &lt;configSections&gt;.</value>
+    <value>No default Logging provider was found in the &lt;{0}&gt; section of the the configuration file or the &lt;{0}&gt; section was missing. Please provide a default provider as follows: &lt;{0} defaultProvider="[NameOfYourDefaultProvider]"&gt;&lt;add name="[NameOfYourDefaultProvider]" type="[ProviderType]" /&gt;&lt;/{0}&gt;.</value>
   </data>
   <data name="ProviderParameterMustBeOfTypeX" xml:space="preserve">
     <value>The provider parameter must be of type {0}.</value>
