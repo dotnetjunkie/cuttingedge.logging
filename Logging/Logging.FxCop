@@ -71,25 +71,6 @@
           <Members>
            <Member Name="#.cctor()">
             <Messages>
-             <Message TypeName="DoNotRaiseExceptionsInUnexpectedLocations" Category="Microsoft.Design" CheckId="CA1065" Status="Excluded" Created="2008-10-12 19:30:09Z" FixCategory="NonBreaking">
-              <Issue Name="NoAllowedExceptions" Level="Error">
-               <Item>'Logger.Logger()'</Item>
-               <Item>'ConfigurationErrorsException'</Item>
-              </Issue>
-              <Issue Name="NoAllowedExceptions" Level="Error">
-               <Item>'Logger.Logger()'</Item>
-               <Item>'ProviderException'</Item>
-              </Issue>
-              <Issue Name="NoAllowedExceptions" Level="Error">
-               <Item>'Logger.Logger()'</Item>
-               <Item>'ProviderException'</Item>
-              </Issue>
-              <Notes>
-               <User Name="Steven">
-                <Note Id="1" />
-               </User>
-              </Notes>
-             </Message>
              <Message TypeName="InitializeReferenceTypeStaticFieldsInline" Category="Microsoft.Performance" CheckId="CA1810" Status="Excluded" Created="2008-10-12 19:30:09Z">
               <Issue>
                <Item>'Logger'</Item>
@@ -132,7 +113,6 @@
   <Notes>
    <User Name="Steven">
     <Note Id="0" Modified="2008-10-12 19:30:32Z">The static constructor must be used.</Note>
-    <Note Id="1" Modified="2008-10-12 19:30:43Z">Exceptions must be thrown from the static constructor when configuration errors exist.</Note>
     <Note Id="2" Modified="2008-10-12 19:30:57Z">This seems to be a bug in FxCop. The Clear() method is not declared virtual and is declared in a base type.</Note>
    </User>
   </Notes>
@@ -142,9 +122,6 @@
    </Rule>
    <Rule TypeName="DoNotDeclareVirtualMembersInSealedTypes" Category="Microsoft.Design" CheckId="CA1048">
     <Resolution Name="Default">'{0}' is a virtual member declared in a sealed type. Mark the member non-virtual or, if the type should be extensible, unseal it.</Resolution>
-   </Rule>
-   <Rule TypeName="DoNotRaiseExceptionsInUnexpectedLocations" Category="Microsoft.Design" CheckId="CA1065">
-    <Resolution Name="NoAllowedExceptions">{0} creates an exception of type {1}. Exceptions should not be raised in this type of method. If this exception instance might be raised, change this method's logic so it no longer raises an exception.</Resolution>
    </Rule>
    <Rule TypeName="InitializeReferenceTypeStaticFieldsInline" Category="Microsoft.Performance" CheckId="CA1810">
     <Resolution Name="Default">Initialize all static fields in {0} when those fields are declared and remove the explicit static constructor.</Resolution>
