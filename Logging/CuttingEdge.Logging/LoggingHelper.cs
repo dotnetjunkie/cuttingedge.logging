@@ -33,12 +33,11 @@ namespace CuttingEdge.Logging
             }
         }
 
-        internal static void ValidateTypeInValidRange(EventType type)
+        internal static void ValidateTypeInValidRange(LoggingEventType severity)
         {
-            int eventType = (int)type;
-            if (eventType < 0 || eventType > 2)
+            if (severity < LoggingEventType.Debug || severity > LoggingEventType.Critical)
             {
-                throw new InvalidEnumArgumentException("type", eventType, typeof(EventType));
+                throw new InvalidEnumArgumentException("severity", (int)severity, typeof(LoggingEventType));
             }
         }
 

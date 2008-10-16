@@ -1,26 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace CuttingEdge.Logging.UnitTests.Helpers
 {
-    internal sealed class EventTypeEnumerator
+    internal static class EventTypeEnumerator
     {
-        public static IEnumerable<EventType> GetValidValues()
+        public static readonly ReadOnlyCollection<LoggingEventType> ValidValues;
+
+        static EventTypeEnumerator()
         {
-            foreach (EventType type in Enum.GetValues(typeof(EventType)))
+            List<LoggingEventType> types = new List<LoggingEventType>();
+
+            foreach (LoggingEventType eventType in Enum.GetValues(typeof(LoggingEventType)))
             {
-                yield return type;
+                types.Add(eventType);
             }
+
+            ValidValues = new ReadOnlyCollection<LoggingEventType>(types.ToArray());
         }
 
-        public static IEnumerable<EventType> GetInvalidValues()
+        public static IEnumerable<LoggingEventType> GetValidValues()
+        {
+            return ValidValues;
+        }
+
+        public static IEnumerable<LoggingEventType> GetInvalidValues()
         {
             for (int i = -30; i < 30; i++)
             {
-                EventType type = (EventType)i;
+                LoggingEventType type = (LoggingEventType)i;
 
-                if (EventType.Error != type && EventType.Information != type &&
-                    EventType.Warning != type)
+                if (!ValidValues.Contains(type))
                 {
                     yield return type;
                 }

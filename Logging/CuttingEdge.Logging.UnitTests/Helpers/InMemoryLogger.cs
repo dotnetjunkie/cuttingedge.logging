@@ -73,7 +73,7 @@ namespace CuttingEdge.Logging.UnitTests.Helpers
         /// <exception cref="ArgumentNullException">Thrown when the given <paramref name="message"/> is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when the given <paramref name="message"/> is an empty string.</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when<paramref name="type"/> has an invalid value.</exception>
-        public object Log(EventType type, string message, string source, Exception exception)
+        public object Log(LoggingEventType type, string message, string source, Exception exception)
         {
             LoggingEvent loggingMessage = new LoggingEvent(type, message, source, exception);
             this.loggedMessages.Add(loggingMessage);

@@ -109,7 +109,7 @@ namespace CuttingEdge.Logging.UnitTests
 
                 Logger.Log(exception);
 
-                Assert.AreEqual(EventType.Error, scope.Logger.FirstLoggedEvent.Type);
+                Assert.AreEqual(LoggingEventType.Error, scope.Logger.FirstLoggedEvent.Type);
             }
         }
 
@@ -185,7 +185,7 @@ namespace CuttingEdge.Logging.UnitTests
             {
                 Logger.Log("message");
 
-                Assert.AreEqual(EventType.Information, scope.Logger.FirstLoggedEvent.Type);
+                Assert.AreEqual(LoggingEventType.Information, scope.Logger.FirstLoggedEvent.Type);
             }
         }
 
@@ -248,14 +248,14 @@ namespace CuttingEdge.Logging.UnitTests
             {
                 Logger.Log(new Exception(), MethodBase.GetCurrentMethod());
 
-                Assert.AreEqual(EventType.Error, scope.Logger.FirstLoggedEvent.Type);
+                Assert.AreEqual(LoggingEventType.Error, scope.Logger.FirstLoggedEvent.Type);
             }
         }
 
         [TestMethod]
         public void CanNotCallLogEventTypeMessageWithInvalidEventType()
         {
-            foreach (EventType type in EventTypeEnumerator.GetInvalidValues())
+            foreach (LoggingEventType type in EventTypeEnumerator.GetInvalidValues())
             {
                 try
                 {
@@ -274,7 +274,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMesssageWithNullMessage()
         {
             string message = null;
-            Logger.Log(EventType.Error, message);
+            Logger.Log(LoggingEventType.Error, message);
         }
 
         [TestMethod]
@@ -282,13 +282,13 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMesssageWithEmptyMessage()
         {
             string message = string.Empty;
-            Logger.Log(EventType.Error, message);
+            Logger.Log(LoggingEventType.Error, message);
         }
 
         [TestMethod]
         public void CanCallLogEventTypeMesssage()
         {
-            Logger.Log(EventType.Error, "Nice message.");
+            Logger.Log(LoggingEventType.Error, "Nice message.");
         }
 
         [TestMethod]
@@ -296,7 +296,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
             {
-                foreach (EventType type in Enum.GetValues(typeof(EventType)))
+                foreach (LoggingEventType type in Enum.GetValues(typeof(LoggingEventType)))
                 {
                     Logger.Log(type, "Nice message.");
 
@@ -310,11 +310,11 @@ namespace CuttingEdge.Logging.UnitTests
         {
             using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
             {
-                Logger.Log(EventType.Information, "Nice message.");
+                Logger.Log(LoggingEventType.Information, "Nice message.");
 
                 LoggingEvent e = scope.Logger.FirstLoggedEvent;
 
-                Assert.AreEqual(EventType.Information, e.Type);
+                Assert.AreEqual(LoggingEventType.Information, e.Type);
                 Assert.AreEqual("Nice message.", e.Message);
                 Assert.AreEqual(null, e.Exception);
                 Assert.AreEqual(null, e.Source);
@@ -363,7 +363,7 @@ namespace CuttingEdge.Logging.UnitTests
 
                 LoggingEvent e = scope.Logger.FirstLoggedEvent;
 
-                Assert.AreEqual(EventType.Error, e.Type);
+                Assert.AreEqual(LoggingEventType.Error, e.Type);
                 Assert.AreEqual("message", e.Message);
                 Assert.AreEqual(exception, e.Exception);
                 Assert.AreEqual(null, e.Source);
@@ -412,7 +412,7 @@ namespace CuttingEdge.Logging.UnitTests
 
                 LoggingEvent e = scope.Logger.FirstLoggedEvent;
 
-                Assert.AreEqual(EventType.Information, e.Type);
+                Assert.AreEqual(LoggingEventType.Information, e.Type);
                 Assert.AreEqual("message", e.Message);
                 Assert.AreEqual(null, e.Exception);
                 Assert.IsTrue(e.Source.Contains(method.Name));
@@ -423,7 +423,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageMethodBaseWithInvalidType()
         {
             MethodBase method = MethodBase.GetCurrentMethod();
-            foreach (EventType type in EventTypeEnumerator.GetInvalidValues())
+            foreach (LoggingEventType type in EventTypeEnumerator.GetInvalidValues())
             {
                 try
                 {
@@ -443,7 +443,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = null;
 
-            Logger.Log(EventType.Error, message, MethodBase.GetCurrentMethod());
+            Logger.Log(LoggingEventType.Error, message, MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -452,7 +452,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = String.Empty;
 
-            Logger.Log(EventType.Error, message, MethodBase.GetCurrentMethod());
+            Logger.Log(LoggingEventType.Error, message, MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -460,13 +460,13 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageMethodBaseWithNullSource()
         {
             MethodBase method = null;
-            Logger.Log(EventType.Error, "message", method);
+            Logger.Log(LoggingEventType.Error, "message", method);
         }
 
         [TestMethod]
         public void CanCallLogEventTypeMessageMethodBase()
         {
-            Logger.Log(EventType.Error, "message", MethodBase.GetCurrentMethod());
+            Logger.Log(LoggingEventType.Error, "message", MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -475,11 +475,11 @@ namespace CuttingEdge.Logging.UnitTests
             using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
             {
                 MethodBase method = MethodBase.GetCurrentMethod();
-                Logger.Log(EventType.Warning, "message", method);
+                Logger.Log(LoggingEventType.Warning, "message", method);
                 
                 LoggingEvent e = scope.Logger.FirstLoggedEvent;
 
-                Assert.AreEqual(EventType.Warning, e.Type);
+                Assert.AreEqual(LoggingEventType.Warning, e.Type);
                 Assert.AreEqual("message", e.Message);
                 Assert.AreEqual(null, e.Exception);
                 Assert.IsTrue(e.Source.Contains(method.Name));
@@ -489,14 +489,14 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void CanCallLogEventTypeMessageString()
         {
-            Logger.Log(EventType.Error, "message", "source");
+            Logger.Log(LoggingEventType.Error, "message", "source");
         }
 
         [TestMethod]
         public void CanNotCallLogEventTypeMessageStringWithInvalidType()
         {
             string source = "source";
-            foreach (EventType type in EventTypeEnumerator.GetInvalidValues())
+            foreach (LoggingEventType type in EventTypeEnumerator.GetInvalidValues())
             {
                 try
                 {
@@ -516,7 +516,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = null;
 
-            Logger.Log(EventType.Error, message, "source");
+            Logger.Log(LoggingEventType.Error, message, "source");
         }
 
         [TestMethod]
@@ -525,7 +525,7 @@ namespace CuttingEdge.Logging.UnitTests
         {
             string message = String.Empty;
 
-            Logger.Log(EventType.Error, message, "source");
+            Logger.Log(LoggingEventType.Error, message, "source");
         }
 
         [TestMethod]
@@ -533,7 +533,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageStringWithNullSource()
         {
             string source = null;
-            Logger.Log(EventType.Error, "message", source);
+            Logger.Log(LoggingEventType.Error, "message", source);
         }
 
         [TestMethod]
@@ -541,7 +541,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageStringWithEmptySource()
         {
             string source = string.Empty;
-            Logger.Log(EventType.Error, "message", source);
+            Logger.Log(LoggingEventType.Error, "message", source);
         }
 
         [TestMethod]
@@ -550,11 +550,11 @@ namespace CuttingEdge.Logging.UnitTests
             using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
             {
                 string source = "source";
-                Logger.Log(EventType.Warning, "message", source);
+                Logger.Log(LoggingEventType.Warning, "message", source);
 
                 LoggingEvent e = scope.Logger.FirstLoggedEvent;
 
-                Assert.AreEqual(EventType.Warning, e.Type);
+                Assert.AreEqual(LoggingEventType.Warning, e.Type);
                 Assert.AreEqual("message", e.Message);
                 Assert.AreEqual(null, e.Exception);
                 Assert.AreEqual(source, e.Source);
@@ -611,7 +611,7 @@ namespace CuttingEdge.Logging.UnitTests
 
                 LoggingEvent e = scope.Logger.FirstLoggedEvent;
 
-                Assert.AreEqual(EventType.Error, e.Type);
+                Assert.AreEqual(LoggingEventType.Error, e.Type);
                 Assert.AreEqual(message, e.Message);
                 Assert.AreEqual(exception, e.Exception);
                 Assert.IsTrue(e.Source.Contains(source.Name));
@@ -676,7 +676,7 @@ namespace CuttingEdge.Logging.UnitTests
 
                 LoggingEvent e = scope.Logger.FirstLoggedEvent;
 
-                Assert.AreEqual(EventType.Error, e.Type);
+                Assert.AreEqual(LoggingEventType.Error, e.Type);
                 Assert.AreEqual(message, e.Message);
                 Assert.AreEqual(exception, e.Exception);
                 Assert.IsTrue(e.Source.Contains(source.Name));
@@ -686,14 +686,14 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void CanCallEventTypeMessageExceptionMethodBase()
         {
-            Logger.Log(EventType.Warning, "message", new Exception(), MethodBase.GetCurrentMethod());
+            Logger.Log(LoggingEventType.Warning, "message", new Exception(), MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
         public void CanNotCallLogEventTypeMessageExceptionMethodBaseWithInvalidType()
         {
             MethodBase source = MethodBase.GetCurrentMethod();
-            foreach (EventType type in EventTypeEnumerator.GetInvalidValues())
+            foreach (LoggingEventType type in EventTypeEnumerator.GetInvalidValues())
             {
                 try
                 {
@@ -712,7 +712,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionMethodBaseWithNullMessage()
         {
             string message = null;
-            Logger.Log(EventType.Warning, message, new Exception(), MethodBase.GetCurrentMethod());
+            Logger.Log(LoggingEventType.Warning, message, new Exception(), MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -720,7 +720,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionMethodBaseWithEmptyMessage()
         {
             string message = string.Empty;
-            Logger.Log(EventType.Warning, message, new Exception(), MethodBase.GetCurrentMethod());
+            Logger.Log(LoggingEventType.Warning, message, new Exception(), MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -728,7 +728,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionMethodBaseWithNullException()
         {
             Exception exception = null;
-            Logger.Log(EventType.Warning, "message", exception, MethodBase.GetCurrentMethod());
+            Logger.Log(LoggingEventType.Warning, "message", exception, MethodBase.GetCurrentMethod());
         }
 
         [TestMethod]
@@ -736,7 +736,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionMethodBaseWithNullSource()
         {
             MethodBase source = null;
-            Logger.Log(EventType.Warning, "message", new Exception(), source);
+            Logger.Log(LoggingEventType.Warning, "message", new Exception(), source);
         }
 
         [TestMethod]
@@ -747,11 +747,11 @@ namespace CuttingEdge.Logging.UnitTests
                 Exception exception = new Exception();
                 MethodBase source = MethodBase.GetCurrentMethod();
 
-                Logger.Log(EventType.Warning, "message", exception, source);
+                Logger.Log(LoggingEventType.Warning, "message", exception, source);
 
                 LoggingEvent e = scope.Logger.FirstLoggedEvent;
 
-                Assert.AreEqual(EventType.Warning, e.Type);
+                Assert.AreEqual(LoggingEventType.Warning, e.Type);
                 Assert.AreEqual("message", e.Message);
                 Assert.AreEqual(exception, e.Exception);
                 Assert.IsTrue(e.Source.Contains(source.Name));
@@ -761,14 +761,14 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void CanCallEventTypeMessageExceptionString()
         {
-            Logger.Log(EventType.Warning, "message", new Exception(), "source");
+            Logger.Log(LoggingEventType.Warning, "message", new Exception(), "source");
         }
 
         [TestMethod]
         public void CanNotCallLogEventTypeMessageExceptionStringWithInvalidType()
         {
             string source = "source";
-            foreach (EventType type in EventTypeEnumerator.GetInvalidValues())
+            foreach (LoggingEventType type in EventTypeEnumerator.GetInvalidValues())
             {
                 try
                 {
@@ -787,7 +787,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionStringWithNullMessage()
         {
             string message = null;
-            Logger.Log(EventType.Warning, message, new Exception(), "source");
+            Logger.Log(LoggingEventType.Warning, message, new Exception(), "source");
         }
 
         [TestMethod]
@@ -795,7 +795,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionStringWithEmptyMessage()
         {
             string message = string.Empty;
-            Logger.Log(EventType.Warning, message, new Exception(), "source");
+            Logger.Log(LoggingEventType.Warning, message, new Exception(), "source");
         }
 
         [TestMethod]
@@ -803,7 +803,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionStringWithNullException()
         {
             Exception exception = null;
-            Logger.Log(EventType.Warning, "message", exception, "source");
+            Logger.Log(LoggingEventType.Warning, "message", exception, "source");
         }
 
         [TestMethod]
@@ -811,7 +811,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionStringWithNullSource()
         {
             string source = null;
-            Logger.Log(EventType.Warning, "message", new Exception(), source);
+            Logger.Log(LoggingEventType.Warning, "message", new Exception(), source);
         }
 
         [TestMethod]
@@ -819,7 +819,7 @@ namespace CuttingEdge.Logging.UnitTests
         public void CanNotCallLogEventTypeMessageExceptionStringWithEmptySource()
         {
             string source = string.Empty;
-            Logger.Log(EventType.Warning, "message", new Exception(), source);
+            Logger.Log(LoggingEventType.Warning, "message", new Exception(), source);
         }
 
         [TestMethod]
@@ -829,11 +829,11 @@ namespace CuttingEdge.Logging.UnitTests
             {
                 Exception exception = new Exception();
 
-                Logger.Log(EventType.Warning, "message", exception, "source");
+                Logger.Log(LoggingEventType.Warning, "message", exception, "source");
 
                 LoggingEvent e = scope.Logger.FirstLoggedEvent;
 
-                Assert.AreEqual(EventType.Warning, e.Type);
+                Assert.AreEqual(LoggingEventType.Warning, e.Type);
                 Assert.AreEqual("message", e.Message);
                 Assert.AreEqual(exception, e.Exception);
                 Assert.AreEqual("source", e.Source);

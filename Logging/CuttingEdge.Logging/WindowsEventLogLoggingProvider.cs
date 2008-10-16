@@ -124,15 +124,15 @@ namespace CuttingEdge.Logging
         /// <summary>
         /// Implements the functionality to log the event.
         /// </summary>
-        /// <param name="type">The <see cref="EventType"/> of the event.</param>
+        /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
         /// <param name="source">An optional source where the event occured.</param>
         /// <returns>The id of the logged event or null when an id is inappropriate.</returns>
-        protected override object LogInternal(EventType type, string message, Exception exception, 
+        protected override object LogInternal(LoggingEventType severity, string message, Exception exception, 
             string source)
         {
-            EventLogEntryType entry = ConvertToEventLogEntry(type);
+            EventLogEntryType? entry = ConvertToEventLogEntry(severity);
 
             using (EventLog eventLog = new EventLog(this.logName))
             {
@@ -154,27 +154,40 @@ namespace CuttingEdge.Logging
 
                 eventLog.Source = this.source;
 
-                eventLog.WriteEntry(message, entry);
+                if (entry != null)
+                {
+                    eventLog.WriteEntry(message, entry.Value);
+                }
+                else
+                {
+                    eventLog.WriteEntry(message);
+                }
             }
 
             return 0;
         }
 
-        private static EventLogEntryType ConvertToEventLogEntry(EventType type)
+        private static EventLogEntryType? ConvertToEventLogEntry(LoggingEventType severity)
         {
-            switch (type)
+            switch (severity)
             {
-                case EventType.Error:
+                case LoggingEventType.Critical:
                     return EventLogEntryType.Error;
 
-                case EventType.Warning:
+                case LoggingEventType.Error:
+                    return EventLogEntryType.Error;
+
+                case LoggingEventType.Warning:
                     return EventLogEntryType.Warning;
 
-                case EventType.Information:
+                case LoggingEventType.Information:
                     return EventLogEntryType.Information;
 
+                case LoggingEventType.Debug:
+                    return null;
+
                 default:
-                    throw new InvalidEnumArgumentException("type", (int)type, typeof(EventType));
+                    throw new InvalidEnumArgumentException("severity", (int)severity, typeof(LoggingEventType));
             }
         }
     }

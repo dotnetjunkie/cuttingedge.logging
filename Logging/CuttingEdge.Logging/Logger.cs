@@ -208,7 +208,7 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
-        /// <param name="type">The <see cref="EventType"/> of the event.</param>
+        /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
         /// <param name="source">A source where the event occured.</param>
@@ -219,13 +219,13 @@ namespace CuttingEdge.Logging
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
-        public static object Log(EventType type, string message, Exception exception, MethodBase source)
+        public static object Log(LoggingEventType severity, string message, Exception exception, MethodBase source)
         {
-            return provider.Log(type, message, exception, source);
+            return provider.Log(severity, message, exception, source);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
-        /// <param name="type">The <see cref="EventType"/> of the event.</param>
+        /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
         /// <param name="source">A source where the event occured.</param>
@@ -236,9 +236,9 @@ namespace CuttingEdge.Logging
         /// <paramref name="exception"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
-        public static object Log(EventType type, string message, Exception exception, string source)
+        public static object Log(LoggingEventType severity, string message, Exception exception, string source)
         {
-            return provider.Log(type, message, exception, source);
+            return provider.Log(severity, message, exception, source);
         }
 
         /// <summary>Logs an information event to the default <see cref="Provider"/>.</summary>
@@ -254,7 +254,7 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
-        /// <param name="type">The <see cref="EventType"/> of the event.</param>
+        /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <returns>The id of the logged event or null when an id is inappropriate for the current logging provider.</returns>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="message"/> is
@@ -262,9 +262,9 @@ namespace CuttingEdge.Logging
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/> is a null reference.</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
-        public static object Log(EventType type, string message)
+        public static object Log(LoggingEventType severity, string message)
         {
-            return provider.Log(type, message);
+            return provider.Log(severity, message);
         }
 
         /// <summary>Logs an information event to the default <see cref="Provider"/>.</summary>
@@ -281,7 +281,7 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
-        /// <param name="type">The <see cref="EventType"/> of the event.</param>
+        /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="source">A source where the event occured.</param>
         /// <returns>The id of the logged event or null when an id is inappropriate for the current logging provider.</returns>
@@ -291,13 +291,13 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
-        public static object Log(EventType type, string message, MethodBase source)
+        public static object Log(LoggingEventType severity, string message, MethodBase source)
         {
-            return provider.Log(type, message, source);
+            return provider.Log(severity, message, source);
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
-        /// <param name="type">The <see cref="EventType"/> of the event.</param>
+        /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="source">A source where the event occured.</param>
         /// <returns>The id of the logged event or null when an id is inappropriate for the current logging provider.</returns>
@@ -307,9 +307,9 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
-        public static object Log(EventType type, string message, string source)
+        public static object Log(LoggingEventType severity, string message, string source)
         {
-            return provider.Log(type, message, source);
+            return provider.Log(severity, message, source);
         }
 
         // The fallback providers must be initialized from within the this Logger class. It can't be done

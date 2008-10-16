@@ -108,13 +108,19 @@ ALTER TABLE [dbo].[logging_Events] CHECK CONSTRAINT [FK_logging_Events_logging_E
 
 
 INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
-VALUES (0, 'Error', 'An error event. This indicates a significant problem the user should know about; usually a loss of functionality or data.')
+VALUES (0, 'Debug', 'A debug event. This indicates a verbose event, usefull during development.')
 
 INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
-VALUES (1, 'Warning', 'A warning event. This indicates a problem that is not immediately significant, but that may signify conditions that could cause future problems.')
+VALUES (1, 'Information', 'An information event. This indicates a significant, successful operation.')
 
 INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
-VALUES (2, 'Information', 'An information event. This indicates a significant, successful operation.')
+VALUES (2, 'Warning', 'A warning event. This indicates a problem that is not immediately significant, but that may signify conditions that could cause future problems.')
+
+INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
+VALUES (3, 'Error', 'An error event. This indicates a significant problem the user should know about; usually a loss of functionality or data.')
+
+INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
+VALUES (4, 'Critical', 'A critical event. This indicates a fatal error or application crash.')
 
 
 COMMIT
