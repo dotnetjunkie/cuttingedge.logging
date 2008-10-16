@@ -86,63 +86,65 @@ namespace CuttingEdge.Logging
         private static readonly LoggingProviderCollection providerCollection;
         private static readonly LoggingProviderBase provider;
 
+        // When the initialization of the Logger class failed, this field will have a non-null value.
+        private static readonly Exception InitializationException;
+
         /// <summary>Initializes static members of the Logger class.</summary>
         static Logger()
         {
-            // Get the feature's configuration info
-            object section = ConfigurationManager.GetSection(SectionName);
-
-            // Throw exception when null
-            if (section == null)
+            try
             {
-                throw new ProviderException(SR.GetString(SR.LoggingSectionMissingFromConfigSettings,
-                    typeof(LoggingSection).FullName, typeof(LoggingSection).Assembly.GetName().Name));
+                LoggingSection loggingSection = GetLoggingSection();
+
+                LoggingProviderCollection loggingProviders = LoadProviderCollection(loggingSection);
+
+                LoggingProviderBase defaultProvider = GetDefaultProvider(loggingSection, loggingProviders);
+
+                InitializeFallbackProviders(loggingProviders);
+
+                ValidateProviders(loggingProviders);
+
+                Logger.providerCollection = loggingProviders;
+                Logger.provider = defaultProvider;
             }
-
-            LoggingSection config = section as LoggingSection;
-
-            // Throw exception when invalid cast
-            if (config == null)
+            catch (ProviderException pex)
             {
-                throw new ProviderException(SR.GetString(SR.SectionIsNotOfCorrectType, SectionName, 
-                    typeof(LoggingSection).FullName, section.GetType().FullName));
+                InitializationException = pex;
             }
-
-            // Instantiate the providers
-            providerCollection = new LoggingProviderCollection();
-
-            ProvidersHelper.InstantiateProviders(config.Providers, providerCollection,
-                typeof(LoggingProviderBase));
-
-            providerCollection.SetReadOnly();
-
-            provider = providerCollection[config.DefaultProvider];
-
-            if (provider == null)
+            catch (ConfigurationErrorsException ceex)
             {
-                PropertyInformation property = config.ElementInformation.Properties["defaultProvider"];
-
-                throw new ConfigurationErrorsException(SR.GetString(SR.NoDefaultLoggingProviderFound, 
-                    SectionName), property.Source, property.LineNumber);
+                InitializationException = ceex;
             }
-
-            InitializeFallbackProviders(providerCollection);
-
-            ValidateProviders(providerCollection);
         }
 
         /// <summary>Gets the default configured <see cref="LoggingProviderBase"/> instance.</summary>
         /// <value>The provider.</value>
         public static LoggingProviderBase Provider
         {
-            get { return provider; }
+            get
+            {
+                if (Logger.InitializationException != null)
+                {
+                    throw InitializationException;
+                }
+
+                return provider;
+            }
         }
 
         /// <summary>Gets the collection of configured <see cref="LoggingProviderBase"/> instances.</summary>
         /// <value>The providers.</value>
         public static LoggingProviderCollection Providers
         {
-            get { return providerCollection; }
+            get
+            {
+                if (Logger.InitializationException != null)
+                {
+                    throw InitializationException;
+                }
+
+                return providerCollection;
+            }
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -152,7 +154,7 @@ namespace CuttingEdge.Logging
         /// a null reference (Nothing in VB).</exception>
         public static object Log(Exception exception)
         {
-            return provider.Log(exception);
+            return Logger.Provider.Log(exception);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -165,7 +167,7 @@ namespace CuttingEdge.Logging
         /// a null reference (Nothing in VB) or the supplied <paramref name="message"/> is a null reference.</exception>
         public static object Log(string message, Exception exception)
         {
-            return provider.Log(message, exception);
+            return Logger.Provider.Log(message, exception);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -176,7 +178,7 @@ namespace CuttingEdge.Logging
         /// the <paramref name="source"/> are null references (Nothing in VB).</exception>
         public static object Log(Exception exception, MethodBase source)
         {
-            return provider.Log(exception, source);
+            return Logger.Provider.Log(exception, source);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -190,7 +192,7 @@ namespace CuttingEdge.Logging
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         public static object Log(string message, Exception exception, MethodBase source)
         {
-            return provider.Log(message, exception, source);
+            return Logger.Provider.Log(message, exception, source);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -204,7 +206,7 @@ namespace CuttingEdge.Logging
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         public static object Log(string message, Exception exception, string source)
         {
-            return provider.Log(message, exception, source);
+            return Logger.Provider.Log(message, exception, source);
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
@@ -221,7 +223,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(LoggingEventType severity, string message, Exception exception, MethodBase source)
         {
-            return provider.Log(severity, message, exception, source);
+            return Logger.Provider.Log(severity, message, exception, source);
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
@@ -238,7 +240,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(LoggingEventType severity, string message, Exception exception, string source)
         {
-            return provider.Log(severity, message, exception, source);
+            return Logger.Provider.Log(severity, message, exception, source);
         }
 
         /// <summary>Logs an information event to the default <see cref="Provider"/>.</summary>
@@ -250,7 +252,7 @@ namespace CuttingEdge.Logging
         /// null reference.</exception>
         public static object Log(string message)
         {
-            return provider.Log(message);
+            return Logger.Provider.Log(message);
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
@@ -264,7 +266,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(LoggingEventType severity, string message)
         {
-            return provider.Log(severity, message);
+            return Logger.Provider.Log(severity, message);
         }
 
         /// <summary>Logs an information event to the default <see cref="Provider"/>.</summary>
@@ -277,7 +279,7 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
         public static object Log(string message, MethodBase source)
         {
-            return provider.Log(message, source);
+            return Logger.Provider.Log(message, source);
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
@@ -293,7 +295,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(LoggingEventType severity, string message, MethodBase source)
         {
-            return provider.Log(severity, message, source);
+            return Logger.Provider.Log(severity, message, source);
         }
 
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
@@ -309,7 +311,59 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public static object Log(LoggingEventType severity, string message, string source)
         {
-            return provider.Log(severity, message, source);
+            return Logger.Provider.Log(severity, message, source);
+        }
+
+        private static LoggingSection GetLoggingSection()
+        {
+            // Get the feature's configuration info
+            object section = ConfigurationManager.GetSection(SectionName);
+
+            // Throw exception when null
+            if (section == null)
+            {
+                throw new ProviderException(SR.GetString(SR.LoggingSectionMissingFromConfigSettings,
+                    typeof(LoggingSection).FullName, typeof(LoggingSection).Assembly.GetName().Name));
+            }
+
+            LoggingSection config = section as LoggingSection;
+
+            // Throw exception when invalid cast
+            if (config == null)
+            {
+                throw new ProviderException(SR.GetString(SR.SectionIsNotOfCorrectType, SectionName,
+                    typeof(LoggingSection).FullName, section.GetType().FullName));
+            }
+
+            return config;
+        }
+
+        private static LoggingProviderCollection LoadProviderCollection(LoggingSection loggingSection)
+        {
+            LoggingProviderCollection providerCollection = new LoggingProviderCollection();
+
+            ProvidersHelper.InstantiateProviders(loggingSection.Providers, providerCollection,
+                typeof(LoggingProviderBase));
+
+            providerCollection.SetReadOnly();
+
+            return providerCollection;
+        }
+
+        private static LoggingProviderBase GetDefaultProvider(LoggingSection loggingSection,
+            LoggingProviderCollection providerCollection)
+        {
+            LoggingProviderBase defaultProvider = providerCollection[loggingSection.DefaultProvider];
+
+            if (defaultProvider == null)
+            {
+                PropertyInformation property = loggingSection.ElementInformation.Properties["defaultProvider"];
+
+                throw new ConfigurationErrorsException(SR.GetString(SR.NoDefaultLoggingProviderFound,
+                    SectionName), property.Source, property.LineNumber);
+            }
+
+            return defaultProvider;
         }
 
         // The fallback providers must be initialized from within the this Logger class. It can't be done
