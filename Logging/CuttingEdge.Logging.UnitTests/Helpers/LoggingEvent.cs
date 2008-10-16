@@ -7,7 +7,7 @@ namespace CuttingEdge.Logging.UnitTests.Helpers
     /// <summary>A logging event.</summary>
     internal sealed class LoggingEvent
     {
-        internal LoggingEvent(EventType type, string message, string source, Exception exception)
+        internal LoggingEvent(LoggingEventType type, string message, string source, Exception exception)
         {
             this.Type = type;
             this.Message = message;
@@ -15,7 +15,7 @@ namespace CuttingEdge.Logging.UnitTests.Helpers
             this.Exception = exception;
         }
 
-        internal EventType Type { get; private set; }
+        internal LoggingEventType Type { get; private set; }
 
         internal string Message { get; private set; }
 

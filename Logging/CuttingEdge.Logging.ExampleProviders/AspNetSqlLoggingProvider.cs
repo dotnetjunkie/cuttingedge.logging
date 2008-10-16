@@ -85,7 +85,7 @@ namespace CuttingEdge.Logging.ExampleProviders
         /// The database's primary key of the saved event.
         /// </returns>
         protected override int SaveEventToDatabase(SqlTransaction transaction, 
-            EventType type, string message, string source)
+            LoggingEventType type, string message, string source)
         {
             RequestLogData requestLogData = 
                 new RequestLogData(HttpContext.Current, this.logQueryString, this.logFormData);

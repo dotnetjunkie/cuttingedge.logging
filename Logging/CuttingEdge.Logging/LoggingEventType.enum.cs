@@ -28,23 +28,33 @@ namespace CuttingEdge.Logging
     /// <summary>
     /// The type of the event.
     /// </summary>
-    public enum EventType
+    public enum LoggingEventType
     {
         /// <summary>
-        /// An error event. This indicates a significant problem the user should know about; usually a loss of
-        /// functionality or data.
+        /// A debug event. This indicates a verbose event, usefull during development.
         /// </summary>
-        Error = 0,
+        Debug = 0,
+
+        /// <summary>
+        /// An information event. This indicates a significant, successful operation.
+        /// </summary>
+        Information = 1,
 
         /// <summary>
         /// A warning event. This indicates a problem that is not immediately significant, but that may 
         /// signify conditions that could cause future problems.
         /// </summary>
-        Warning = 1,
+        Warning = 2,
 
         /// <summary>
-        /// An information event. This indicates a significant, successful operation.
+        /// An error event. This indicates a significant problem the user should know about; usually a loss of
+        /// functionality or data.
         /// </summary>
-        Information = 2,
+        Error = 3,
+
+        /// <summary>
+        /// A critical event. This indicates a fatal error or application crash.
+        /// </summary>
+        Critical = 4,
     }
 }

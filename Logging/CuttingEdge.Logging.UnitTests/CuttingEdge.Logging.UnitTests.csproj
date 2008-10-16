@@ -51,7 +51,7 @@
     <Compile Include="LoggerWrapperTests.cs" />
     <Compile Include="LoggingProviderBaseTests.cs" />
     <Compile Include="Helpers\LoggingProviderTestingScope.cs" />
-    <Compile Include="EventTypeTests.cs" />
+    <Compile Include="LoggingEventTypeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LoggerTests.cs" />
     <Compile Include="Helpers\UnitTestingLoggingProvider.cs" />

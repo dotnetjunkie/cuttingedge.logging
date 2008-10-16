@@ -58,7 +58,7 @@
     <Compile Include="LoggingProviderBase.cs" />
     <Compile Include="LoggingProviderCollection.cs" />
     <Compile Include="LoggingSection.cs" />
-    <Compile Include="EventType.enum.cs" />
+    <Compile Include="LoggingEventType.enum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlLoggingProvider.cs" />
     <Compile Include="SR.cs" />

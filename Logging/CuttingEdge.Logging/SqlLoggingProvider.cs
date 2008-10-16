@@ -112,12 +112,12 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>Implements the functionality to log the event.</summary>
-        /// <param name="type">The <see cref="EventType"/> of the event.</param>
+        /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
         /// <param name="source">An optional source where the event occured.</param>
         /// <returns>The id of the logged event or null when an id is inappropriate.</returns>
-        protected override object LogInternal(EventType type, string message, Exception exception, 
+        protected override object LogInternal(LoggingEventType severity, string message, Exception exception, 
             string source)
         {
             using (SqlConnection connection = new SqlConnection(this.ConnectionString))
@@ -127,7 +127,7 @@ namespace CuttingEdge.Logging
                 using (SqlTransaction transaction = connection.BeginTransaction())
                 {
                     // Log the message
-                    int eventId = this.SaveEventToDatabase(transaction, type, message, source);
+                    int eventId = this.SaveEventToDatabase(transaction, severity, message, source);
 
                     this.SaveExceptionChainToDatabase(transaction, exception, eventId);
 
@@ -144,7 +144,7 @@ namespace CuttingEdge.Logging
         /// <param name="message">The message.</param>
         /// <param name="source">The source.</param>
         /// <returns>The database's primary key of the saved event.</returns>
-        protected virtual int SaveEventToDatabase(SqlTransaction transaction, EventType type, 
+        protected virtual int SaveEventToDatabase(SqlTransaction transaction, LoggingEventType type, 
             string message, string source)
         {
             using (SqlCommand command =

@@ -120,7 +120,9 @@ namespace CuttingEdge.Logging
             LoggingHelper.ValidateExceptionIsNotNull(exception);
 
             string message = LoggingHelper.GetExceptionMessage(exception);
-            return ((ILogger)this).Log(EventType.Error, message, null, exception);
+
+            ILogger logger = this;
+            return logger.Log(LoggingEventType.Error, message, null, exception);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -136,7 +138,8 @@ namespace CuttingEdge.Logging
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateExceptionIsNotNull(exception);
 
-            return ((ILogger)this).Log(EventType.Error, message, null, exception);
+            ILogger logger = this;
+            return logger.Log(LoggingEventType.Error, message, null, exception);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -152,7 +155,9 @@ namespace CuttingEdge.Logging
 
             string message = LoggingHelper.GetExceptionMessage(exception);
             string methodName = LoggingHelper.BuildMethodName(source);
-            return ((ILogger)this).Log(EventType.Error, message, methodName, exception);
+
+            ILogger logger = this;
+            return logger.Log(LoggingEventType.Error, message, methodName, exception);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -171,7 +176,9 @@ namespace CuttingEdge.Logging
             LoggingHelper.ValidateSourceIsNotNull(source);
 
             string methodName = LoggingHelper.BuildMethodName(source);
-            return ((ILogger)this).Log(EventType.Error, message, methodName, exception);
+
+            ILogger logger = this;
+            return logger.Log(LoggingEventType.Error, message, methodName, exception);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -189,11 +196,12 @@ namespace CuttingEdge.Logging
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 
-            return ((ILogger)this).Log(EventType.Error, message, source, exception);
+            ILogger logger = this;
+            return logger.Log(LoggingEventType.Error, message, source, exception);
         }
 
         /// <summary>Logs an event.</summary>
-        /// <param name="type">The <see cref="EventType"/> of the event.</param>
+        /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
         /// <param name="source">A source where the event occured.</param>
@@ -204,19 +212,21 @@ namespace CuttingEdge.Logging
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
-        public object Log(EventType type, string message, Exception exception, MethodBase source)
+        public object Log(LoggingEventType severity, string message, Exception exception, MethodBase source)
         {
-            LoggingHelper.ValidateTypeInValidRange(type);
+            LoggingHelper.ValidateTypeInValidRange(severity);
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceIsNotNull(source);
 
             string methodName = LoggingHelper.BuildMethodName(source);
-            return ((ILogger)this).Log(type, message, methodName, exception);
+
+            ILogger logger = this;
+            return logger.Log(severity, message, methodName, exception);
         }
 
         /// <summary>Logs an error event.</summary>
-        /// <param name="type">The <see cref="EventType"/> of the event.</param>
+        /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
         /// <param name="source">A source where the event occured.</param>
@@ -227,14 +237,15 @@ namespace CuttingEdge.Logging
         /// <paramref name="exception"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
-        public object Log(EventType type, string message, Exception exception, string source)
+        public object Log(LoggingEventType severity, string message, Exception exception, string source)
         {
-            LoggingHelper.ValidateTypeInValidRange(type);
+            LoggingHelper.ValidateTypeInValidRange(severity);
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 
-            return ((ILogger)this).Log(type, message, source, exception);
+            ILogger logger = this;
+            return logger.Log(severity, message, source, exception);
         }
 
         /// <summary>Logs an information event.</summary>
@@ -248,11 +259,12 @@ namespace CuttingEdge.Logging
         {
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
 
-            return ((ILogger)this).Log(EventType.Information, message, null, null);
+            ILogger logger = this;
+            return logger.Log(LoggingEventType.Information, message, null, null);
         }
 
         /// <summary>Logs an event.</summary>
-        /// <param name="type">The <see cref="EventType"/> of the event.</param>
+        /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="message"/> is
@@ -260,12 +272,13 @@ namespace CuttingEdge.Logging
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/> is a null reference.</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
-        public object Log(EventType type, string message)
+        public object Log(LoggingEventType severity, string message)
         {
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateTypeInValidRange(type);
+            LoggingHelper.ValidateTypeInValidRange(severity);
 
-            return ((ILogger)this).Log(type, message, null, null);
+            ILogger logger = this;
+            return logger.Log(severity, message, null, null);
         }
 
         /// <summary>Logs an information event.</summary>
@@ -282,11 +295,13 @@ namespace CuttingEdge.Logging
             LoggingHelper.ValidateSourceIsNotNull(source);
 
             string methodName = LoggingHelper.BuildMethodName(source);
-            return ((ILogger)this).Log(EventType.Information, message, methodName, null);
+
+            ILogger logger = this;
+            return logger.Log(LoggingEventType.Information, message, methodName, null);
         }
 
         /// <summary>Logs an event.</summary>
-        /// <param name="type">The <see cref="EventType"/> of the event.</param>
+        /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="source">A source where the event occured.</param>
         /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
@@ -296,18 +311,20 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
-        public object Log(EventType type, string message, MethodBase source)
+        public object Log(LoggingEventType severity, string message, MethodBase source)
         {
-            LoggingHelper.ValidateTypeInValidRange(type);
+            LoggingHelper.ValidateTypeInValidRange(severity);
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateSourceIsNotNull(source);
 
             string methodName = LoggingHelper.BuildMethodName(source);
-            return ((ILogger)this).Log(type, message, methodName, null);
+
+            ILogger logger = this;
+            return logger.Log(severity, message, methodName, null);
         }
 
         /// <summary>Logs an event.</summary>
-        /// <param name="type">The <see cref="EventType"/> of the event.</param>
+        /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="source">A source where the event occured.</param>
         /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
@@ -317,13 +334,14 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
-        public object Log(EventType type, string message, string source)
+        public object Log(LoggingEventType severity, string message, string source)
         {
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateTypeInValidRange(type);
+            LoggingHelper.ValidateTypeInValidRange(severity);
             LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 
-            return ((ILogger)this).Log(type, message, source, null);
+            ILogger logger = this;
+            return logger.Log(severity, message, source, null);
         }
 
         /// <summary>Adds a event to the log. When logging fails, the event is forwarded to the
@@ -338,7 +356,7 @@ namespace CuttingEdge.Logging
         /// <exception cref="ArgumentNullException">Thrown when the given <paramref name="message"/> is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when the given <paramref name="message"/> is an empty string.</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when<paramref name="type"/> has an invalid value.</exception>
-        object ILogger.Log(EventType type, string message, string source, Exception exception)
+        object ILogger.Log(LoggingEventType type, string message, string source, Exception exception)
         {
             LoggingHelper.ValidateTypeInValidRange(type);
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
@@ -368,12 +386,12 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>Implements the functionality to log the event.</summary>
-        /// <param name="type">The <see cref="EventType"/> of the event.</param>
+        /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
         /// <param name="source">An optional source where the event occured.</param>
         /// <returns>The id of the logged event or null when an id is inappropriate.</returns>
-        protected abstract object LogInternal(EventType type, string message, Exception exception, 
+        protected abstract object LogInternal(LoggingEventType severity, string message, Exception exception, 
             string source);
 
         private static void CheckForUnrecognizedAttributes(string name, NameValueCollection config)
@@ -400,7 +418,7 @@ namespace CuttingEdge.Logging
             // We don't throw an exception when there is no provider, because this attribute is optional.
         }
 
-        private void LogToFallbackProvider(EventType type, string message, string source, Exception exception)
+        private void LogToFallbackProvider(LoggingEventType type, string message, string source, Exception exception)
         {
             ILogger fallbackProvider = this.FallbackProvider;
             fallbackProvider.Log(type, message, source, exception);
@@ -409,8 +427,9 @@ namespace CuttingEdge.Logging
         private void LogProviderFailureToFallbackProvider(Exception exception)
         {
             string failureMessage = SR.GetString(SR.EventCouldNotBeLoggedWithX, this.GetType().Name);
+
             ILogger fallbackProvider = this.FallbackProvider;
-            fallbackProvider.Log(EventType.Error, failureMessage, this.GetType().FullName, exception);
+            fallbackProvider.Log(LoggingEventType.Error, failureMessage, this.GetType().FullName, exception);
         }
     }
 }
