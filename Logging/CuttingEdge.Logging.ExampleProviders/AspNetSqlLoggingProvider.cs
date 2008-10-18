@@ -60,18 +60,28 @@ namespace CuttingEdge.Logging.ExampleProviders
             get { return this.logFormData; }
         }
 
-        /// <summary>Overridden from base.</summary>
+        /// <summary>Initializes the provider.</summary>
         /// <param name="name">The friendly name of the provider.</param>
-        /// <param name="config">A collection of the name/value pairs representing the provider-specific 
+        /// <param name="config">A collection of the name/value pairs representing the provider-specific
         /// attributes specified in the configuration for this provider.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="config"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when the name of the provider has a length of zero.</exception>
+        /// <exception cref="InvalidOperationException">Thrown wen an attempt is made to call Initialize on a
+        /// provider after the provider has already been initialized.</exception>
+        /// <exception cref="ProviderException">Thrown when the <paramref name="config"/> contains
+        /// unrecognized attributes or when the connectionStringName attribute is not configured properly.</exception>
         public override void Initialize(string name, NameValueCollection config)
         {
+            if (config == null)
+            {
+                throw new ArgumentNullException("config");
+            }
+
             this.logQueryString = ParseBoolConfigValue(name, "logQueryString", config["logQueryString"], true);
             this.logFormData = ParseBoolConfigValue(name, "logFormData", config["logFormData"], false);
 
             config.Remove("logQueryString");
             config.Remove("logFormData");
-            config.Remove("applicationName");
 
             base.Initialize(name, config);
         }

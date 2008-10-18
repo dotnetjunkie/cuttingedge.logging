@@ -46,6 +46,25 @@ namespace CuttingEdge.Logging.UnitTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void ProviderCanOnlyBeInitializedOnce()
+        {
+            StubLoggingProvider provider = new StubLoggingProvider();
+
+            try
+            {
+                provider.Initialize(null, new NameValueCollection());
+            }
+            catch
+            {
+                Assert.Fail("First initialization should succeed.");
+            }
+
+            // This one should fail.
+            provider.Initialize(null, new NameValueCollection());
+        }
+
+        [TestMethod]
         public void LoggingProviderBaseLogShouldSucceedOnValidEventType()
         {
             ILogger tester = new StubLoggingProvider();
@@ -116,12 +135,13 @@ namespace CuttingEdge.Logging.UnitTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void InitializeShouldFailWhenNameIsNull()
+        public void NameShouldContainTypeNameWhenLeftEmpty()
         {
             StubLoggingProvider tester = new StubLoggingProvider();
 
             tester.Initialize(null, new NameValueCollection());
+
+            Assert.AreEqual(tester.GetType().Name, tester.Name);
         }
 
         [TestMethod]
