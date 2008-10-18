@@ -83,7 +83,7 @@ namespace CuttingEdge.Logging
     {
         private const string SectionName = "logging";
 
-        private static readonly LoggingProviderCollection providerCollection;
+        private static readonly LoggingProviderCollection providers;
         private static readonly LoggingProviderBase provider;
 
         // When the initialization of the Logger class failed, this field will have a non-null value.
@@ -94,17 +94,17 @@ namespace CuttingEdge.Logging
         {
             try
             {
-                LoggingSection loggingSection = GetLoggingSection();
+                LoggingSection section = GetLoggingSection();
 
-                LoggingProviderCollection loggingProviders = LoadProviderCollection(loggingSection);
+                LoggingProviderCollection providerCollection = LoadProviderCollection(section);
 
-                LoggingProviderBase defaultProvider = GetDefaultProvider(loggingSection, loggingProviders);
+                LoggingProviderBase defaultProvider = GetDefaultProvider(section, providerCollection);
 
-                InitializeFallbackProviders(loggingProviders);
+                InitializeFallbackProviders(providerCollection);
 
-                ValidateProviders(loggingProviders);
+                ValidateProviders(providerCollection);
 
-                Logger.providerCollection = loggingProviders;
+                Logger.providers = providerCollection;
                 Logger.provider = defaultProvider;
             }
             catch (ProviderException pex)
@@ -117,33 +117,33 @@ namespace CuttingEdge.Logging
             }
         }
 
-        /// <summary>Gets the default configured <see cref="LoggingProviderBase"/> instance.</summary>
-        /// <value>The provider.</value>
+        /// <summary>Gets a reference to the default Logging provider for the application.</summary>
+        /// <returns>The default Logging provider for the application exposed using the <see cref="XXXProviderBase"/> abstract base class.</returns>
         public static LoggingProviderBase Provider
         {
             get
             {
                 if (Logger.InitializationException != null)
                 {
-                    throw InitializationException;
+                    throw Logger.InitializationException;
                 }
 
                 return provider;
             }
         }
 
-        /// <summary>Gets the collection of configured <see cref="LoggingProviderBase"/> instances.</summary>
-        /// <value>The providers.</value>
+        /// <summary>Gets a collection of the Logging providers for the application.</summary>
+        /// <returns>A <see cref="LoggingProviderCollection"/> of the Logging providers configured for the application.</returns>
         public static LoggingProviderCollection Providers
         {
             get
             {
                 if (Logger.InitializationException != null)
                 {
-                    throw InitializationException;
+                    throw Logger.InitializationException;
                 }
 
-                return providerCollection;
+                return providers;
             }
         }
 
@@ -338,11 +338,11 @@ namespace CuttingEdge.Logging
             return config;
         }
 
-        private static LoggingProviderCollection LoadProviderCollection(LoggingSection loggingSection)
+        private static LoggingProviderCollection LoadProviderCollection(LoggingSection section)
         {
             LoggingProviderCollection providerCollection = new LoggingProviderCollection();
 
-            ProvidersHelper.InstantiateProviders(loggingSection.Providers, providerCollection,
+            ProvidersHelper.InstantiateProviders(section.Providers, providerCollection,
                 typeof(LoggingProviderBase));
 
             providerCollection.SetReadOnly();

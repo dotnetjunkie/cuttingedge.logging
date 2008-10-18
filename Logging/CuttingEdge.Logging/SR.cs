@@ -60,7 +60,7 @@ namespace CuttingEdge.Logging
         internal const string EventCouldNotBeLoggedWithX = "EventCouldNotBeLoggedWithX";
 
         private static readonly ResourceManager resource =
-            new ResourceManager(typeof(SR).Namespace + ".ExceptionMessages", typeof(SR).Assembly);
+            new ResourceManager(typeof(SR).Namespace + ".LoggingExceptionMessages", typeof(SR).Assembly);
 
         // Returns a string from the resource.
         internal static string GetString(string name)

@@ -43,8 +43,8 @@ namespace CuttingEdge.Logging
     /// applications. You can use the supplied Logging providers that are included with this assembly, or you 
     /// can implement your own provider.</p>
     /// <p>
-    /// When implementing a custom Logging provider, you are required to inherit this LoggingProvider abstract
-    /// class.</p>
+    /// When implementing a custom Logging provider, you are required to inherit this abstract
+    /// <b>LoggingProviderBase</b> class.</p>
     /// <p>
     /// The <b>LoggingProviderBase</b> abstract class inherits from the <see cref="ProviderBase"/> abstract 
     /// class. <b>LoggingProviderBase</b> implementations must also implement the required members of 
@@ -85,6 +85,10 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>Initializes the provider.</summary>
+        /// <remarks>
+        /// Inheritors should call <b>base.Initialize</b> before performing implementation-specific provider
+        /// initialization and call <see cref="CheckForUnrecognizedAttributes"/> last.
+        /// </remarks>
         /// <param name="name">The friendly name of the provider.</param>
         /// <param name="config">A collection of the name/value pairs representing the provider-specific 
         /// attributes specified in the configuration for this provider.</param>
@@ -102,12 +106,15 @@ namespace CuttingEdge.Logging
                 throw new ArgumentNullException("config");
             }
 
-            // Let ProviderBase perform the basic initialization
+            if (string.IsNullOrEmpty(name))
+            {
+                name = this.GetType().Name;
+            }
+
+            // Let ProviderBase perform the basic initialization.
             base.Initialize(name, config);
 
             this.InitializeFallbackProvider(config);
-
-            CheckForUnrecognizedAttributes(name, config);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -394,11 +401,21 @@ namespace CuttingEdge.Logging
         protected abstract object LogInternal(LoggingEventType severity, string message, Exception exception, 
             string source);
 
-        private static void CheckForUnrecognizedAttributes(string name, NameValueCollection config)
+        /// <summary>Checks for unrecognized attributes and throws an <see cref="ProviderException"/> when
+        /// the <paramref name="config"/> contains values.</summary>
+        /// <param name="name">The name.</param>
+        /// <param name="config">The config.</param>
+        /// <exception cref="ProviderException">Thrown when the <paramref name="config"/> collection is not empty.</exception>
+        protected void CheckForUnrecognizedAttributes(string name, NameValueCollection config)
         {
             // The config argument should contain no elements.
-            if (config.Count > 0)
+            if (config != null && config.Count > 0)
             {
+                if (string.IsNullOrEmpty(name))
+                {
+                    name = this.GetType().Name;
+                }
+
                 throw new ProviderException(SR.GetString(SR.UnrecognizedAttributeInProviderConfiguration,
                     name, config.GetKey(0)));
             }

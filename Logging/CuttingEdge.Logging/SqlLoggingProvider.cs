@@ -35,11 +35,16 @@ namespace CuttingEdge.Logging
     /// <summary>
     /// Manages storage of logging information in a SQL Server database.
     /// </summary>
+    /// <remarks>
+    /// This class is used by the <see cref="Logger"/> class to provide Logging services for an 
+    /// application using a SQL Server database. You cannot use a <see cref="SqlLoggingProvider"/>
+    /// without SQL Server.
+    /// </remarks>
     /// <example>
-    /// This example demonstrates how to specify values declaratively for several attributes of the 
-    /// Logging section, which can also be accessed as members of the
-    /// <see cref="LoggingSection"/> class. The following configuration file example shows
-    /// how to specify values declaratively for the Logging section.
+    /// This example demonstrates how to specify values declaratively for several attributes of the
+    /// Logging section, which can also be accessed as members of the <see cref="LoggingSection"/> class.
+    /// The following configuration file example shows how to specify values declaratively for the
+    /// Logging section.
     /// <code>
     /// &lt;?xml version="1.0"?&gt;
     /// &lt;configuration&gt;
@@ -48,14 +53,14 @@ namespace CuttingEdge.Logging
     ///             allowDefinition="MachineToApplication" /&gt;
     ///     &lt;/configSections&gt;
     ///     &lt;connectionStrings&gt;
-    ///         &lt;add name="SqlLogging" 
+    ///         &lt;add name="LocalSqlServer" 
     ///             connectionString="Data Source=localhost;Integrated Security=SSPI;Initial Catalog=Logging;" /&gt;
     ///     &lt;/connectionStrings&gt;
     ///     &lt;logging defaultProvider="SqlLoggingProvider"&gt;
     ///         &lt;providers&gt;
     ///             &lt;add 
     ///                 name="SqlLoggingProvider"
-    ///                 connectionStringName="SqlLogging"
+    ///                 connectionStringName="LocalSqlServer"
     ///                 type="CuttingEdge.Logging.SqlLoggingProvider, CuttingEdge.Logging"
     ///                 description="SQL logging provider"
     ///             /&gt;
@@ -69,7 +74,7 @@ namespace CuttingEdge.Logging
         private string connectionString;
 
         /// <summary>Gets the connection string provided with this provider.</summary>
-        /// <value>The connection string.</value>
+        /// <return>The connection string.</return>
         public string ConnectionString
         {
             get { return this.connectionString; }
@@ -92,23 +97,20 @@ namespace CuttingEdge.Logging
                 throw new ArgumentNullException("config");
             }
 
-            // The contract of the base type is relexed. When the name is null, we give it the name of the
-            // current type.
-            if (string.IsNullOrEmpty(name))
-            {
-                name = this.GetType().Name;
-            }
-
             if (string.IsNullOrEmpty(config["description"]))
             {
                 config.Remove("description");
                 config.Add("description", "SQL logging provider");
             }
 
+            // Call initialize first.
+            base.Initialize(name, config);
+
+            // Performing implementation-specific provider initialization here.
             this.InitializeConnectionString(name, config);
 
-            // We call base last, because base.Initialize will throw when it has found unused config arguments.
-            base.Initialize(name, config);
+            // Always call this method last
+            this.CheckForUnrecognizedAttributes(name, config);
         }
 
         /// <summary>Implements the functionality to log the event.</summary>
