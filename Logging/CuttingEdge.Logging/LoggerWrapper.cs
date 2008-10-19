@@ -7,6 +7,21 @@ namespace CuttingEdge.Logging
     /// <summary>
     /// Wraps an <see cref="ILogger"/> instance and adds convenient <b>Log</b> methods.
     /// </summary>
+    /// <example>
+    /// The <see cref="LoggerWrapper"/> can be used in situations where the <see cref="LoggingProviderBase"/>
+    /// class isn't suitable. The folowing example shows a possible use of the <see cref="LoggerWrapper"/>
+    /// class.
+    /// <code>
+    /// public class BusinessCommand
+    /// {
+    ///     public void Execute(ExecutionContext context, ILogger iLogger)
+    ///     {
+    ///         LoggerWrapper logger = new LoggerWrapper(iLogger);
+    ///         logger.Log(LoggingEventType.Warning, "This is a warning.");
+    ///     }
+    /// }
+    /// </code>
+    /// </example>
     public class LoggerWrapper : ILogger
     {
         private readonly ILogger logger;
@@ -36,7 +51,12 @@ namespace CuttingEdge.Logging
 
         /// <summary>Logs an error event to the default <see cref="Logger"/>.</summary>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
+        /// </returns>
         /// <exception cref="ArgumentNullException">Throrn when the supplied <paramref name="exception"/> is
         /// a null reference (Nothing in VB).</exception>
         public object Log(Exception exception)
@@ -50,7 +70,12 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an error event to the wrapped <see cref="Logger"/>.</summary>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
+        /// </returns>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="exception"/> is
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/> is
@@ -66,7 +91,12 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an error event to the wrapped <see cref="Logger"/>.</summary>
         /// <param name="exception">The exception that has to be logged.</param>
         /// <param name="source">A source where the event occured.</param>
-        /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
+        /// </returns>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/> or
         /// the <paramref name="source"/> are null references (Nothing in VB).</exception>
         public object Log(Exception exception, MethodBase source)
@@ -83,7 +113,12 @@ namespace CuttingEdge.Logging
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
         /// <param name="source">A source where the event occured.</param>
-        /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
+        /// </returns>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="exception"/> is
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/>,
@@ -102,7 +137,12 @@ namespace CuttingEdge.Logging
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
         /// <param name="source">A source where the event occured.</param>
-        /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
+        /// </returns>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="message"/> or
         /// <paramref name="source"/> are empty strings.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/>,
@@ -121,7 +161,12 @@ namespace CuttingEdge.Logging
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
         /// <param name="source">A source where the event occured.</param>
-        /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
+        /// </returns>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="message"/> is an
         /// empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/>,
@@ -144,7 +189,12 @@ namespace CuttingEdge.Logging
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
         /// <param name="source">A source where the event occured.</param>
-        /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
+        /// </returns>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="message"/> or 
         /// <paramref name="source"/> are empty strings.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/>,
@@ -163,7 +213,12 @@ namespace CuttingEdge.Logging
 
         /// <summary>Logs an information event to the wrapped <see cref="Logger"/>.</summary>
         /// <param name="message">The description of the event.</param>
-        /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
+        /// </returns>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="message"/> is
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/> is a 
@@ -178,7 +233,12 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an event to the wrapped <see cref="Logger"/>.</summary>
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
-        /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
+        /// </returns>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="message"/> is
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/> is a null reference.</exception>
@@ -195,7 +255,12 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an information event to the wrapped <see cref="Logger"/>.</summary>
         /// <param name="message">The description of the event.</param>
         /// <param name="source">A source where the event occured.</param>
-        /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
+        /// </returns>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="exception"/> is
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/> or
@@ -213,7 +278,12 @@ namespace CuttingEdge.Logging
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="source">A source where the event occured.</param>
-        /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
+        /// </returns>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="message"/> is
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/> or
@@ -234,7 +304,12 @@ namespace CuttingEdge.Logging
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="source">A source where the event occured.</param>
-        /// <returns>The id of the logged event or null when an id is inappropriate for the current logging this.</returns>
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
+        /// </returns>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="message"/> or 
         /// <paramref name="source"/> are empty strings.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/> or
@@ -255,8 +330,11 @@ namespace CuttingEdge.Logging
         /// <param name="message">The message of the event.</param>
         /// <param name="source">The optional source to log.</param>
         /// <param name="exception">An optional exception to log.</param>
-        /// <returns>
-        /// The id of the saved log (or null when an id is not appropriate for this type of logger.
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown when the given <paramref name="message"/> is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when the given <paramref name="message"/> is an empty string.</exception>

@@ -1,29 +1,29 @@
 ﻿<?xml version="1.0"?>
 <configuration>
-	<configSections>
-		<section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-			allowDefinition="MachineToApplication" />
-	</configSections>
-	<connectionStrings>
-		<add name="SqlLogging"
-			connectionString="Data Source=localhost;Integrated Security=SSPI;Initial Catalog=Logging;" />
-	</connectionStrings>
-	<logging defaultProvider="SqlLoggingProvider">
-		<providers>
+    <configSections>
+        <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging" allowDefinition="MachineToApplication" />
+    </configSections>
+    <connectionStrings>
+        <add name="SqlLogging" connectionString="Data Source=localhost;Integrated Security=SSPI;Initial Catalog=Logging;" />
+    </connectionStrings>
+    <logging defaultProvider="SqlLoggingProvider">
+    	<providers>
 			<add
 				name="SqlLoggingProvider"
-				fallbackProvider="WindowsEventLogLoggingProvider"
-				connectionStringName="SqlLogging"
 				type="CuttingEdge.Logging.SqlLoggingProvider, CuttingEdge.Logging"
+				fallbackProvider="WindowsEventLogLoggingProvider"
+				threshold="Information"
+				connectionStringName="SqlLogging"
 				description="SQL logging provider"
-                    />
+            />
 			<add
 				name="WindowsEventLogLoggingProvider"
+				type="CuttingEdge.Logging.WindowsEventLogLoggingProvider, CuttingEdge.Logging"
+				threshold="Warning"
 				source="MyWebApplication"
 				logName="MyWebApplication"
-				type="CuttingEdge.Logging.WindowsEventLogLoggingProvider, CuttingEdge.Logging"
 				description="Windows event log logging provider"
-                    />
+            />
 		</providers>
 	</logging>
 	<system.web>

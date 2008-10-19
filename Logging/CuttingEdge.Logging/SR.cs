@@ -47,6 +47,7 @@ namespace CuttingEdge.Logging
         internal const string InvalidFallbackProviderPropertyInConfig = "InvalidFallbackProviderPropertyInConfig";
         internal const string DuplicateLoggingProviderInConfig = "DuplicateLoggingProviderInConfig";
         internal const string UnrecognizedAttributeInProviderConfiguration = "UnrecognizedAttributeInProviderConfiguration";
+        internal const string InvalidThresholdValueInProviderConfiguration = "InvalidThresholdValueInProviderConfiguration";
 
         // Exception messages for LoggingProviderCollection class
         internal const string ProviderParameterMustBeOfTypeX = "ProviderParameterMustBeOfTypeX";

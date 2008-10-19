@@ -51,9 +51,10 @@ namespace CuttingEdge.Logging
     ///         &lt;providers&gt;
     ///             &lt;add 
     ///                 name="WindowsEventLogLoggingProvider"
-    ///                 source="MyWebApplication"
-    ///                 logName="MyWebApplication"
     ///                 type="CuttingEdge.Logging.WindowsEventLogLoggingProvider, CuttingEdge.Logging"
+    ///                 threshold="Warning"
+    ///                 source="MyApplication"
+    ///                 logName="MyApplication"
     ///                 description="Windows event log logging provider"
     ///             /&gt;
     ///         &lt;/providers&gt;
@@ -92,24 +93,9 @@ namespace CuttingEdge.Logging
         /// attributes specified in the configuration for this provider.</param>
         public override void Initialize(string name, NameValueCollection config)
         {
-            this.source = config["source"];
-            this.logName = config["logName"];
-
-            config.Remove("source");
-            config.Remove("logName");
-
-            // Throw exception when no source is provided
-            if (string.IsNullOrEmpty(this.source))
+            if (config == null)
             {
-                throw new ProviderException(SR.GetString(SR.EmptyOrMissingPropertyInConfiguration,
-                    "source", name));
-            }
-
-            // Throw exception when no logname is provided
-            if (string.IsNullOrEmpty(this.logName))
-            {
-                throw new ProviderException(SR.GetString(SR.EmptyOrMissingPropertyInConfiguration,
-                    "logName", name));
+                throw new ArgumentNullException("config");
             }
 
             if (string.IsNullOrEmpty(config["description"]))
@@ -118,12 +104,19 @@ namespace CuttingEdge.Logging
                 config.Add("description", "Windows event log logging provider");
             }
 
+            // Call initialize first.
             base.Initialize(name, config);
+
+            // Performing implementation-specific provider initialization here.
+            this.InitializeSource(name, config);
+
+            this.InitializeLogName(name, config);
+            
+            // Always call this method last
+            this.CheckForUnrecognizedAttributes(name, config);
         }
 
-        /// <summary>
-        /// Implements the functionality to log the event.
-        /// </summary>
+        /// <summary>Implements the functionality to log the event.</summary>
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
@@ -189,6 +182,38 @@ namespace CuttingEdge.Logging
                 default:
                     throw new InvalidEnumArgumentException("severity", (int)severity, typeof(LoggingEventType));
             }
+        }
+
+        private void InitializeLogName(string name, NameValueCollection config)
+        {
+            string logName = config["logName"];
+            
+            // Throw exception when no logname is provided
+            if (string.IsNullOrEmpty(logName))
+            {
+                throw new ProviderException(SR.GetString(SR.EmptyOrMissingPropertyInConfiguration,
+                    "logName", name));
+            }
+
+            this.logName = logName;
+
+            config.Remove("logName");
+        }
+
+        private void InitializeSource(string name, NameValueCollection config)
+        {
+            string source = config["source"];
+            
+            // Throw exception when no source is provided
+            if (string.IsNullOrEmpty(source))
+            {
+                throw new ProviderException(SR.GetString(SR.EmptyOrMissingPropertyInConfiguration,
+                    "source", name));
+            }
+
+            this.source = source;
+
+            config.Remove("source");
         }
     }
 }

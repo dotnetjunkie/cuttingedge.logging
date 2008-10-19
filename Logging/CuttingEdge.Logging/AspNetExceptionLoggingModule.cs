@@ -56,9 +56,10 @@ namespace CuttingEdge.Logging
     ///         &lt;providers&gt;
     ///             &lt;add 
     ///                 name="WindowsEventLogLoggingProvider"
+    ///                 type="CuttingEdge.Logging.WindowsEventLogLoggingProvider, CuttingEdge.Logging"
+    ///                    threshold="Information"
     ///                 source="MyWebApplication"
     ///                 logName="MyWebApplication"
-    ///                 type="CuttingEdge.Logging.WindowsEventLogLoggingProvider, CuttingEdge.Logging"
     ///                 description="Windows event log logging provider"
     ///             /&gt;
     ///         &lt;/providers&gt;
