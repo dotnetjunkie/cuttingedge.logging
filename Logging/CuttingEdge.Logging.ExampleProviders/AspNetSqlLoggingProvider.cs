@@ -4,7 +4,8 @@
  * 
  * Copyright (C) 2008 S. van Deursen
  * 
- * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ 
+ * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
+ * cuttingedge.it.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -37,6 +38,42 @@ namespace CuttingEdge.Logging.ExampleProviders
     /// <summary>
     /// Manages storage of logging information for ASP.NET web applications in a SQL Server database.
     /// </summary>
+    /// <example>
+    /// This example demonstrates how to specify values declaratively for several attributes of the
+    /// Logging section, which can also be accessed as members of the <see cref="LoggingSection"/> class.
+    /// The following configuration file example shows how to specify values declaratively for the
+    /// Logging section.
+    /// <code>
+    /// &lt;?xml version="1.0"?&gt;
+    /// &lt;configuration&gt;
+    ///     &lt;configSections&gt;
+    ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
+    ///             allowDefinition="MachineToApplication" /&gt;
+    ///     &lt;/configSections&gt;
+    ///     &lt;connectionStrings&gt;
+    ///         &lt;add name="SqlLogging" 
+    ///             connectionString="Data Source=localhost;Integrated Security=SSPI;Initial Catalog=Logging;" /&gt;
+    ///     &lt;/connectionStrings&gt;
+    ///     &lt;logging defaultProvider="AspNetSqlLoggingProvider"&gt;
+    ///         &lt;providers&gt;
+    ///             &lt;add 
+    ///                 name="AspNetSqlLoggingProvider"
+    ///                 type="CuttingEdge.Logging.ExampleProviders.AspNetSqlLoggingProvider, CuttingEdge.Logging.ExampleProviders"
+    ///                 threshold="Information"
+    ///                 connectionStringName="SqlLogging"
+    ///                 description="ASP.NET SQL logging provider example"
+    ///             /&gt;
+    ///         &lt;/providers&gt;
+    ///     &lt;/logging&gt;
+    ///     &lt;system.web&gt;
+    ///         &lt;httpModules&gt;
+    ///             &lt;add name="ExceptionLogger" 
+    ///                 type="CuttingEdge.Logging.AspNetExceptionLoggingModule, CuttingEdge.Logging"/&gt;
+    ///         &lt;/httpModules&gt;
+    ///     &lt;/system.web&gt;
+    /// &lt;/configuration&gt;
+    /// </code>
+    /// </example> 
     public class AspNetSqlLoggingProvider : SqlLoggingProvider
     {
         private bool logQueryString = true;
@@ -77,13 +114,15 @@ namespace CuttingEdge.Logging.ExampleProviders
                 throw new ArgumentNullException("config");
             }
 
-            this.logQueryString = ParseBoolConfigValue(name, "logQueryString", config["logQueryString"], true);
-            this.logFormData = ParseBoolConfigValue(name, "logFormData", config["logFormData"], false);
+            base.Initialize(name, config);
 
+            this.logQueryString = ParseBoolConfigValue(name, "logQueryString", config["logQueryString"], true);
             config.Remove("logQueryString");
+
+            this.logFormData = ParseBoolConfigValue(name, "logFormData", config["logFormData"], false);
             config.Remove("logFormData");
 
-            base.Initialize(name, config);
+            this.CheckForUnrecognizedAttributes(name, config);
         }
 
         /// <summary>Saves the event to database.</summary>
