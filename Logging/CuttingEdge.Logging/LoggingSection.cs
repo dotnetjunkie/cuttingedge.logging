@@ -4,7 +4,8 @@
  * 
  * Copyright (C) 2008 S. van Deursen
  * 
- * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ 
+ * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
+ * cuttingedge.it.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
