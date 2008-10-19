@@ -33,7 +33,7 @@ namespace CuttingEdge.Logging
             }
         }
 
-        internal static void ValidateTypeInValidRange(LoggingEventType severity)
+        internal static void ValidateSeverityInValidRange(LoggingEventType severity)
         {
             if (severity < LoggingEventType.Debug || severity > LoggingEventType.Critical)
             {

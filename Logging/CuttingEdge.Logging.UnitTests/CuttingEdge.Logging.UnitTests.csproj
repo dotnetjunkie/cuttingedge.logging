@@ -44,9 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helpers\InMemoryLogger.cs" />
     <Compile Include="Helpers\InvalidLoggingTypes.cs" />
-    <Compile Include="Helpers\LoggingEvent.cs" />
     <Compile Include="Helpers\StubLoggingProvider.cs" />
     <Compile Include="LoggerWrapperTests.cs" />
     <Compile Include="LoggingProviderBaseTests.cs" />

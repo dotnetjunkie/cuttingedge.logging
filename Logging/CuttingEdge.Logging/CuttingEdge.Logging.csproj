@@ -47,13 +47,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AspNetExceptionLoggingModule.cs" />
+    <Compile Include="AspNetTraceLoggingProvider.cs" />
+    <Compile Include="ConsoleLoggingProvider.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="LoggerWrapper.cs" />
+    <Compile Include="MemoryLoggingEvent.cs" />
     <Compile Include="LoggingProviderBase.cs" />
     <Compile Include="LoggingProviderCollection.cs" />
     <Compile Include="LoggingSection.cs" />
     <Compile Include="LoggingEventType.enum.cs" />
+    <Compile Include="MemoryLoggingProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlLoggingProvider.cs" />
     <Compile Include="SR.cs" />
