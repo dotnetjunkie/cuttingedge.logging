@@ -135,6 +135,9 @@
   <data name="InvalidFallbackProviderPropertyInConfig" xml:space="preserve">
     <value>There was an error in the '{0}' section of the the configuration file. The given {1} with name '{2}' has a 'fallbackProvider' property with a value of '{3}'. No provider with that name could be found. The given fallbackProvider must be an item in the list of logging providers. Please check the configuration file for errors.</value>
   </data>
+  <data name="InvalidThresholdValueInProviderConfiguration" xml:space="preserve">
+    <value>Invalid threshold attribute in provider '{0}' in the config file. Please supply one of the following values: {1}.</value>
+  </data>
   <data name="LoggingSectionMissingFromConfigSettings" xml:space="preserve">
     <value>The Logger hasn't been configured properly. Please register the logger as &lt;section&gt; in the &lt;configSections&gt; of your configurations file as follows: &lt;configSections&gt;&lt;section name="logging" type="{0}, {1}" allowDefinition="MachineToApplication" /&gt;&lt;/configSections&gt;.</value>
   </data>
@@ -154,6 +157,6 @@
     <value>The section '{0}' in the configuration's &lt;configSections&gt; is not of type {1} but of type {2}.</value>
   </data>
   <data name="UnrecognizedAttributeInProviderConfiguration" xml:space="preserve">
-    <value>he configuration for provider '{0}' contains the unrecognized attribute with name '{1}'.</value>
+    <value>The configuration for provider '{0}' contains the unrecognized attribute with name '{1}'.</value>
   </data>
 </root>

@@ -36,13 +36,35 @@ namespace CuttingEdge.Logging.UnitTests
                 try
                 {
                     tester.Log(type, "message", "source", new Exception());
-                    Assert.Fail();
+                    Assert.Fail(String.Format("Calling log with a severity of {0} should fail.", type));
                 }
                 catch (InvalidEnumArgumentException)
                 {
                     // An InvalidEnumArgumentException should be thrown.
                 }
             }
+        }
+
+        [TestMethod]
+        public void ThresholdAttributeShouldBeOptional()
+        {
+            StubLoggingProvider provider = new StubLoggingProvider();
+
+            NameValueCollection config = new NameValueCollection();
+
+            provider.Initialize("Stub log", config);
+        }
+
+        [TestMethod]
+        public void DefaultThresholdIsDebugWhenNoThresholdIsSupplied()
+        {
+            StubLoggingProvider provider = new StubLoggingProvider();
+
+            NameValueCollection config = new NameValueCollection();
+
+            provider.Initialize("Stub logger", config);
+
+            Assert.AreEqual(LoggingEventType.Debug, provider.Threshold);
         }
 
         [TestMethod]
@@ -122,7 +144,10 @@ namespace CuttingEdge.Logging.UnitTests
         {
             StubLoggingProvider tester = new StubLoggingProvider();
 
-            tester.Initialize("MyProvider", new NameValueCollection());
+            NameValueCollection config = new NameValueCollection();
+            config.Add("threshold", LoggingEventType.Critical.ToString());
+
+            tester.Initialize("MyProvider", config);
         }
 
         [TestMethod]
@@ -139,7 +164,10 @@ namespace CuttingEdge.Logging.UnitTests
         {
             StubLoggingProvider tester = new StubLoggingProvider();
 
-            tester.Initialize(null, new NameValueCollection());
+            NameValueCollection config = new NameValueCollection();
+            config.Add("threshold", LoggingEventType.Critical.ToString());
+
+            tester.Initialize(null, config);
 
             Assert.AreEqual(tester.GetType().Name, tester.Name);
         }
@@ -150,6 +178,7 @@ namespace CuttingEdge.Logging.UnitTests
             StubLoggingProvider tester = new StubLoggingProvider();
 
             NameValueCollection config = new NameValueCollection();
+            config.Add("threshold", LoggingEventType.Error.ToString());
             config.Add("badAttribute", "some value");
 
             try
@@ -170,6 +199,7 @@ namespace CuttingEdge.Logging.UnitTests
             StubLoggingProvider tester = new StubLoggingProvider();
 
             NameValueCollection config = new NameValueCollection();
+            config.Add("threshold", LoggingEventType.Warning.ToString());
 
             tester.Initialize("MyProvider", config);
 

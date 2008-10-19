@@ -300,7 +300,11 @@ namespace CuttingEdge.Logging.UnitTests
                 {
                     Logger.Log(type, "Nice message.");
 
-                    Assert.AreEqual(type, scope.Logger.LastLoggedEvent.Type);
+                    LoggingEvent lastLoggedEvent = scope.Logger.LastLoggedEvent;
+
+                    Assert.IsNotNull(lastLoggedEvent);
+
+                    Assert.AreEqual(type, lastLoggedEvent.Type);
                 }
             }
         }

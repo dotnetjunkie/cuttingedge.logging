@@ -40,19 +40,18 @@ namespace CuttingEdge.Logging
     /// Logging section.
     /// <code>
     ///     &lt;configSections&gt;
-    ///         &lt;section name="logging"
-    ///             type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
+    ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
     ///             allowDefinition="MachineToApplication" /&gt;
     ///     &lt;/configSections&gt;
-    ///     &lt;logging defaultProvider="SqlLoggingProvider"&gt;
-    ///         &lt;providers&gt;
+    ///     &lt;logging defaultProvider="EventLogLoggingProvider"&gt;
     ///             &lt;add 
-    ///                 name="SqlLoggingProvider"
-    ///                 type="CuttingEdge.Logging.SqlLoggingProvider, CuttingEdge.Logging"
-    ///                 connectionStringName="LocalSqlServer"
-    ///                 description="Example provider."
+    ///                 name="EventLogLoggingProvider"
+    ///                 type="CuttingEdge.Logging.WindowsEventLogLoggingProvider, CuttingEdge.Logging"
+    ///                 threshold="Warning"
+    ///                 source="MyWebApplication"
+    ///                 logName="MyWebApplication"
+    ///                 description="Windows event log logging provider"
     ///             /&gt;
-    ///         &lt;/providers&gt;
     ///     &lt;/logging&gt;
     /// </code>
     /// </example>

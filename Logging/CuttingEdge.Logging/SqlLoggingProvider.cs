@@ -53,15 +53,16 @@ namespace CuttingEdge.Logging
     ///             allowDefinition="MachineToApplication" /&gt;
     ///     &lt;/configSections&gt;
     ///     &lt;connectionStrings&gt;
-    ///         &lt;add name="LocalSqlServer" 
+    ///         &lt;add name="SqlLogging" 
     ///             connectionString="Data Source=localhost;Integrated Security=SSPI;Initial Catalog=Logging;" /&gt;
     ///     &lt;/connectionStrings&gt;
     ///     &lt;logging defaultProvider="SqlLoggingProvider"&gt;
     ///         &lt;providers&gt;
     ///             &lt;add 
     ///                 name="SqlLoggingProvider"
-    ///                 connectionStringName="LocalSqlServer"
     ///                 type="CuttingEdge.Logging.SqlLoggingProvider, CuttingEdge.Logging"
+    ///                 threshold="Information"
+    ///                 connectionStringName="SqlLogging"
     ///                 description="SQL logging provider"
     ///             /&gt;
     ///         &lt;/providers&gt;
@@ -74,7 +75,7 @@ namespace CuttingEdge.Logging
         private string connectionString;
 
         /// <summary>Gets the connection string provided with this provider.</summary>
-        /// <return>The connection string.</return>
+        /// <value>The connection string.</value>
         public string ConnectionString
         {
             get { return this.connectionString; }
@@ -219,8 +220,6 @@ namespace CuttingEdge.Logging
         {
             string connectionStringName = config["connectionStringName"];
 
-            config.Remove("connectionStringName");
-
             // Throw exception when no connectionStringName is provided
             if (string.IsNullOrEmpty(connectionStringName) == true)
             {
@@ -236,6 +235,8 @@ namespace CuttingEdge.Logging
                 throw new ProviderException(SR.GetString(SR.MissingConnectionStringInConfig,
                     connectionStringName));
             }
+
+            config.Remove("connectionStringName");
 
             this.connectionString = connectionString;
         }
