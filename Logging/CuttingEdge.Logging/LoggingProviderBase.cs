@@ -263,7 +263,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public object Log(LoggingEventType severity, string message, Exception exception, MethodBase source)
         {
-            LoggingHelper.ValidateTypeInValidRange(severity);
+            LoggingHelper.ValidateSeverityInValidRange(severity);
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceIsNotNull(source);
@@ -292,7 +292,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public object Log(LoggingEventType severity, string message, Exception exception, string source)
         {
-            LoggingHelper.ValidateTypeInValidRange(severity);
+            LoggingHelper.ValidateSeverityInValidRange(severity);
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceNotNullOrEmpty(source);
@@ -336,7 +336,7 @@ namespace CuttingEdge.Logging
         public object Log(LoggingEventType severity, string message)
         {
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateTypeInValidRange(severity);
+            LoggingHelper.ValidateSeverityInValidRange(severity);
 
             ILogger logger = this;
             return logger.Log(severity, message, null, null);
@@ -382,7 +382,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public object Log(LoggingEventType severity, string message, MethodBase source)
         {
-            LoggingHelper.ValidateTypeInValidRange(severity);
+            LoggingHelper.ValidateSeverityInValidRange(severity);
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateSourceIsNotNull(source);
 
@@ -410,7 +410,7 @@ namespace CuttingEdge.Logging
         public object Log(LoggingEventType severity, string message, string source)
         {
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateTypeInValidRange(severity);
+            LoggingHelper.ValidateSeverityInValidRange(severity);
             LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 
             ILogger logger = this;
@@ -433,7 +433,7 @@ namespace CuttingEdge.Logging
         /// <exception cref="InvalidEnumArgumentException">Thrown when<paramref name="type"/> has an invalid value.</exception>
         object ILogger.Log(LoggingEventType type, string message, string source, Exception exception)
         {
-            LoggingHelper.ValidateTypeInValidRange(type);
+            LoggingHelper.ValidateSeverityInValidRange(type);
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
 
             // Only log when the event is equal to or above the specified threshold.

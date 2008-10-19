@@ -103,53 +103,53 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void LoggerLogExceptionLogsEventAsError()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 Exception exception = new InvalidOperationException();
 
                 Logger.Log(exception);
 
-                Assert.AreEqual(LoggingEventType.Error, scope.Logger.FirstLoggedEvent.Type);
+                Assert.AreEqual(LoggingEventType.Error, scope.Logger.GetLoggedEvents()[0].Severity);
             }
         }
 
         [TestMethod]
         public void LoggerLogExceptionLogsExceptionMessageAsMessage()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 string exceptionMessage = "This is a nice message";
                 Exception exception = new InvalidOperationException(exceptionMessage);
 
                 Logger.Log(exception);
 
-                Assert.AreEqual(exceptionMessage, scope.Logger.FirstLoggedEvent.Message);
+                Assert.AreEqual(exceptionMessage, scope.Logger.GetLoggedEvents()[0].Message);
             }
         }
 
         [TestMethod]
         public void LoggerLogExceptionLogsExceptionTypeAsMessage()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 Exception exception = new InvalidOperationException(String.Empty);
 
                 Logger.Log(exception);
 
-                Assert.AreEqual(exception.GetType().Name, scope.Logger.FirstLoggedEvent.Message);
+                Assert.AreEqual(exception.GetType().Name, scope.Logger.GetLoggedEvents()[0].Message);
             }
         }
 
         [TestMethod]
         public void LoggerLogExceptionLogsOneEvent()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 Exception exception = new InvalidOperationException();
 
                 Logger.Log(exception);
 
-                Assert.AreEqual(1, scope.Logger.LoggedEvents.Count);
+                Assert.AreEqual(1, scope.Logger.GetLoggedEvents().Length);
             }
         }
 
@@ -181,22 +181,22 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void LoggerLogMessageLogsEventAsInformation()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 Logger.Log("message");
 
-                Assert.AreEqual(LoggingEventType.Information, scope.Logger.FirstLoggedEvent.Type);
+                Assert.AreEqual(LoggingEventType.Information, scope.Logger.GetLoggedEvents()[0].Severity);
             }
         }
 
         [TestMethod]
         public void LoggerLogMessageLogsCorrectData()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 Logger.Log("message");
 
-                LoggingEvent loggingMessage = scope.Logger.FirstLoggedEvent;
+                MemoryLoggingEvent loggingMessage = scope.Logger.GetLoggedEvents()[0];
 
                 Assert.AreEqual("message", loggingMessage.Message);
                 Assert.AreEqual(null, loggingMessage.Source);
@@ -233,22 +233,22 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void LoggerLogExceptionMethodBaseLogsOneEvent()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 Logger.Log(new Exception(), MethodBase.GetCurrentMethod());
 
-                Assert.AreEqual(1, scope.Logger.LoggedEvents.Count);
+                Assert.AreEqual(1, scope.Logger.GetLoggedEvents().Length);
             }
         }
 
         [TestMethod]
         public void LoggerLogExceptionMethodBaseLogsAsError()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 Logger.Log(new Exception(), MethodBase.GetCurrentMethod());
 
-                Assert.AreEqual(LoggingEventType.Error, scope.Logger.FirstLoggedEvent.Type);
+                Assert.AreEqual(LoggingEventType.Error, scope.Logger.GetLoggedEvents()[0].Severity);
             }
         }
 
@@ -294,17 +294,19 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void LoggerLogEventTypeMessageLogsCorrectEventType()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 foreach (LoggingEventType type in Enum.GetValues(typeof(LoggingEventType)))
                 {
                     Logger.Log(type, "Nice message.");
 
-                    LoggingEvent lastLoggedEvent = scope.Logger.LastLoggedEvent;
+                    MemoryLoggingEvent[] events = scope.Logger.GetLoggedEvents();
+
+                    MemoryLoggingEvent lastLoggedEvent = events[events.Length - 1];
 
                     Assert.IsNotNull(lastLoggedEvent);
 
-                    Assert.AreEqual(type, lastLoggedEvent.Type);
+                    Assert.AreEqual(type, lastLoggedEvent.Severity);
                 }
             }
         }
@@ -312,13 +314,13 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void LoggerLogEventTypeMessageLogsCorrectData()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 Logger.Log(LoggingEventType.Information, "Nice message.");
 
-                LoggingEvent e = scope.Logger.FirstLoggedEvent;
+                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
 
-                Assert.AreEqual(LoggingEventType.Information, e.Type);
+                Assert.AreEqual(LoggingEventType.Information, e.Severity);
                 Assert.AreEqual("Nice message.", e.Message);
                 Assert.AreEqual(null, e.Exception);
                 Assert.AreEqual(null, e.Source);
@@ -360,14 +362,14 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void LoggerLogMessageExceptionLogsCorrectData()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 Exception exception = new Exception();
                 Logger.Log("message", exception);
 
-                LoggingEvent e = scope.Logger.FirstLoggedEvent;
+                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
 
-                Assert.AreEqual(LoggingEventType.Error, e.Type);
+                Assert.AreEqual(LoggingEventType.Error, e.Severity);
                 Assert.AreEqual("message", e.Message);
                 Assert.AreEqual(exception, e.Exception);
                 Assert.AreEqual(null, e.Source);
@@ -409,14 +411,14 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void LoggerLogMessageMethodBaseLogsCorrectData()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 MethodBase method = MethodBase.GetCurrentMethod();
                 Logger.Log("message", method);
 
-                LoggingEvent e = scope.Logger.FirstLoggedEvent;
+                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
 
-                Assert.AreEqual(LoggingEventType.Information, e.Type);
+                Assert.AreEqual(LoggingEventType.Information, e.Severity);
                 Assert.AreEqual("message", e.Message);
                 Assert.AreEqual(null, e.Exception);
                 Assert.IsTrue(e.Source.Contains(method.Name));
@@ -476,14 +478,14 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void LoggerLogEventTypeMessageMethodBaseLogsCorrectData()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 MethodBase method = MethodBase.GetCurrentMethod();
                 Logger.Log(LoggingEventType.Warning, "message", method);
-                
-                LoggingEvent e = scope.Logger.FirstLoggedEvent;
 
-                Assert.AreEqual(LoggingEventType.Warning, e.Type);
+                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
+
+                Assert.AreEqual(LoggingEventType.Warning, e.Severity);
                 Assert.AreEqual("message", e.Message);
                 Assert.AreEqual(null, e.Exception);
                 Assert.IsTrue(e.Source.Contains(method.Name));
@@ -551,14 +553,14 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void LoggerLogEventTypeMessageStringLogsCorrectData()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 string source = "source";
                 Logger.Log(LoggingEventType.Warning, "message", source);
 
-                LoggingEvent e = scope.Logger.FirstLoggedEvent;
+                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
 
-                Assert.AreEqual(LoggingEventType.Warning, e.Type);
+                Assert.AreEqual(LoggingEventType.Warning, e.Severity);
                 Assert.AreEqual("message", e.Message);
                 Assert.AreEqual(null, e.Exception);
                 Assert.AreEqual(source, e.Source);
@@ -606,16 +608,16 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void LoggerLogMessageExceptionMethodBaseLogsCorrectData()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 string message = "message";
                 Exception exception = new Exception();
                 MethodBase source = MethodBase.GetCurrentMethod();
                 Logger.Log(message, exception, source);
 
-                LoggingEvent e = scope.Logger.FirstLoggedEvent;
+                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
 
-                Assert.AreEqual(LoggingEventType.Error, e.Type);
+                Assert.AreEqual(LoggingEventType.Error, e.Severity);
                 Assert.AreEqual(message, e.Message);
                 Assert.AreEqual(exception, e.Exception);
                 Assert.IsTrue(e.Source.Contains(source.Name));
@@ -671,16 +673,16 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void LoggerLogMessageExceptionStringLogsCorrectData()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 string message = "message";
                 Exception exception = new Exception();
                 MethodBase source = MethodBase.GetCurrentMethod();
                 Logger.Log(message, exception, source);
 
-                LoggingEvent e = scope.Logger.FirstLoggedEvent;
+                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
 
-                Assert.AreEqual(LoggingEventType.Error, e.Type);
+                Assert.AreEqual(LoggingEventType.Error, e.Severity);
                 Assert.AreEqual(message, e.Message);
                 Assert.AreEqual(exception, e.Exception);
                 Assert.IsTrue(e.Source.Contains(source.Name));
@@ -746,16 +748,16 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void LoggerLogEventTypeMessageExceptionMethodBaseLogsCorrectData()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 Exception exception = new Exception();
                 MethodBase source = MethodBase.GetCurrentMethod();
 
                 Logger.Log(LoggingEventType.Warning, "message", exception, source);
 
-                LoggingEvent e = scope.Logger.FirstLoggedEvent;
+                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
 
-                Assert.AreEqual(LoggingEventType.Warning, e.Type);
+                Assert.AreEqual(LoggingEventType.Warning, e.Severity);
                 Assert.AreEqual("message", e.Message);
                 Assert.AreEqual(exception, e.Exception);
                 Assert.IsTrue(e.Source.Contains(source.Name));
@@ -829,15 +831,15 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void LoggerLogEventTypeMessageExceptionStringLogsCorrectData()
         {
-            using (var scope = new LoggingProviderTestingScope<InMemoryLogger>())
+            using (var scope = new LoggingProviderTestingScope<MemoryLoggingProvider>())
             {
                 Exception exception = new Exception();
 
                 Logger.Log(LoggingEventType.Warning, "message", exception, "source");
 
-                LoggingEvent e = scope.Logger.FirstLoggedEvent;
+                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
 
-                Assert.AreEqual(LoggingEventType.Warning, e.Type);
+                Assert.AreEqual(LoggingEventType.Warning, e.Severity);
                 Assert.AreEqual("message", e.Message);
                 Assert.AreEqual(exception, e.Exception);
                 Assert.AreEqual("source", e.Source);

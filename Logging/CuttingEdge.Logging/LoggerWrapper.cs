@@ -175,7 +175,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public object Log(LoggingEventType severity, string message, Exception exception, MethodBase source)
         {
-            LoggingHelper.ValidateTypeInValidRange(severity);
+            LoggingHelper.ValidateSeverityInValidRange(severity);
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceIsNotNull(source);
@@ -203,7 +203,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public object Log(LoggingEventType severity, string message, Exception exception, string source)
         {
-            LoggingHelper.ValidateTypeInValidRange(severity);
+            LoggingHelper.ValidateSeverityInValidRange(severity);
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceNotNullOrEmpty(source);
@@ -246,7 +246,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public object Log(LoggingEventType severity, string message)
         {
-            LoggingHelper.ValidateTypeInValidRange(severity);
+            LoggingHelper.ValidateSeverityInValidRange(severity);
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
 
             return this.logger.Log(severity, message, null, null);
@@ -292,7 +292,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public object Log(LoggingEventType severity, string message, MethodBase source)
         {
-            LoggingHelper.ValidateTypeInValidRange(severity);
+            LoggingHelper.ValidateSeverityInValidRange(severity);
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateSourceIsNotNull(source);
 
@@ -319,7 +319,7 @@ namespace CuttingEdge.Logging
         public object Log(LoggingEventType severity, string message, string source)
         {
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateTypeInValidRange(severity);
+            LoggingHelper.ValidateSeverityInValidRange(severity);
             LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 
             return this.logger.Log(severity, message, source, null);
