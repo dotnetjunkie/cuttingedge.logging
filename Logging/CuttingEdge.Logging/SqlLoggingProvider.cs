@@ -30,6 +30,7 @@ using System.Configuration;
 using System.Configuration.Provider;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 
 namespace CuttingEdge.Logging
 {
@@ -111,8 +112,33 @@ namespace CuttingEdge.Logging
             // Performing implementation-specific provider initialization here.
             this.InitializeConnectionString(name, config);
 
+            bool mustInitializeSchema = this.MustInitializeDatabaseSchema(name, config);
+
             // Always call this method last
             this.CheckForUnrecognizedAttributes(name, config);
+
+            // Execute creation of tables and stored procs after checking for unrecognized attributes.
+            if (mustInitializeSchema)
+            {
+                this.InitializeDatabaseSchema();
+            }
+        }
+
+        /// <summary>Initializes the database schema.</summary>
+        protected virtual void InitializeDatabaseSchema()
+        {
+            try
+            {
+                this.CheckIfSchemaAlreadyHasBeenInitialized();
+
+                this.CreateTablesAndStoredProcedures();
+            }
+            catch (SqlException sex)
+            {
+                throw new ProviderException(String.Format(
+                    "Initializion of database schema for provider {0} failed. {1}", 
+                    this.Name, sex.Message), sex);
+            }
         }
 
         /// <summary>Implements the functionality to log the event.</summary>
@@ -200,6 +226,55 @@ namespace CuttingEdge.Logging
             return parameter;
         }
 
+        private void CreateTablesAndStoredProcedures()
+        {
+            using (SqlConnection connection = new SqlConnection(this.ConnectionString))
+            {
+                connection.Open();
+
+                using (SqlTransaction transaction = connection.BeginTransaction())
+                {
+                    string createScript = SR.GetString(SR.SqlLoggingProviderSchemaScripts);
+
+                    string[] createScripts =
+                        createScript.Split(new string[] { "GO" }, StringSplitOptions.None);
+
+                    foreach (string script in createScripts)
+                    {
+                        using (SqlCommand command = new SqlCommand(script, connection, transaction))
+                        {
+                            command.ExecuteNonQuery();
+                        }
+                    }
+
+                    transaction.Commit();
+                }
+            }
+        }
+
+        private void CheckIfSchemaAlreadyHasBeenInitialized()
+        {
+            using (SqlConnection connection = new SqlConnection(this.ConnectionString))
+            {
+                connection.Open();
+
+                string query = 
+                    "SELECT CONVERT(int, count(*)) FROM sysobjects WHERE name IN ('logging_EventTypes', 'logging_Events', 'logging_Exceptions', 'logging_AddEvent', 'logging_AddException');";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    int sysObjectCount = (int)command.ExecuteScalar();
+
+                    if (sysObjectCount > 0)
+                    {
+                        throw new ProviderException(String.Format(
+                            "The provider '{0}' has already been initialized. Please remove the 'initializeSchema' attribute from the provider configuration.",
+                            this.Name));
+                    }
+                }
+            }
+        }
+
         private void SaveExceptionChainToDatabase(SqlTransaction transaction, Exception exception,
             int eventId)
         {
@@ -219,7 +294,7 @@ namespace CuttingEdge.Logging
             string connectionStringName = config["connectionStringName"];
 
             // Throw exception when no connectionStringName is provided
-            if (string.IsNullOrEmpty(connectionStringName) == true)
+            if (string.IsNullOrEmpty(connectionStringName))
             {
                 throw new ProviderException(SR.GetString(SR.MissingConnectionStringAttribute, name));
             }
@@ -237,6 +312,28 @@ namespace CuttingEdge.Logging
             config.Remove("connectionStringName");
 
             this.connectionString = connectionString;
+        }
+
+        private bool MustInitializeDatabaseSchema(string name, NameValueCollection config)
+        {
+            string initializeSchema = config["initializeSchema"];
+
+            config.Remove("initializeSchema");
+
+            if (!string.IsNullOrEmpty(initializeSchema))
+            {
+                bool mustInitializeSchema;
+
+                if (!bool.TryParse(initializeSchema, out mustInitializeSchema))
+                {
+                    throw new ProviderException(SR.GetString(SR.InvalidBooleanAttribute, initializeSchema, 
+                        name));
+                }
+
+                return mustInitializeSchema;
+            }
+
+            return false;
         }
     }
 }

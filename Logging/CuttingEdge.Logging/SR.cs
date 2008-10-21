@@ -49,6 +49,7 @@ namespace CuttingEdge.Logging
         internal const string DuplicateLoggingProviderInConfig = "DuplicateLoggingProviderInConfig";
         internal const string UnrecognizedAttributeInProviderConfiguration = "UnrecognizedAttributeInProviderConfiguration";
         internal const string InvalidThresholdValueInProviderConfiguration = "InvalidThresholdValueInProviderConfiguration";
+        internal const string InvalidBooleanAttribute = "InvalidBooleanAttribute";
 
         // Exception messages for LoggingProviderCollection class
         internal const string ProviderParameterMustBeOfTypeX = "ProviderParameterMustBeOfTypeX";
@@ -56,10 +57,11 @@ namespace CuttingEdge.Logging
         // Exception messages for WindowsEventLogLoggingProvider class
         internal const string EmptyOrMissingPropertyInConfiguration = "EmptyOrMissingPropertyInConfiguration";
 
-        // Exception messages for DatabaseLoggingProviderBase
+        // Exception messages for SqlLoggingProviderBase
         internal const string MissingConnectionStringAttribute = "MissingConnectionStringAttribute";
         internal const string MissingConnectionStringInConfig = "MissingConnectionStringInConfig";
         internal const string EventCouldNotBeLoggedWithX = "EventCouldNotBeLoggedWithX";
+        internal const string SqlLoggingProviderSchemaScripts = "SqlLoggingProviderSchemaScripts";
 
         private static readonly ResourceManager resource =
             new ResourceManager(typeof(SR).Namespace + ".LoggingExceptionMessages", typeof(SR).Assembly);
