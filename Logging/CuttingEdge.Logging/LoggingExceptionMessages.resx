@@ -132,6 +132,9 @@
   <data name="EventCouldNotBeLoggedWithX" xml:space="preserve">
     <value>The event could not be logged with the {0}.</value>
   </data>
+  <data name="InvalidBooleanAttribute" xml:space="preserve">
+    <value>Invalid value '{0}' in attribute 'initializeSchema' in provider {1} in config file. Should be True or False.</value>
+  </data>
   <data name="InvalidFallbackProviderPropertyInConfig" xml:space="preserve">
     <value>There was an error in the '{0}' section of the the configuration file. The given {1} with name '{2}' has a 'fallbackProvider' property with a value of '{3}'. No provider with that name could be found. The given fallbackProvider must be an item in the list of logging providers. Please check the configuration file for errors.</value>
   </data>
@@ -155,6 +158,128 @@
   </data>
   <data name="SectionIsNotOfCorrectType" xml:space="preserve">
     <value>The section '{0}' in the configuration's &lt;configSections&gt; is not of type {1} but of type {2}.</value>
+  </data>
+  <data name="SqlLoggingProviderSchemaScripts" xml:space="preserve">
+    <value>CREATE TABLE [dbo].[logging_EventTypes](
+	[EventTypeId] [int] NOT NULL,
+	[Name] [nvarchar](50) NOT NULL,
+	[Description] [nvarchar](255) NULL,
+ CONSTRAINT [PK_logging_EventTypes] PRIMARY KEY CLUSTERED 
+(
+	[EventTypeId] ASC
+) ON [PRIMARY]
+) ON [PRIMARY]
+
+
+GO
+
+
+CREATE TABLE [dbo].[logging_Events](
+	[EventId] [int] IDENTITY(1,1) NOT NULL,
+	[EventTypeId] [int] NOT NULL,
+	[EventTime] [datetime] NOT NULL CONSTRAINT [DF_logging_Events_eventTime]  DEFAULT (getdate()),
+	[Message] [ntext] NULL,
+	[Source] [ntext] NULL,
+ CONSTRAINT [PK_logging_Events] PRIMARY KEY CLUSTERED 
+(
+	[EventId] ASC
+) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+
+GO
+
+
+CREATE TABLE [dbo].[logging_Exceptions](
+	[ExceptionId] [int] IDENTITY(1,1) NOT NULL,
+	[EventId] [int] NOT NULL,
+	[ParentExceptionId] [int] NULL,
+	[ExceptionType] [nvarchar](255) NOT NULL,
+	[Message] [ntext] NULL,
+	[StackTrace] [ntext] NULL,
+ CONSTRAINT [PK_logging_Exceptions] PRIMARY KEY CLUSTERED 
+(
+	[ExceptionId] ASC
+) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+
+GO
+
+
+CREATE PROCEDURE [dbo].[logging_AddEvent]
+	@EventTypeId int,
+	@Message ntext,
+	@Source ntext
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	INSERT INTO dbo.logging_Events (EventTypeId, Message, Source) VALUES (@EventTypeId, @Message, @Source);
+
+	SELECT CONVERT(int, SCOPE_IDENTITY());
+END
+
+
+GO
+
+
+CREATE PROCEDURE [dbo].[logging_AddException]
+	@EventId int,
+	@ParentExceptionId int,
+	@ExceptionType nvarchar(255),
+	@Message as ntext,
+	@StackTrace as ntext
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	INSERT INTO dbo.logging_Exceptions (EventId, ParentExceptionId, ExceptionType, Message, StackTrace) 
+	VALUES (@EventId, @ParentExceptionId, @ExceptionType, @Message, @StackTrace);
+
+	SELECT CONVERT(int, SCOPE_IDENTITY());
+END
+
+
+GO
+
+
+ALTER TABLE [dbo].[logging_Exceptions] WITH CHECK ADD CONSTRAINT [FK_logging_Exceptions_logging_Events] FOREIGN KEY([EventId])
+REFERENCES [dbo].[logging_Events] ([EventId])
+
+
+ALTER TABLE [dbo].[logging_Exceptions] CHECK CONSTRAINT [FK_logging_Exceptions_logging_Events]
+
+
+ALTER TABLE [dbo].[logging_Exceptions] WITH CHECK ADD CONSTRAINT [FK_logging_Exceptions_logging_Exceptions] FOREIGN KEY([ParentExceptionId])
+REFERENCES [dbo].[logging_Exceptions] ([ExceptionId])
+
+
+ALTER TABLE [dbo].[logging_Exceptions] CHECK CONSTRAINT [FK_logging_Exceptions_logging_Exceptions]
+
+
+ALTER TABLE [dbo].[logging_Events] WITH CHECK ADD CONSTRAINT [FK_logging_Events_logging_EventTypes] FOREIGN KEY([EventTypeId])
+REFERENCES [dbo].[logging_EventTypes] ([EventTypeId])
+
+
+ALTER TABLE [dbo].[logging_Events] CHECK CONSTRAINT [FK_logging_Events_logging_EventTypes]
+
+
+
+INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
+VALUES (0, 'Debug', 'A debug event. This indicates a verbose event, usefull during development.')
+
+INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
+VALUES (1, 'Information', 'An information event. This indicates a significant, successful operation.')
+
+INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
+VALUES (2, 'Warning', 'A warning event. This indicates a problem that is not immediately significant, but that may signify conditions that could cause future problems.')
+
+INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
+VALUES (3, 'Error', 'An error event. This indicates a significant problem the user should know about; usually a loss of functionality or data.')
+
+INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
+VALUES (4, 'Critical', 'A critical event. This indicates a fatal error or application crash.')</value>
   </data>
   <data name="UnrecognizedAttributeInProviderConfiguration" xml:space="preserve">
     <value>The configuration for provider '{0}' contains the unrecognized attribute with name '{1}'.</value>
