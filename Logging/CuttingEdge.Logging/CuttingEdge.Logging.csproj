@@ -46,8 +46,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AspNetExceptionLoggingModule.cs" />
-    <Compile Include="AspNetTraceLoggingProvider.cs" />
+    <Compile Include="SqlLoggingHelper.cs" />
+    <Compile Include="Web\AspNetExceptionLoggingModule.cs" />
+    <Compile Include="Web\AspNetSqlLoggingProvider.cs" />
+    <Compile Include="Web\AspNetTraceLoggingProvider.cs" />
     <Compile Include="ConsoleLoggingProvider.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Logger.cs" />
@@ -62,6 +64,7 @@
     <Compile Include="SqlLoggingProvider.cs" />
     <Compile Include="SR.cs" />
     <Compile Include="LoggingHelper.cs" />
+    <Compile Include="Web\UserIdentityRetrievalType.enum.cs" />
     <Compile Include="WindowsEventLogLoggingProvider.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -74,7 +77,12 @@
     <Content Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SqlLoggingProviderScripts.sql" />
+    <None Include="Web\AspNetSqlLoggingProviderScripts.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SqlLoggingProviderScripts.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

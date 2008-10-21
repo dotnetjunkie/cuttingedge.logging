@@ -44,7 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AspNetSqlLoggingProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -52,11 +51,6 @@
       <Project>{740C36FE-5353-4862-907A-693511194CC1}</Project>
       <Name>CuttingEdge.Logging</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="AspNetSqlLoggingProviderScripts.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -57,11 +57,14 @@ namespace CuttingEdge.Logging
         // Exception messages for WindowsEventLogLoggingProvider class
         internal const string EmptyOrMissingPropertyInConfiguration = "EmptyOrMissingPropertyInConfiguration";
 
-        // Exception messages for SqlLoggingProviderBase
+        // Exception messages for SqlLoggingProvider
         internal const string MissingConnectionStringAttribute = "MissingConnectionStringAttribute";
         internal const string MissingConnectionStringInConfig = "MissingConnectionStringInConfig";
         internal const string EventCouldNotBeLoggedWithX = "EventCouldNotBeLoggedWithX";
         internal const string SqlLoggingProviderSchemaScripts = "SqlLoggingProviderSchemaScripts";
+        internal const string InitializationOfDatabaseSchemaFailed = "InitializationOfDatabaseSchemaFailed";
+        internal const string SqlProviderAlreadyInitialized = "SqlProviderAlreadyInitialized";
+        internal const string AspNetSqlLoggingProviderSchemaScripts = "AspNetSqlLoggingProviderSchemaScripts";
 
         private static readonly ResourceManager resource =
             new ResourceManager(typeof(SR).Namespace + ".LoggingExceptionMessages", typeof(SR).Assembly);

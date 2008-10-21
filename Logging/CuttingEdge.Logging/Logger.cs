@@ -79,7 +79,7 @@ namespace CuttingEdge.Logging
     ///     &lt;system.web&gt;
     ///         &lt;httpModules&gt;
     ///             &lt;add name="ExceptionLogger" 
-    ///                 type="CuttingEdge.Logging.AspNetExceptionLoggingModule, CuttingEdge.Logging"/&gt;
+    ///                 type="CuttingEdge.Logging.Web.AspNetExceptionLoggingModule, CuttingEdge.Logging"/&gt;
     ///         &lt;/httpModules&gt;
     ///     &lt;/system.web&gt;
     /// &lt;/configuration&gt;

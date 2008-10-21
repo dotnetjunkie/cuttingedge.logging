@@ -28,7 +28,7 @@ using System;
 using System.Threading;
 using System.Web;
 
-namespace CuttingEdge.Logging
+namespace CuttingEdge.Logging.Web
 {
     /// <summary>
     /// HttpModule to enable logging of unhandled exceptions in web applications.
@@ -68,7 +68,7 @@ namespace CuttingEdge.Logging
     ///     &lt;system.web&gt;
     ///         &lt;httpModules&gt;
     ///             &lt;add name="ExceptionLogger" 
-    ///                 type="CuttingEdge.Logging.AspNetExceptionLoggingModule, CuttingEdge.Logging"/&gt;
+    ///                 type="CuttingEdge.Logging.Web.AspNetExceptionLoggingModule, CuttingEdge.Logging"/&gt;
     ///         &lt;/httpModules&gt;
     ///     &lt;/system.web&gt;
     /// &lt;/configuration&gt;

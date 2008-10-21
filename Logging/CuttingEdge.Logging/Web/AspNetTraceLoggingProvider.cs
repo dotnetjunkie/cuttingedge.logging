@@ -29,7 +29,7 @@ using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Web;
 
-namespace CuttingEdge.Logging
+namespace CuttingEdge.Logging.Web
 {
     /// <summary>
     /// Manages the writing of logging information in ASP.NET applications to the ASP.NET 
@@ -56,7 +56,7 @@ namespace CuttingEdge.Logging
     ///         &lt;providers&gt;
     ///             &lt;add 
     ///                 name="AspNetTraceLoggingProvider"
-    ///                 type="CuttingEdge.Logging.AspNetTraceLoggingProvider, CuttingEdge.Logging"
+    ///                 type="CuttingEdge.Logging.Web.AspNetTraceLoggingProvider, CuttingEdge.Logging"
     ///                 threshold="Warning"
     ///                 description="ASP.NET trace logging provider"
     ///             /&gt;

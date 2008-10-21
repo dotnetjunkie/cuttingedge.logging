@@ -369,25 +369,6 @@ namespace CuttingEdge.Logging
             return this.logger.Log(entry);
         }
 
-        ///// <summary>Adds a event to the wrapped <see cref="Logger"/>.</summary>
-        ///// <param name="severity">The severity of the event.</param>
-        ///// <param name="message">The message of the event.</param>
-        ///// <param name="source">The optional source to log.</param>
-        ///// <param name="exception">An optional exception to log.</param>
-        ///// <returns>The id of the logged event or null in one of the following reasons:
-        ///// The event hasn't been logged, because of the current 
-        ///// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
-        ///// Returning an id is not supported by the current implementation;
-        ///// The event has been logged to a fallback provider, because of an error in the current implementation.
-        ///// </returns>
-        ///// <exception cref="ArgumentNullException">Thrown when the given <paramref name="message"/> is a null reference.</exception>
-        ///// <exception cref="ArgumentException">Thrown when the given <paramref name="message"/> is an empty string.</exception>
-        ///// <exception cref="InvalidEnumArgumentException">Thrown when<paramref name="severity"/>has an invalid value.</exception>
-        //object ILogger.Log(LoggingEventType severity, string message, string source, Exception exception)
-        //{
-        //    return this.logger.Log(severity, message, source, exception);
-        //}
-
         /// <summary>Logs the specified entry to the wrapped <see cref="LoggerWrapper.Logger">Logger</see>.</summary>
         /// <param name="entry">The entry to log.</param>
         /// <returns>

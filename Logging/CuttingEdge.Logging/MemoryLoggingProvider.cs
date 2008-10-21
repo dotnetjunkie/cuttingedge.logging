@@ -32,7 +32,7 @@ using System.Configuration.Provider;
 namespace CuttingEdge.Logging
 {
     /// <summary>
-    /// Manages storage of logging information into memory. Use the <see cref="GetLoggedEvents"/> to retrieve
+    /// Manages storage of logging information into memory. Use the <see cref="GetLoggedEntries"/> to retrieve
     /// a copy of the internal cache and <see cref="Clear"/> to clear the internal cache.
     /// </summary>
     /// <remarks>
