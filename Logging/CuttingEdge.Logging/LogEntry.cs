@@ -45,11 +45,6 @@ namespace CuttingEdge.Logging
         private readonly Exception exception;
 
         /// <summary>Initializes a new instance of the <see cref="LogEntry"/> class.</summary>
-        private LogEntry()
-        {
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="LogEntry"/> class.</summary>
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The message of the event.</param>
         /// <param name="source">The optional source to log.</param>

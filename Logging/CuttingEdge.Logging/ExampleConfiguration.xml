@@ -29,7 +29,7 @@
 	<system.web>
 		<httpModules>
 			<add name="ExceptionLogger"
-				 type="CuttingEdge.Logging.AspNetExceptionLoggingModule, CuttingEdge.Logging"/>
+				 type="CuttingEdge.Logging.Web.AspNetExceptionLoggingModule, CuttingEdge.Logging"/>
 		</httpModules>
 	</system.web>
 </configuration>
