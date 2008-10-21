@@ -41,11 +41,13 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\InvalidLoggingTypes.cs" />
     <Compile Include="Helpers\StubLoggingProvider.cs" />
+    <Compile Include="LogEntryTests.cs" />
     <Compile Include="LoggerWrapperTests.cs" />
     <Compile Include="LoggingProviderBaseTests.cs" />
     <Compile Include="Helpers\LoggingProviderTestingScope.cs" />

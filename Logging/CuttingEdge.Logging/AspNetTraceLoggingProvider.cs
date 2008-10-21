@@ -105,15 +105,9 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>Implements the functionality to log the event.</summary>
-        /// <param name="severity">The severity of the event.</param>
-        /// <param name="message">The description of the event.</param>
-        /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">An optional source where the event occured.</param>
-        /// <returns>
-        /// The id of the logged event or null when an id is inappropriate.
-        /// </returns>
-        protected override object LogInternal(LoggingEventType severity, string message, Exception exception,
-            string source)
+        /// <param name="entry">The entry to log.</param>
+        /// <returns>Returns null.</returns>
+        protected override object LogInternal(LogEntry entry)
         {
             HttpContext currentContext = HttpContext.Current;
             TraceContext currentTrace = currentContext != null ? currentContext.Trace : null;
@@ -124,13 +118,13 @@ namespace CuttingEdge.Logging
                 return null;
             }
 
-            if (LoggingEventType.Warning <= severity)
+            if (LoggingEventType.Warning <= entry.Severity)
             {
-                currentTrace.Warn(this.Name, message, exception);
+                currentTrace.Warn(this.Name, entry.Message, entry.Exception);
             }
             else
             {
-                currentTrace.Write(this.Name, message, exception);
+                currentTrace.Write(this.Name, entry.Message, entry.Exception);
             }
 
             return null;

@@ -35,15 +35,10 @@ namespace CuttingEdge.Logging
     /// </summary>
     public interface ILogger
     {
-        /// <summary>Adds a event to the log.</summary>
-        /// <param name="severity">The severity of the event.</param>
-        /// <param name="message">The message of the event.</param>
-        /// <param name="source">The optional source to log.</param>
-        /// <param name="exception">An optional exception to log.</param>
+        /// <summary>Logs the specified entry.</summary>
+        /// <param name="entry">The entry to log.</param>
         /// <returns>The id of the saved log (or null when an id is not appropriate for this type of logger.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when the given <paramref name="message"/> is a null reference.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <paramref name="message"/> is an empty string.</exception>
-        /// <exception cref="InvalidEnumArgumentException">Thrown when<paramref name="type"/> has an invalid value.</exception>
-        object Log(LoggingEventType severity, string message, string source, Exception exception);
+        /// <exception cref="ArgumentNullException">Thrown when the given <paramref name="entry"/> is a null reference.</exception>
+        object Log(LogEntry entry);
     }
 }

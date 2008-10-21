@@ -78,13 +78,13 @@ namespace CuttingEdge.Logging
     public class MemoryLoggingProvider : LoggingProviderBase
     {
         private readonly object locker = new object();
-        private readonly List<MemoryLoggingEvent> loggingEvents = new List<MemoryLoggingEvent>();
+        private readonly List<LogEntry> loggingEvents = new List<LogEntry>();
 
         /// <summary>
-        /// Gets a copy of the internal cache of <see cref="MemoryLoggingEvent"/> objects.
+        /// Gets a copy of the internal cache of <see cref="LogEntry"/> objects.
         /// </summary>
-        /// <returns>An array of <see cref="MemoryLoggingEvent"/> objects.</returns>
-        public MemoryLoggingEvent[] GetLoggedEvents()
+        /// <returns>An array of <see cref="LogEntry"/> objects.</returns>
+        public LogEntry[] GetLoggedEntries()
         {
             lock (this.locker)
             {
@@ -92,7 +92,7 @@ namespace CuttingEdge.Logging
             }
         }
 
-        /// <summary>Clears the internal cache of <see cref="MemoryLoggingEvent"/> objects.</summary>
+        /// <summary>Clears the internal cache of <see cref="LogEntry"/> objects.</summary>
         public void Clear()
         {
             lock (this.locker)
@@ -139,21 +139,13 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>Implements the functionality to log the event.</summary>
-        /// <param name="severity">The severity of the event.</param>
-        /// <param name="message">The description of the event.</param>
-        /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">An optional source where the event occured.</param>
-        /// <returns>
-        /// The index of the inserted event in the internal cache.
-        /// </returns>
-        protected override object LogInternal(LoggingEventType severity, string message, Exception exception,
-            string source)
+        /// <param name="entry">The entry to log.</param>
+        /// <returns>An <see cref="Int32"/> with the index of the inserted event in the internal cache.</returns>
+        protected override object LogInternal(LogEntry entry)
         {
-            MemoryLoggingEvent e = new MemoryLoggingEvent(severity, message, source, exception);
-
             lock (this.locker)
             {
-                this.loggingEvents.Add(e);
+                this.loggingEvents.Add(entry);
                 
                 return this.loggingEvents.Count - 1;
             }

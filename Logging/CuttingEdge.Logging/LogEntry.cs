@@ -25,31 +25,58 @@
 #endregion
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 
 namespace CuttingEdge.Logging
 {
     /// <summary>
-    /// Container for event data for the <see cref="MemoryLoggingProvider"/>.
+    /// The LogEntry class encapsulates content and associated properties for the information an application 
+    /// sends to the logging framework.
     /// </summary>
-    [DebuggerDisplay("LoggingEvent (Severity: {Severity}, Message: {Message}, Source: {Source})")]
-    public class MemoryLoggingEvent
+    [DebuggerDisplay("LoggingEvent (Severity: {Severity}, Message: {Message}, Source: {Source}, Exception: {Exception})")]
+    [Serializable]
+    public class LogEntry
     {
         private readonly LoggingEventType severity;
         private readonly string message;
         private readonly string source;
         private readonly Exception exception;
 
-        /// <summary>Initializes a new instance of the <see cref="MemoryLoggingEvent"/> class.</summary>
-        /// <param name="severity">The severity.</param>
-        /// <param name="message">The message.</param>
-        /// <param name="source">The source.</param>
-        /// <param name="exception">The exception.</param>
-        public MemoryLoggingEvent(LoggingEventType severity, string message, string source, Exception exception)
+        /// <summary>Initializes a new instance of the <see cref="LogEntry"/> class.</summary>
+        private LogEntry()
         {
-            LoggingHelper.ValidateSeverityInValidRange(severity);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="LogEntry"/> class.</summary>
+        /// <param name="severity">The severity of the event.</param>
+        /// <param name="message">The message of the event.</param>
+        /// <param name="source">The optional source to log.</param>
+        /// <param name="exception">An optional exception to log.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the given <paramref name="message"/> is a null reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when the given <paramref name="message"/> is an empty string.</exception>
+        /// <exception cref="InvalidEnumArgumentException">Thrown when<paramref name="severity"/>has an invalid value.</exception>
+        public LogEntry(LoggingEventType severity, string message, string source, Exception exception)
+        {
+            if (severity < LoggingEventType.Debug || severity > LoggingEventType.Critical)
+            {
+                throw new InvalidEnumArgumentException("severity", (int)severity, typeof(LoggingEventType));
+            }
+
+            if (String.IsNullOrEmpty(message))
+            {
+                if (message != null)
+                {
+                    throw new ArgumentException(SR.GetString(SR.ArgumentMustNotBeNullOrEmptyString),
+                        "message");
+                }
+                else
+                {
+                    throw new ArgumentNullException("message",
+                        SR.GetString(SR.ArgumentMustNotBeNullOrEmptyString));
+                }
+            }
 
             this.severity = severity;
             this.message = message;
@@ -86,13 +113,14 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>
-        /// Returns a <see cref="T:System.String"/> that represents the current <see cref="MemoryLoggingEvent"/>.
+        /// Returns a <see cref="String"/> that represents the current <see cref="LogEntry"/>.
         /// </summary>
-        /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MemoryLoggingEvent"/>.</returns>
+        /// <returns>A <see cref="String"/> that represents the current <see cref="LogEntry"/>.</returns>
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, "Severity: {0}, Message: {1}, Source: {2}", 
-                this.severity, this.message, this.source);
+            return string.Format(CultureInfo.InvariantCulture, 
+                "Severity: {0}, Message: {1}, Source: {2}, Exception: {3}", 
+                this.severity, this.message, this.source, this.exception);
         }
     }
 }

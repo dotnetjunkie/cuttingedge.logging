@@ -105,41 +105,35 @@ namespace CuttingEdge.Logging
         /// <summary>
         /// Implements the functionality to log the event.
         /// </summary>
-        /// <param name="severity">The severity of the event.</param>
-        /// <param name="message">The description of the event.</param>
-        /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">An optional source where the event occured.</param>
-        /// <returns>
-        /// The id of the logged event or null when an id is inappropriate.
-        /// </returns>
-        protected override object LogInternal(LoggingEventType severity, string message, Exception exception, 
-            string source)
+        /// <param name="entry">The entry to log.</param>
+        /// <returns>Returns null.</returns>
+        protected override object LogInternal(LogEntry entry)
         {
-            string formattedEvent = FormatEvent(severity, message, exception, source);
+            string formattedEvent = FormatEvent(entry);
 
             Console.Write(formattedEvent);
 
+            // Returning an ID is inappropriate for this type of logger.
             return null;
         }
 
-        private static string FormatEvent(LoggingEventType severity, string message, Exception exception, 
-            string source)
+        private static string FormatEvent(LogEntry entry)
         {
             StringBuilder builder = new StringBuilder(256);
             
             builder.AppendLine("LoggingEvent:");
-            builder.Append("Severity:\t").AppendLine(severity.ToString());
-            builder.Append("Message:\t").AppendLine(message);
+            builder.Append("Severity:\t").AppendLine(entry.Severity.ToString());
+            builder.Append("Message:\t").AppendLine(entry.Message);
 
-            if (source != null)
+            if (entry.Source != null)
             {
-                builder.Append("Source\t").AppendLine(source);
+                builder.Append("Source\t").AppendLine(entry.Source);
             }
 
-            if (exception != null)
+            if (entry.Exception != null)
             {
-                builder.Append("Exception:\t").AppendLine(exception.Message);
-                builder.AppendLine(exception.StackTrace);
+                builder.Append("Exception:\t").AppendLine(entry.Exception.Message);
+                builder.AppendLine(entry.Exception.StackTrace);
                 builder.AppendLine();
             }
 

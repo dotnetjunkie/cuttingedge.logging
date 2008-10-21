@@ -149,10 +149,11 @@ namespace CuttingEdge.Logging
         {
             LoggingHelper.ValidateExceptionIsNotNull(exception);
 
-            string message = LoggingHelper.GetExceptionMessage(exception);
+            string message = LoggingHelper.GetExceptionMessageOrExceptionType(exception);
 
+            LogEntry entry = new LogEntry(LoggingEventType.Error, message, null, exception);
             ILogger logger = this;
-            return logger.Log(LoggingEventType.Error, message, null, exception);
+            return logger.Log(entry);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -172,8 +173,9 @@ namespace CuttingEdge.Logging
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateExceptionIsNotNull(exception);
 
+            LogEntry entry = new LogEntry(LoggingEventType.Error, message, null, exception);
             ILogger logger = this;
-            return logger.Log(LoggingEventType.Error, message, null, exception);
+            return logger.Log(entry);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -191,11 +193,12 @@ namespace CuttingEdge.Logging
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceIsNotNull(source);
 
-            string message = LoggingHelper.GetExceptionMessage(exception);
+            string message = LoggingHelper.GetExceptionMessageOrExceptionType(exception);
             string methodName = LoggingHelper.BuildMethodName(source);
 
+            LogEntry entry = new LogEntry(LoggingEventType.Error, message, methodName, exception);
             ILogger logger = this;
-            return logger.Log(LoggingEventType.Error, message, methodName, exception);
+            return logger.Log(entry);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -219,8 +222,9 @@ namespace CuttingEdge.Logging
 
             string methodName = LoggingHelper.BuildMethodName(source);
 
+            LogEntry entry = new LogEntry(LoggingEventType.Error, message, methodName, exception);
             ILogger logger = this;
-            return logger.Log(LoggingEventType.Error, message, methodName, exception);
+            return logger.Log(entry);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -242,8 +246,9 @@ namespace CuttingEdge.Logging
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 
+            LogEntry entry = new LogEntry(LoggingEventType.Error, message, source, exception);
             ILogger logger = this;
-            return logger.Log(LoggingEventType.Error, message, source, exception);
+            return logger.Log(entry);
         }
 
         /// <summary>Logs an event.</summary>
@@ -271,8 +276,9 @@ namespace CuttingEdge.Logging
 
             string methodName = LoggingHelper.BuildMethodName(source);
 
+            LogEntry entry = new LogEntry(severity, message, methodName, exception);
             ILogger logger = this;
-            return logger.Log(severity, message, methodName, exception);
+            return logger.Log(entry);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -298,8 +304,9 @@ namespace CuttingEdge.Logging
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 
+            LogEntry entry = new LogEntry(severity, message, source, exception);
             ILogger logger = this;
-            return logger.Log(severity, message, source, exception);
+            return logger.Log(entry);
         }
 
         /// <summary>Logs an information event.</summary>
@@ -317,8 +324,9 @@ namespace CuttingEdge.Logging
         {
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
 
+            LogEntry entry = new LogEntry(LoggingEventType.Information, message, null, null);
             ILogger logger = this;
-            return logger.Log(LoggingEventType.Information, message, null, null);
+            return logger.Log(entry);
         }
 
         /// <summary>Logs an event.</summary>
@@ -339,8 +347,9 @@ namespace CuttingEdge.Logging
             LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateSeverityInValidRange(severity);
 
+            LogEntry entry = new LogEntry(severity, message, null, null);
             ILogger logger = this;
-            return logger.Log(severity, message, null, null);
+            return logger.Log(entry);
         }
 
         /// <summary>Logs an information event.</summary>
@@ -362,8 +371,9 @@ namespace CuttingEdge.Logging
 
             string methodName = LoggingHelper.BuildMethodName(source);
 
+            LogEntry entry = new LogEntry(LoggingEventType.Information, message, methodName, null);
             ILogger logger = this;
-            return logger.Log(LoggingEventType.Information, message, methodName, null);
+            return logger.Log(entry);
         }
 
         /// <summary>Logs an event.</summary>
@@ -389,8 +399,9 @@ namespace CuttingEdge.Logging
 
             string methodName = LoggingHelper.BuildMethodName(source);
 
+            LogEntry entry = new LogEntry(severity, message, methodName, null);
             ILogger logger = this;
-            return logger.Log(severity, message, methodName, null);
+            return logger.Log(entry);
         }
 
         /// <summary>Logs an event.</summary>
@@ -414,38 +425,36 @@ namespace CuttingEdge.Logging
             LoggingHelper.ValidateSeverityInValidRange(severity);
             LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 
+            LogEntry entry = new LogEntry(severity, message, source, null);
             ILogger logger = this;
-            return logger.Log(severity, message, source, null);
+            return logger.Log(entry);
         }
 
         /// <summary>Adds a event to the log. When logging fails, the event is forwarded to the
         /// <see cref="FallbackProvider"/>, if any.</summary>
-        /// <param name="type">The type of event to log.</param>
-        /// <param name="message">The message of the event.</param>
-        /// <param name="source">The optional source to log.</param>
-        /// <param name="exception">An optional exception to log.</param>
+        /// <param name="entry">The entry to log.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current <see cref="Threshold"/> level;
         /// Returning an id is not supported by the current implementation;
         /// The event has been logged to a fallback provider, because of an error in the current implementation.
         /// </returns>
-        /// <exception cref="ArgumentNullException">Thrown when the given <paramref name="message"/> is a null reference.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <paramref name="message"/> is an empty string.</exception>
-        /// <exception cref="InvalidEnumArgumentException">Thrown when<paramref name="type"/> has an invalid value.</exception>
-        object ILogger.Log(LoggingEventType type, string message, string source, Exception exception)
+        /// <exception cref="ArgumentNullException">Thrown when the given <paramref name="entry"/> is a null reference.</exception>
+        object ILogger.Log(LogEntry entry)
         {
-            LoggingHelper.ValidateSeverityInValidRange(type);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
+            if (entry == null)
+            {
+                throw new ArgumentNullException("entry");
+            }
 
             // Only log when the event is equal to or above the specified threshold.
-            if (type < this.threshold)
+            if (entry.Severity < this.threshold)
             {
                 return null;
             }
 
             try
             {
-                return this.LogInternal(type, message, exception, source);
+                return this.LogInternal(entry);
             }
             catch (Exception ex)
             {
@@ -456,7 +465,7 @@ namespace CuttingEdge.Logging
                 }
 
                 // When there is a fallback provider, we let the fallback provider log the event.
-                this.LogToFallbackProvider(type, message, source, exception);
+                this.LogToFallbackProvider(entry);
 
                 // We also log the failure of the current provider
                 this.LogProviderFailureToFallbackProvider(ex);
@@ -468,13 +477,9 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>Implements the functionality to log the event.</summary>
-        /// <param name="severity">The severity of the event.</param>
-        /// <param name="message">The description of the event.</param>
-        /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">An optional source where the event occured.</param>
+        /// <param name="entry">The entry to log.</param>
         /// <returns>The id of the logged event or null when an id is inappropriate.</returns>
-        protected abstract object LogInternal(LoggingEventType severity, string message, Exception exception, 
-            string source);
+        protected abstract object LogInternal(LogEntry entry);
 
         /// <summary>Checks for unrecognized attributes and throws an <see cref="ProviderException"/> when
         /// the <paramref name="config"/> contains values.</summary>
@@ -560,10 +565,10 @@ namespace CuttingEdge.Logging
             // We don't throw an exception when there is no provider, because this attribute is optional.
         }
 
-        private void LogToFallbackProvider(LoggingEventType type, string message, string source, Exception exception)
+        private void LogToFallbackProvider(LogEntry entry)
         {
             ILogger fallbackProvider = this.FallbackProvider;
-            fallbackProvider.Log(type, message, source, exception);
+            fallbackProvider.Log(entry);
         }
 
         private void LogProviderFailureToFallbackProvider(Exception exception)
@@ -571,7 +576,11 @@ namespace CuttingEdge.Logging
             string failureMessage = SR.GetString(SR.EventCouldNotBeLoggedWithX, this.GetType().Name);
 
             ILogger fallbackProvider = this.FallbackProvider;
-            fallbackProvider.Log(LoggingEventType.Error, failureMessage, this.GetType().FullName, exception);
+
+            LogEntry entry = 
+                new LogEntry(LoggingEventType.Error, failureMessage, this.GetType().FullName, exception);
+
+            fallbackProvider.Log(entry);
         }
     }
 }

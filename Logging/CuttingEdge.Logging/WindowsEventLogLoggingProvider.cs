@@ -118,18 +118,22 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>Implements the functionality to log the event.</summary>
-        /// <param name="severity">The severity of the event.</param>
-        /// <param name="message">The description of the event.</param>
-        /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">An optional source where the event occured.</param>
-        /// <returns>The id of the logged event or null when an id is inappropriate.</returns>
-        protected override object LogInternal(LoggingEventType severity, string message, Exception exception, 
-            string source)
+        /// <param name="entry">The entry to log.</param>
+        /// <returns>Returns null.</returns>
+        protected override object LogInternal(LogEntry entry)
         {
-            EventLogEntryType? entry = ConvertToEventLogEntry(severity);
+            EventLogEntryType? eventLogType = ConvertToEventLogEntry(entry.Severity);
 
             using (EventLog eventLog = new EventLog(this.logName))
             {
+                Exception exception = entry.Exception;
+                string message = entry.Message;
+
+                if (entry.Source != null)
+                {
+                    message += "\nSource: " + entry.Source;
+                }
+
                 if (exception != null)
                 {
                     while (exception != null)
@@ -150,7 +154,7 @@ namespace CuttingEdge.Logging
 
                 if (entry != null)
                 {
-                    eventLog.WriteEntry(message, entry.Value);
+                    eventLog.WriteEntry(message, eventLogType.Value);
                 }
                 else
                 {
@@ -158,7 +162,8 @@ namespace CuttingEdge.Logging
                 }
             }
 
-            return 0;
+            // Returning an ID is inappropriate for this type of logger.
+            return null;
         }
 
         private static EventLogEntryType? ConvertToEventLogEntry(LoggingEventType severity)
