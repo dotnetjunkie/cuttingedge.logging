@@ -38,26 +38,6 @@ namespace CuttingEdge.Logging.UnitTests
             tester.Log(ValidLogEntry);
         }
 
-        //[TestMethod]
-        //public void LoggingProviderBaseLogShouldFailOnInvalidEventType()
-        //{
-        //    ILogger tester = new StubLoggingProvider();
-
-        //    foreach (LoggingEventType type in EventTypeEnumerator.GetInvalidValues())
-        //    {
-        //        try
-        //        {
-        //            LogEntry entry = new LogEntry(type, "message", "source", new Exception());
-        //            tester.Log(entry);
-        //            Assert.Fail(String.Format("Calling log with a severity of {0} should fail.", type));
-        //        }
-        //        catch (InvalidEnumArgumentException)
-        //        {
-        //            // An InvalidEnumArgumentException should be thrown.
-        //        }
-        //    }
-        //}
-
         [TestMethod]
         public void ThresholdAttributeShouldBeOptional()
         {
@@ -98,59 +78,6 @@ namespace CuttingEdge.Logging.UnitTests
             // This one should fail.
             provider.Initialize(null, new NameValueCollection());
         }
-
-        //[TestMethod]
-        //public void LoggingProviderBaseLogShouldSucceedOnValidEventType()
-        //{
-        //    ILogger tester = new StubLoggingProvider();
-
-        //    foreach (LoggingEventType type in EventTypeEnumerator.GetValidValues())
-        //    {
-        //        tester.Log(type, "message", "source", new Exception());
-        //    }
-        //}
-
-        //[TestMethod]
-        //[ExpectedException(typeof(ArgumentNullException))]
-        //public void LoggingProviderBaseLogShouldFailOnInvalidMessage1()
-        //{
-        //    ILogger tester = new StubLoggingProvider();
-
-        //    tester.Log(LoggingEventType.Error, null, "source", new Exception());
-        //}
-
-        //[TestMethod]
-        //[ExpectedException(typeof(ArgumentException))]
-        //public void LoggingProviderBaseLogShouldFailOnInvalidMessage2()
-        //{
-        //    ILogger tester = new StubLoggingProvider();
-
-        //    tester.Log(LoggingEventType.Error, String.Empty, "source", new Exception());
-        //}
-
-        //[TestMethod]
-        //public void LoggingProviderBaseLogShouldSucceedOnNullSource()
-        //{
-        //    ILogger tester = new StubLoggingProvider();
-
-        //    tester.Log(LoggingEventType.Error, "message", null, new Exception());
-        //}
-
-        //[TestMethod]
-        //public void LoggingProviderBaseLogShouldSucceedOnEmptySource()
-        //{
-        //    ILogger tester = new StubLoggingProvider();
-
-        //    tester.Log(LoggingEventType.Error, "message", string.Empty, new Exception());
-        //}
-
-        //[TestMethod]
-        //public void LoggingProviderBaseLogShouldSucceedOnNullException()
-        //{
-        //    ILogger tester = new StubLoggingProvider();
-
-        //    tester.Log(LoggingEventType.Error, "message", "source", null);
-        //}
 
         [TestMethod]
         public void InitializeShouldSucceed()

@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.ComponentModel;
-using System.Xml.Serialization;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization.Formatters.Soap;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.Logging.UnitTests
 {
     /// <summary>
-    /// Summary description for LogEntryTests
+    /// Tests for the <see cref="LogEntry"/> class.
     /// </summary>
     [TestClass]
     public class LogEntryTests
@@ -45,7 +41,7 @@ namespace CuttingEdge.Logging.UnitTests
         [ExpectedException(typeof(ArgumentException))]
         public void CreatingALogEntryWithValidArgumentsShouldFail1()
         {
-            LogEntry entry = new LogEntry(LoggingEventType.Error, "", null, null);
+            LogEntry entry = new LogEntry(LoggingEventType.Error, String.Empty, null, null);
         }
 
         [TestMethod]
@@ -66,21 +62,21 @@ namespace CuttingEdge.Logging.UnitTests
         [ExpectedException(typeof(InvalidEnumArgumentException))]
         public void CreatingALogEntryWithValidArgumentsShouldFail4()
         {
-            LogEntry entry = new LogEntry((LoggingEventType)(5), "message", "source", new Exception());
+            LogEntry entry = new LogEntry((LoggingEventType)5, "message", "source", new Exception());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidEnumArgumentException))]
         public void CreatingALogEntryWithValidArgumentsShouldFail5()
         {
-            LogEntry entry = new LogEntry((LoggingEventType)(6), "message", "source", new Exception());
+            LogEntry entry = new LogEntry((LoggingEventType)6, "message", "source", new Exception());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidEnumArgumentException))]
         public void CreatingALogEntryWithValidArgumentsShouldFail6()
         {
-            LogEntry entry = new LogEntry((LoggingEventType)(7), "message", "source", new Exception());
+            LogEntry entry = new LogEntry((LoggingEventType)7, "message", "source", new Exception());
         }
 
         [TestMethod]
@@ -157,9 +153,7 @@ namespace CuttingEdge.Logging.UnitTests
                 caughtException = odex;
             }
 
-
             return new LogEntry(LoggingEventType.Error, "message", "source", caughtException);
-
         }
     }
 }
