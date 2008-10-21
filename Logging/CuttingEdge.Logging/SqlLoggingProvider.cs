@@ -184,7 +184,7 @@ namespace CuttingEdge.Logging
                 AddParameter(command, "Message", SqlDbType.NText, exception.Message);
                 AddParameter(command, "StackTrace", SqlDbType.NText, exception.StackTrace);
 
-                return (int)command.ExecuteNonQuery();
+                return (int)command.ExecuteScalar();
             }
         }
 
