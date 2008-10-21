@@ -145,7 +145,7 @@ namespace CuttingEdge.Logging
             return methodName.ToString();
         }
 
-        internal static string GetExceptionMessage(Exception exception)
+        internal static string GetExceptionMessageOrExceptionType(Exception exception)
         {
             string message = exception.Message;
 

@@ -109,7 +109,7 @@ namespace CuttingEdge.Logging.UnitTests
 
                 Logger.Log(exception);
 
-                Assert.AreEqual(LoggingEventType.Error, scope.Logger.GetLoggedEvents()[0].Severity);
+                Assert.AreEqual(LoggingEventType.Error, scope.Logger.GetLoggedEntries()[0].Severity);
             }
         }
 
@@ -123,7 +123,7 @@ namespace CuttingEdge.Logging.UnitTests
 
                 Logger.Log(exception);
 
-                Assert.AreEqual(exceptionMessage, scope.Logger.GetLoggedEvents()[0].Message);
+                Assert.AreEqual(exceptionMessage, scope.Logger.GetLoggedEntries()[0].Message);
             }
         }
 
@@ -136,7 +136,7 @@ namespace CuttingEdge.Logging.UnitTests
 
                 Logger.Log(exception);
 
-                Assert.AreEqual(exception.GetType().Name, scope.Logger.GetLoggedEvents()[0].Message);
+                Assert.AreEqual(exception.GetType().Name, scope.Logger.GetLoggedEntries()[0].Message);
             }
         }
 
@@ -149,7 +149,7 @@ namespace CuttingEdge.Logging.UnitTests
 
                 Logger.Log(exception);
 
-                Assert.AreEqual(1, scope.Logger.GetLoggedEvents().Length);
+                Assert.AreEqual(1, scope.Logger.GetLoggedEntries().Length);
             }
         }
 
@@ -185,7 +185,7 @@ namespace CuttingEdge.Logging.UnitTests
             {
                 Logger.Log("message");
 
-                Assert.AreEqual(LoggingEventType.Information, scope.Logger.GetLoggedEvents()[0].Severity);
+                Assert.AreEqual(LoggingEventType.Information, scope.Logger.GetLoggedEntries()[0].Severity);
             }
         }
 
@@ -196,11 +196,11 @@ namespace CuttingEdge.Logging.UnitTests
             {
                 Logger.Log("message");
 
-                MemoryLoggingEvent loggingMessage = scope.Logger.GetLoggedEvents()[0];
+                LogEntry entry = scope.Logger.GetLoggedEntries()[0];
 
-                Assert.AreEqual("message", loggingMessage.Message);
-                Assert.AreEqual(null, loggingMessage.Source);
-                Assert.AreEqual(null, loggingMessage.Exception);
+                Assert.AreEqual("message", entry.Message);
+                Assert.AreEqual(null, entry.Source);
+                Assert.AreEqual(null, entry.Exception);
             }
         }
 
@@ -237,7 +237,7 @@ namespace CuttingEdge.Logging.UnitTests
             {
                 Logger.Log(new Exception(), MethodBase.GetCurrentMethod());
 
-                Assert.AreEqual(1, scope.Logger.GetLoggedEvents().Length);
+                Assert.AreEqual(1, scope.Logger.GetLoggedEntries().Length);
             }
         }
 
@@ -248,7 +248,7 @@ namespace CuttingEdge.Logging.UnitTests
             {
                 Logger.Log(new Exception(), MethodBase.GetCurrentMethod());
 
-                Assert.AreEqual(LoggingEventType.Error, scope.Logger.GetLoggedEvents()[0].Severity);
+                Assert.AreEqual(LoggingEventType.Error, scope.Logger.GetLoggedEntries()[0].Severity);
             }
         }
 
@@ -300,9 +300,9 @@ namespace CuttingEdge.Logging.UnitTests
                 {
                     Logger.Log(type, "Nice message.");
 
-                    MemoryLoggingEvent[] events = scope.Logger.GetLoggedEvents();
+                    LogEntry[] entries = scope.Logger.GetLoggedEntries();
 
-                    MemoryLoggingEvent lastLoggedEvent = events[events.Length - 1];
+                    LogEntry lastLoggedEvent = entries[entries.Length - 1];
 
                     Assert.IsNotNull(lastLoggedEvent);
 
@@ -318,7 +318,7 @@ namespace CuttingEdge.Logging.UnitTests
             {
                 Logger.Log(LoggingEventType.Information, "Nice message.");
 
-                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
+                LogEntry e = scope.Logger.GetLoggedEntries()[0];
 
                 Assert.AreEqual(LoggingEventType.Information, e.Severity);
                 Assert.AreEqual("Nice message.", e.Message);
@@ -367,12 +367,12 @@ namespace CuttingEdge.Logging.UnitTests
                 Exception exception = new Exception();
                 Logger.Log("message", exception);
 
-                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
+                LogEntry entries = scope.Logger.GetLoggedEntries()[0];
 
-                Assert.AreEqual(LoggingEventType.Error, e.Severity);
-                Assert.AreEqual("message", e.Message);
-                Assert.AreEqual(exception, e.Exception);
-                Assert.AreEqual(null, e.Source);
+                Assert.AreEqual(LoggingEventType.Error, entries.Severity);
+                Assert.AreEqual("message", entries.Message);
+                Assert.AreEqual(exception, entries.Exception);
+                Assert.AreEqual(null, entries.Source);
             }
         }
 
@@ -416,12 +416,12 @@ namespace CuttingEdge.Logging.UnitTests
                 MethodBase method = MethodBase.GetCurrentMethod();
                 Logger.Log("message", method);
 
-                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
+                LogEntry entry = scope.Logger.GetLoggedEntries()[0];
 
-                Assert.AreEqual(LoggingEventType.Information, e.Severity);
-                Assert.AreEqual("message", e.Message);
-                Assert.AreEqual(null, e.Exception);
-                Assert.IsTrue(e.Source.Contains(method.Name));
+                Assert.AreEqual(LoggingEventType.Information, entry.Severity);
+                Assert.AreEqual("message", entry.Message);
+                Assert.AreEqual(null, entry.Exception);
+                Assert.IsTrue(entry.Source.Contains(method.Name));
             }
         }
 
@@ -483,12 +483,12 @@ namespace CuttingEdge.Logging.UnitTests
                 MethodBase method = MethodBase.GetCurrentMethod();
                 Logger.Log(LoggingEventType.Warning, "message", method);
 
-                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
+                LogEntry entry = scope.Logger.GetLoggedEntries()[0];
 
-                Assert.AreEqual(LoggingEventType.Warning, e.Severity);
-                Assert.AreEqual("message", e.Message);
-                Assert.AreEqual(null, e.Exception);
-                Assert.IsTrue(e.Source.Contains(method.Name));
+                Assert.AreEqual(LoggingEventType.Warning, entry.Severity);
+                Assert.AreEqual("message", entry.Message);
+                Assert.AreEqual(null, entry.Exception);
+                Assert.IsTrue(entry.Source.Contains(method.Name));
             }
         }
 
@@ -558,12 +558,12 @@ namespace CuttingEdge.Logging.UnitTests
                 string source = "source";
                 Logger.Log(LoggingEventType.Warning, "message", source);
 
-                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
+                LogEntry entry = scope.Logger.GetLoggedEntries()[0];
 
-                Assert.AreEqual(LoggingEventType.Warning, e.Severity);
-                Assert.AreEqual("message", e.Message);
-                Assert.AreEqual(null, e.Exception);
-                Assert.AreEqual(source, e.Source);
+                Assert.AreEqual(LoggingEventType.Warning, entry.Severity);
+                Assert.AreEqual("message", entry.Message);
+                Assert.AreEqual(null, entry.Exception);
+                Assert.AreEqual(source, entry.Source);
             }
         }
 
@@ -615,12 +615,12 @@ namespace CuttingEdge.Logging.UnitTests
                 MethodBase source = MethodBase.GetCurrentMethod();
                 Logger.Log(message, exception, source);
 
-                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
+                LogEntry entries = scope.Logger.GetLoggedEntries()[0];
 
-                Assert.AreEqual(LoggingEventType.Error, e.Severity);
-                Assert.AreEqual(message, e.Message);
-                Assert.AreEqual(exception, e.Exception);
-                Assert.IsTrue(e.Source.Contains(source.Name));
+                Assert.AreEqual(LoggingEventType.Error, entries.Severity);
+                Assert.AreEqual(message, entries.Message);
+                Assert.AreEqual(exception, entries.Exception);
+                Assert.IsTrue(entries.Source.Contains(source.Name));
             }
         }
 
@@ -680,12 +680,12 @@ namespace CuttingEdge.Logging.UnitTests
                 MethodBase source = MethodBase.GetCurrentMethod();
                 Logger.Log(message, exception, source);
 
-                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
+                LogEntry entries = scope.Logger.GetLoggedEntries()[0];
 
-                Assert.AreEqual(LoggingEventType.Error, e.Severity);
-                Assert.AreEqual(message, e.Message);
-                Assert.AreEqual(exception, e.Exception);
-                Assert.IsTrue(e.Source.Contains(source.Name));
+                Assert.AreEqual(LoggingEventType.Error, entries.Severity);
+                Assert.AreEqual(message, entries.Message);
+                Assert.AreEqual(exception, entries.Exception);
+                Assert.IsTrue(entries.Source.Contains(source.Name));
             }
         }
 
@@ -755,12 +755,12 @@ namespace CuttingEdge.Logging.UnitTests
 
                 Logger.Log(LoggingEventType.Warning, "message", exception, source);
 
-                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
+                LogEntry entries = scope.Logger.GetLoggedEntries()[0];
 
-                Assert.AreEqual(LoggingEventType.Warning, e.Severity);
-                Assert.AreEqual("message", e.Message);
-                Assert.AreEqual(exception, e.Exception);
-                Assert.IsTrue(e.Source.Contains(source.Name));
+                Assert.AreEqual(LoggingEventType.Warning, entries.Severity);
+                Assert.AreEqual("message", entries.Message);
+                Assert.AreEqual(exception, entries.Exception);
+                Assert.IsTrue(entries.Source.Contains(source.Name));
             }
         }
 
@@ -837,12 +837,12 @@ namespace CuttingEdge.Logging.UnitTests
 
                 Logger.Log(LoggingEventType.Warning, "message", exception, "source");
 
-                MemoryLoggingEvent e = scope.Logger.GetLoggedEvents()[0];
+                LogEntry entry = scope.Logger.GetLoggedEntries()[0];
 
-                Assert.AreEqual(LoggingEventType.Warning, e.Severity);
-                Assert.AreEqual("message", e.Message);
-                Assert.AreEqual(exception, e.Exception);
-                Assert.AreEqual("source", e.Source);
+                Assert.AreEqual(LoggingEventType.Warning, entry.Severity);
+                Assert.AreEqual("message", entry.Message);
+                Assert.AreEqual(exception, entry.Exception);
+                Assert.AreEqual("source", entry.Source);
             }
         }
     }
