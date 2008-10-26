@@ -95,6 +95,8 @@ namespace CuttingEdge.Logging
             get { return this.threshold; }
         }
 
+        /// <summary>The name of the fallback provider. This property is used by the <see cref="Logger"/>
+        /// class to initialize the <see cref="FallbackProvider"/> property.</summary>
         internal string FallbackProviderName
         {
             get { return this.fallbackProviderName; }

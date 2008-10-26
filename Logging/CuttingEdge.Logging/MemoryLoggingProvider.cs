@@ -36,15 +36,45 @@ namespace CuttingEdge.Logging
     /// a copy of the internal cache and <see cref="Clear"/> to clear the internal cache.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// This class is used by the <see cref="Logger"/> class to provide Logging services that logs to an
     /// in-memory cache.
+    /// </para>
+    /// <para>
+    /// The table below shows the list of valid attributes for the <see cref="MemoryLoggingProvider"/>:
+    /// <list type="table">  
+    /// <listheader>
+    ///     <attribute>Attribute</attribute>
+    ///     <description>Description</description>
+    /// </listheader>
+    /// <item>
+    ///     <attribute>fallbackProvider</attribute>
+    ///     <description>
+    ///         A fallback provider that the Logger class will use when logging failed on this logging 
+    ///         provider. The value must be the name of an existing logging provider. This attribute is
+    ///         optional.
+    ///     </description>
+    /// </item>  
+    /// <item>
+    ///     <attribute>threshold</attribute>
+    ///     <description>
+    ///         The logging threshold. The threshold limits the number of event logged. The threshold can be
+    ///         defined as follows: Debug &lt; Information &lt; Warning &lt; Error &lt; Fatal. i.e., When the 
+    ///         threshold is set to Information, Debug events will not be logged. When no value is specified
+    ///         all events are logged. This attribute is optional.
+    ///      </description>
+    /// </item>
+    /// </list>
+    /// The attributes can be specified within the provider configuration. See the example below on how to
+    /// use.
+    /// </para>
     /// </remarks>
     /// <example>
     /// This example demonstrates how to specify values declaratively for several attributes of the
     /// Logging section, which can also be accessed as members of the <see cref="LoggingSection"/> class.
     /// The following configuration file example shows how to specify values declaratively for the
     /// Logging section.
-    /// <code>
+    /// <code lang="xml">
     /// &lt;?xml version="1.0"?&gt;
     /// &lt;configuration&gt;
     ///     &lt;configSections&gt;
@@ -56,23 +86,26 @@ namespace CuttingEdge.Logging
     ///             &lt;add 
     ///                 name="MemoryLoggingProvider"
     ///                 type="CuttingEdge.Logging.MemoryLoggingProvider, CuttingEdge.Logging"
-    ///                 threshold="Debug"
     ///                 description="Memory logging provider"
+    ///                 threshold="Debug"
     ///             /&gt;
     ///         &lt;/providers&gt;
     ///     &lt;/logging&gt;
     /// &lt;/configuration&gt;
     /// </code>
     /// The following example shows how to use the class:
-    /// <code>
+    /// <code lang="cs">
     /// Logger.Log(LoggingEventType.Error, "This is an error");
     /// 
     /// MemoryLoggingProvider memoryLogger = (MemoryLoggingProvider)Logger.Provider;
     /// 
-    /// foreach (MemoryLoggingEvent loggedEvent in memoryLogger.GetLoggedEvents())
+    /// foreach (LogEntry entry in memoryLogger.GetLoggedEntries())
     /// {
-    ///     Console.WriteLine(loggedEvent);
+    ///     Console.WriteLine(entry);
     /// }
+    /// 
+    /// // Clear the cache
+    /// memoryLogger.Clear();
     /// </code>
     /// </example>
     public class MemoryLoggingProvider : LoggingProviderBase

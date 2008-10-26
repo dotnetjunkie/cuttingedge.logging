@@ -36,12 +36,56 @@ namespace CuttingEdge.Logging
     /// <summary>
     /// Manages storage of Logging information to the Windows event log.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The table below shows the list of valid attributes for the <see cref="SqlLoggingProvider"/>:
+    /// <list type="table">  
+    /// <listheader>
+    ///     <attribute>Attribute</attribute>
+    ///     <description>Description</description>
+    /// </listheader>
+    /// <item>
+    ///     <attribute>fallbackProvider</attribute>
+    ///     <description>
+    ///         A fallback provider that the Logger class will use when logging failed on this logging 
+    ///         provider. The value must be the name of an existing logging provider. This attribute is
+    ///         optional.
+    ///     </description>
+    /// </item>
+    /// <item>
+    ///     <attribute>threshold</attribute>
+    ///     <description>
+    ///         The logging threshold. The threshold limits the number of event logged. The threshold can be
+    ///         defined as follows: Debug &lt; Information &lt; Warning &lt; Error &lt; Fatal. i.e., When the 
+    ///         threshold is set to Information, Debug events will not be logged. When no value is specified
+    ///         all events are logged. This attribute is optional.
+    ///      </description>
+    /// </item>
+    /// <item>
+    ///     <attribute>source</attribute>
+    ///     <description>
+    ///         The source name to register and use when writing to the event log. This is the source name by
+    ///         which the application is registered on the local computer. This attribute is mandatory.
+    ///     </description>
+    /// </item>
+    /// <item>
+    ///     <attribute>logName</attribute>
+    ///     <description>
+    ///         The name of the log where  the source's entries are written to. Possible values include: 
+    ///         Application, System, or a custom event log. This attribute is mandatory.
+    ///     </description>
+    /// </item>
+    /// </list>
+    /// The attributes can be specified within the provider configuration. See the example below on how to
+    /// use.
+    /// </para>
+    /// </remarks>
     /// <example>
     /// This example demonstrates how to specify values declaratively for several attributes of the 
     /// Logging section, which can also be accessed as members of the
     /// <see cref="LoggingSection"/> class. The following configuration file example shows
     /// how to specify values declaratively for the Logging section.
-    /// <code>
+    /// <code lang="xml">
     /// &lt;?xml version="1.0"?&gt;
     /// &lt;configuration&gt;
     ///     &lt;configSections&gt;
@@ -79,7 +123,7 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>
-        /// Gets the name of the log the source's entries are written to. Possible values include:
+        /// Gets the name of the log where the source's entries are written to. Possible values include:
         /// Application, System, or a custom event log.
         /// </summary>
         /// <value>The name of the log.</value>

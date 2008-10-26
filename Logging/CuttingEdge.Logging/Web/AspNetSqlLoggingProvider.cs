@@ -39,12 +39,92 @@ namespace CuttingEdge.Logging.Web
     /// <summary>
     /// Manages storage of logging information for ASP.NET web applications in a SQL Server database.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The table below shows the list of valid attributes for the <see cref="AspNetSqlLoggingProvider"/>:
+    /// <list type="table">  
+    /// <listheader>
+    ///     <attribute>Attribute</attribute>
+    ///     <description>Description</description>
+    /// </listheader>
+    /// <item>
+    ///     <attribute>fallbackProvider</attribute>
+    ///     <description>
+    ///         A fallback provider that the Logger class will use when logging failed on this logging 
+    ///         provider. The value must be the name of an existing logging provider. This attribute is
+    ///         optional.
+    ///     </description>
+    /// </item>  
+    /// <item>
+    ///     <attribute>threshold</attribute>
+    ///     <description>
+    ///         The logging threshold. The threshold limits the number of event logged. The threshold can be
+    ///         defined as follows: Debug &lt; Information &lt; Warning &lt; Error &lt; Fatal. i.e., When the 
+    ///         threshold is set to Information, Debug events will not be logged. When no value is specified
+    ///         all events are logged. This attribute is optional.
+    ///      </description>
+    /// </item>  
+    /// <item>
+    ///     <attribute>connectionStringName</attribute>
+    ///     <description>
+    ///         The the connection string provided with this provider. This attribute is mandatory.
+    ///     </description>
+    /// </item>  
+    /// <item>
+    ///     <attribute>initializeSchema</attribute>
+    ///     <description>
+    ///         When this boolean attribute is set to true, the provider will try to create the needed tables 
+    ///         and stored spocedures in the database. This attribute is optional and false by default.
+    ///     </description>
+    /// </item>
+    /// <item>
+    ///     <attribute>applicationName</attribute>
+    ///     <description>
+    ///         Specifies the name of the application to log with the request. This allows you to use a single
+    ///         logging store for multiple applications. This attribute is mandatory.
+    ///     </description>
+    /// </item>
+    /// <item>
+    ///     <attribute>userNameRetrievalType</attribute>
+    ///     <description>
+    ///         The userNameRetrievalType attribute allows you to configure the source from which the provider
+    ///         tries to retrieve the user name of the current request. The options are 
+    ///         <see cref="UserIdentityRetrievalType.None">None</see>, 
+    ///         <see cref="UserIdentityRetrievalType.Membership">Membership</see> and
+    ///         <see cref="UserIdentityRetrievalType.WindowsIdentity">WindowsIdentity</see>;
+    ///         Use <b>Membership</b> when a <see cref="MembershipProvider"/> is configured using the
+    ///         <see cref="Membership"/> model. Use <b>WindowsIdentity</b> when you use windows authentication;
+    ///         Use <b>None</b> when you don't want any user information to be logged. This attribute is
+    ///         mandatory.
+    ///     </description>
+    /// </item>
+    /// <item>
+    ///     <attribute>logQueryString</attribute>
+    ///     <description>
+    ///         When this boolean attribute is set to true, the provider will write the 
+    ///         <see cref="HttpRequest.QueryString">query string</see> of the current <see cref="HttpContext"/>
+    ///         to the database. This attribute is optional and <b>true</b> by default.
+    ///     </description>
+    /// </item>
+    /// <item>
+    ///     <attribute>logFormData</attribute>
+    ///     <description>
+    ///         When this boolean attribute is set to true, the provider will write the 
+    ///         <see cref="HttpRequest.Form">form data</see> of the current <see cref="HttpContext"/>
+    ///         to the database. This attribute is optional and <b>false</b> by default.
+    ///     </description>
+    /// </item>
+    /// </list>
+    /// The attributes can be specified within the provider configuration. See the example below on how to
+    /// use.
+    /// </para>
+    /// </remarks>
     /// <example>
     /// This example demonstrates how to specify values declaratively for several attributes of the
     /// Logging section, which can also be accessed as members of the <see cref="LoggingSection"/> class.
     /// The following configuration file example shows how to specify values declaratively for the
     /// Logging section.
-    /// <code>
+    /// <code lang="xml">
     /// &lt;?xml version="1.0"?&gt;
     /// &lt;configuration&gt;
     ///     &lt;configSections&gt;
@@ -60,14 +140,14 @@ namespace CuttingEdge.Logging.Web
     ///             &lt;add 
     ///                 name="AspNetSqlLoggingProvider"
     ///                 type="CuttingEdge.Logging.ExampleProviders.AspNetSqlLoggingProvider, CuttingEdge.Logging.ExampleProviders"
+    ///                 description="ASP.NET SQL logging provider example"
+    ///                 connectionStringName="SqlLogging"
     ///                 threshold="Information"
+    ///                 initializeSchema="False"
     ///                 applicationName="MyWebApplication"
+    ///                 userNameRetrievalType="Membership"
     ///                 logQueryString="False"
     ///                 logFormData="False"
-    ///                 initializeSchema="False"
-    ///                 userNameRetrievalType="Membership"
-    ///                 connectionStringName="SqlLogging"
-    ///                 description="ASP.NET SQL logging provider example"
     ///             /&gt;
     ///         &lt;/providers&gt;
     ///     &lt;/logging&gt;
