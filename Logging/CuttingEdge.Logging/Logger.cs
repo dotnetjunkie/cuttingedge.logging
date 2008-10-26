@@ -45,7 +45,7 @@ namespace CuttingEdge.Logging
     /// Logging section, which can also be accessed as members of the
     /// <see cref="LoggingSection"/> class. The following configuration file example shows
     /// how to specify values declaratively for the Logging section.
-    /// <code>
+    /// <code lang="xml">
     /// &lt;?xml version="1.0"?&gt;
     /// &lt;configuration&gt;
     ///     &lt;configSections&gt;

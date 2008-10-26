@@ -46,7 +46,7 @@ namespace CuttingEdge.Logging.Web
     /// the default logging provider you defined in step 2.</item>
     /// </list>
     /// The following snippet shows an example of how your web.config might look like.
-    /// <code>
+    /// <code lang="xml">
     /// &lt;?xml version="1.0"?&gt;
     /// &lt;configuration&gt;
     ///     &lt;configSections&gt;

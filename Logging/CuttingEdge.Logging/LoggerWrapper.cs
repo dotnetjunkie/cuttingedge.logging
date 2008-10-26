@@ -37,7 +37,7 @@ namespace CuttingEdge.Logging
     /// The <see cref="LoggerWrapper"/> can be used in situations where the <see cref="LoggingProviderBase"/>
     /// class isn't suitable. The folowing example shows a possible use of the <see cref="LoggerWrapper"/>
     /// class.
-    /// <code>
+    /// <code lang="cs">
     /// public class BusinessCommand
     /// {
     ///     public void Execute(ExecutionContext context, ILogger iLogger)
