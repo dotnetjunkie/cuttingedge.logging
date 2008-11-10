@@ -66,6 +66,9 @@ namespace CuttingEdge.Logging
         internal const string SqlProviderAlreadyInitialized = "SqlProviderAlreadyInitialized";
         internal const string AspNetSqlLoggingProviderSchemaScripts = "AspNetSqlLoggingProviderSchemaScripts";
 
+        // Exception messages for LoggingWebEventProvider
+        internal const string MissingLoggingProviderInConfig = "MissingLoggingProviderInConfig";
+
         private static readonly ResourceManager resource =
             new ResourceManager(typeof(SR).Namespace + ".LoggingExceptionMessages", typeof(SR).Assembly);
 

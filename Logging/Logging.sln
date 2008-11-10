@@ -5,11 +5,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging", "Cutt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging.UnitTests", "CuttingEdge.Logging.UnitTests\CuttingEdge.Logging.UnitTests.csproj", "{2E3ED9A6-9377-4260-8561-498AFE03C90E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging.ExampleProviders", "CuttingEdge.Logging.ExampleProviders\CuttingEdge.Logging.ExampleProviders.csproj", "{7BA0140B-8CAD-458D-A8D8-140FE3408F65}"
-EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
+		SccNumberOfProjects = 3
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs08.codeplex.com/
 		SccLocalPath0 = .
@@ -19,9 +17,6 @@ Global
 		SccProjectUniqueName2 = CuttingEdge.Logging\\CuttingEdge.Logging.csproj
 		SccProjectName2 = CuttingEdge.Logging
 		SccLocalPath2 = CuttingEdge.Logging
-		SccProjectUniqueName3 = CuttingEdge.Logging.ExampleProviders\\CuttingEdge.Logging.ExampleProviders.csproj
-		SccProjectName3 = CuttingEdge.Logging.ExampleProviders
-		SccLocalPath3 = CuttingEdge.Logging.ExampleProviders
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,10 +31,6 @@ Global
 		{2E3ED9A6-9377-4260-8561-498AFE03C90E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E3ED9A6-9377-4260-8561-498AFE03C90E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E3ED9A6-9377-4260-8561-498AFE03C90E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7BA0140B-8CAD-458D-A8D8-140FE3408F65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7BA0140B-8CAD-458D-A8D8-140FE3408F65}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7BA0140B-8CAD-458D-A8D8-140FE3408F65}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7BA0140B-8CAD-458D-A8D8-140FE3408F65}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

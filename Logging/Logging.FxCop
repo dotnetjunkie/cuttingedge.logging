@@ -21,7 +21,6 @@
   <IgnoreGeneratedCode>False</IgnoreGeneratedCode>
  </ProjectOptions>
  <Targets>
-  <Target Name="$(ProjectDir)/CuttingEdge.Logging.ExampleProviders/bin/Release/CuttingEdge.Logging.ExampleProviders.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/CuttingEdge.Logging/bin/Release/CuttingEdge.Logging.dll" Analyze="True" AnalyzeAllChildren="True" />
  </Targets>
  <Rules>

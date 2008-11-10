@@ -54,7 +54,7 @@ namespace CuttingEdge.Logging
     ///     <attribute>fallbackProvider</attribute>
     ///     <description>
     ///         A fallback provider that the Logger class will use when logging failed on this logging 
-    ///         provider. The value must be the name of an existing logging provider. This attribute is
+    ///         provider. The value must contain the name of an existing logging provider. This attribute is
     ///         optional.
     ///     </description>
     /// </item>  
