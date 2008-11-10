@@ -27,20 +27,21 @@
 using System;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
+using System.Diagnostics;
 using System.Text;
 
 namespace CuttingEdge.Logging
 {
     /// <summary>
-    /// Manages the writing of logging information to the <see cref="Console"/>.
+    /// Manages the writing of logging information to the <see cref="Debug"/> output.
     /// </summary>
     /// <remarks>
     /// <para>
     /// This class is used by the <see cref="Logger"/> class to provide Logging services to the 
-    /// <see cref="Console"/>.
+    /// <see cref="Debug"/> output.
     /// </para>
     /// <para>
-    /// The table below shows the list of valid attributes for the <see cref="ConsoleLoggingProvider"/>:
+    /// The table below shows the list of valid attributes for the <see cref="DebugLoggingProvider"/>:
     /// <list type="table">  
     /// <listheader>
     ///     <attribute>Attribute</attribute>
@@ -80,12 +81,12 @@ namespace CuttingEdge.Logging
     ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
     ///             allowDefinition="MachineToApplication" /&gt;
     ///     &lt;/configSections&gt;
-    ///     &lt;logging defaultProvider="ConsoleLoggingProvider"&gt;
+    ///     &lt;logging defaultProvider="DebugLoggingProvider"&gt;
     ///         &lt;providers&gt;
     ///             &lt;add 
-    ///                 name="ConsoleLoggingProvider"
-    ///                 type="CuttingEdge.Logging.ConsoleLoggingProvider, CuttingEdge.Logging"
-    ///                 description="Console logging provider"
+    ///                 name="DebugLoggingProvider"
+    ///                 type="CuttingEdge.Logging.DebugLoggingProvider, CuttingEdge.Logging"
+    ///                 description="Debug logging provider"
     ///                 threshold="Warning"
     ///             /&gt;
     ///         &lt;/providers&gt;
@@ -93,7 +94,7 @@ namespace CuttingEdge.Logging
     /// &lt;/configuration&gt;
     /// </code>
     /// </example>
-    public class ConsoleLoggingProvider : LoggingProviderBase
+    public class DebugLoggingProvider : LoggingProviderBase
     {
         /// <summary>
         /// Initializes the provider.
@@ -122,7 +123,7 @@ namespace CuttingEdge.Logging
             if (string.IsNullOrEmpty(config["description"]))
             {
                 config.Remove("description");
-                config.Add("description", "Console logging provider");
+                config.Add("description", "Debug logging provider");
             }
 
             // Call initialize first.
@@ -141,7 +142,7 @@ namespace CuttingEdge.Logging
         {
             string formattedEvent = FormatEvent(entry);
 
-            Console.Write(formattedEvent);
+            Debug.Write(formattedEvent);
 
             // Returning an ID is inappropriate for this type of logger.
             return null;
@@ -150,7 +151,7 @@ namespace CuttingEdge.Logging
         private static string FormatEvent(LogEntry entry)
         {
             StringBuilder builder = new StringBuilder(256);
-            
+
             builder.AppendLine("LoggingEvent:");
             builder.Append("Severity:\t").AppendLine(entry.Severity.ToString());
             builder.Append("Message:\t").AppendLine(entry.Message);

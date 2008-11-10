@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DebugLoggingProvider.cs" />
     <Compile Include="SqlLoggingHelper.cs" />
     <Compile Include="Web\AspNetExceptionLoggingModule.cs" />
     <Compile Include="Web\AspNetSqlLoggingProvider.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="SqlLoggingProvider.cs" />
     <Compile Include="SR.cs" />
     <Compile Include="LoggingHelper.cs" />
+    <Compile Include="Web\LoggingWebEventProvider.cs" />
     <Compile Include="Web\UserIdentityRetrievalType.enum.cs" />
     <Compile Include="WindowsEventLogLoggingProvider.cs" />
   </ItemGroup>

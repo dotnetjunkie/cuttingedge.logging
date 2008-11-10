@@ -133,7 +133,7 @@ ALTER TABLE [dbo].[logging_Events] CHECK CONSTRAINT [FK_logging_Events_logging_E
 
 
 INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
-VALUES (0, 'Debug', 'A debug event. This indicates a verbose event, usefull during development.')
+VALUES (0, 'Debug', 'A debug event. This indicates a verbose event, useful during development.')
 
 INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
 VALUES (1, 'Information', 'An information event. This indicates a significant, successful operation.')

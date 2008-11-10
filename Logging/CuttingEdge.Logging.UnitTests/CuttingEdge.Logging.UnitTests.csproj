@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CuttingEdge.Logging.UnitTests</RootNamespace>
     <AssemblyName>CuttingEdge.Logging.UnitTests</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <SccProjectName>SAK</SccProjectName>
@@ -38,16 +38,28 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="NSandbox, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\SharedAssemblies\NSandbox.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\InvalidLoggingTypes.cs" />
+    <Compile Include="Helpers\LoggerSandbox.cs" />
+    <Compile Include="Helpers\LoggingSandboxManager.cs" />
+    <Compile Include="Helpers\SandboxHelpers.cs" />
     <Compile Include="Helpers\StubLoggingProvider.cs" />
+    <Compile Include="Helpers\TemplatedConfigurationWriter.cs" />
     <Compile Include="LogEntryTests.cs" />
+    <Compile Include="LoggerConfigurationTests.cs" />
     <Compile Include="LoggerWrapperTests.cs" />
     <Compile Include="LoggingProviderBaseTests.cs" />
     <Compile Include="Helpers\LoggingProviderTestingScope.cs" />
