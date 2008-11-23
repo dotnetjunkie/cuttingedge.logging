@@ -29,7 +29,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration.Provider;
 using System.Diagnostics;
-using System.Globalization;
+using System.Text;
 
 namespace CuttingEdge.Logging
 {
@@ -170,25 +170,6 @@ namespace CuttingEdge.Logging
 
             using (EventLog eventLog = new EventLog(this.logName))
             {
-                Exception exception = entry.Exception;
-                string message = entry.Message;
-
-                if (entry.Source != null)
-                {
-                    message += "\nSource: " + entry.Source;
-                }
-
-                if (exception != null)
-                {
-                    while (exception != null)
-                    {
-                        message += "\nException: " + exception.GetType().FullName + "\n";
-                        message += "Message:\n" + exception.Message + "\n";
-                        message += "Stacktrace:\n" + exception.StackTrace + "\n";
-                        exception = exception.InnerException;
-                    }
-                }
-
                 if (!EventLog.SourceExists(this.source))
                 {
                     EventLog.CreateEventSource(this.source, this.logName);
@@ -196,18 +177,50 @@ namespace CuttingEdge.Logging
 
                 eventLog.Source = this.source;
 
-                if (entry != null)
+                string eventLogMessage = this.BuildEventLogMessage(entry);
+
+                if (eventLogType != null)
                 {
-                    eventLog.WriteEntry(message, eventLogType.Value);
+                    eventLog.WriteEntry(eventLogMessage, eventLogType.Value);
                 }
                 else
                 {
-                    eventLog.WriteEntry(message);
+                    eventLog.WriteEntry(eventLogMessage);
                 }
             }
 
             // Returning an ID is inappropriate for this type of logger.
             return null;
+        }
+
+        /// <summary>Builds the event log message.</summary>
+        /// <param name="entry">The entry that will be used to build the message.</param>
+        /// <returns>The message.</returns>
+        protected virtual string BuildEventLogMessage(LogEntry entry)
+        {
+            StringBuilder message = new StringBuilder();
+
+            message.AppendLine(entry.Message);
+
+            if (entry.Source != null)
+            {
+                message.Append("Source: ").AppendLine(entry.Source);
+            }
+
+            Exception exception = entry.Exception;
+
+            while (exception != null)
+            {
+                message
+                    .Append("Exception: ").AppendLine(exception.GetType().FullName)
+                    .Append("Message: ").AppendLine(exception.Message)
+                    .AppendLine("Stacktrace:")
+                    .AppendLine(exception.StackTrace);
+
+                exception = exception.InnerException;
+            }
+
+            return message.ToString();
         }
 
         private static EventLogEntryType? ConvertToEventLogEntry(LoggingEventType severity)

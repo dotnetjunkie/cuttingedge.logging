@@ -133,20 +133,20 @@ namespace CuttingEdge.Logging.Web
     ///     &lt;/configSections&gt;
     ///     &lt;connectionStrings&gt;
     ///         &lt;add name="SqlLogging" 
-    ///             connectionString="Data Source=localhost;Integrated Security=SSPI;Initial Catalog=Logging;" /&gt;
+    ///             connectionString="Data Source=.;Integrated Security=SSPI;Initial Catalog=Logging;" /&gt;
     ///     &lt;/connectionStrings&gt;
     ///     &lt;logging defaultProvider="AspNetSqlLoggingProvider"&gt;
     ///         &lt;providers&gt;
     ///             &lt;add 
     ///                 name="AspNetSqlLoggingProvider"
-    ///                 type="CuttingEdge.Logging.ExampleProviders.AspNetSqlLoggingProvider, CuttingEdge.Logging.ExampleProviders"
+    ///                 type="CuttingEdge.Logging.Web.AspNetSqlLoggingProvider, CuttingEdge.Logging"
     ///                 description="ASP.NET SQL logging provider example"
     ///                 connectionStringName="SqlLogging"
     ///                 threshold="Information"
-    ///                 initializeSchema="False"
+    ///                 initializeSchema="True"
     ///                 applicationName="MyWebApplication"
     ///                 userNameRetrievalType="Membership"
-    ///                 logQueryString="False"
+    ///                 logQueryString="True"
     ///                 logFormData="False"
     ///             /&gt;
     ///         &lt;/providers&gt;
