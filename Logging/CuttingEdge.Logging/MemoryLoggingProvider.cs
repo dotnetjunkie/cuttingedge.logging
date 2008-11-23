@@ -41,6 +41,11 @@ namespace CuttingEdge.Logging
     /// in-memory cache.
     /// </para>
     /// <para>
+    /// <b>WARNING:</b> This class is only suitable for debugging purposes. The internal cache that the 
+    /// <see cref="MemoryLoggingProvider"/> will hold is not cleared automatically and will grow unlimited.
+    /// This could lead to <see cref="OutOfMemoryException"/>s in production environments.
+    /// </para>
+    /// <para>
     /// The table below shows the list of valid attributes for the <see cref="MemoryLoggingProvider"/>:
     /// <list type="table">  
     /// <listheader>

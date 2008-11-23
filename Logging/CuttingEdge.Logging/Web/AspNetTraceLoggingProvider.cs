@@ -33,7 +33,8 @@ namespace CuttingEdge.Logging.Web
 {
     /// <summary>
     /// Manages the writing of logging information in ASP.NET applications to the ASP.NET 
-    /// <see cref="TraceContext"/> system.
+    /// <see cref="TraceContext"/> system. This information will be visible on each web page when pages are 
+    /// configured to show tracing.
     /// </summary>
     /// <remarks>
     /// <para>

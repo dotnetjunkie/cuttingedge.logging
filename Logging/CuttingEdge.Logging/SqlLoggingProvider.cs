@@ -99,7 +99,7 @@ namespace CuttingEdge.Logging
     ///     &lt;/configSections&gt;
     ///     &lt;connectionStrings&gt;
     ///         &lt;add name="SqlLogging" 
-    ///             connectionString="Data Source=localhost;Integrated Security=SSPI;Initial Catalog=Logging;" /&gt;
+    ///             connectionString="Data Source=.;Integrated Security=SSPI;Initial Catalog=Logging;" /&gt;
     ///     &lt;/connectionStrings&gt;
     ///     &lt;logging defaultProvider="SqlLoggingProvider"&gt;
     ///         &lt;providers&gt;
@@ -108,7 +108,7 @@ namespace CuttingEdge.Logging
     ///                 type="CuttingEdge.Logging.SqlLoggingProvider, CuttingEdge.Logging"
     ///                 threshold="Information"
     ///                 connectionStringName="SqlLogging"
-    ///                 initializeSchema="False"
+    ///                 initializeSchema="True"
     ///                 description="SQL logging provider"
     ///             /&gt;
     ///         &lt;/providers&gt;
