@@ -231,6 +231,8 @@ namespace CuttingEdge.Logging.Web
                 }
             }
 
+            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
+            // after the initialization process.
             config.Remove("loggingProvider");
         }
     }

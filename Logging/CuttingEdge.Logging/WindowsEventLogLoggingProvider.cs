@@ -149,12 +149,11 @@ namespace CuttingEdge.Logging
                 config.Add("description", "Windows event log logging provider");
             }
 
-            // Call initialize first.
+            // Call base initialize first. This method prevents initialize from being called more than once.
             base.Initialize(name, config);
 
             // Performing implementation-specific provider initialization here.
             this.InitializeSource(name, config);
-
             this.InitializeLogName(name, config);
             
             // Always call this method last
@@ -249,33 +248,33 @@ namespace CuttingEdge.Logging
 
         private void InitializeLogName(string name, NameValueCollection config)
         {
-            string logName = config["logName"];
+            this.logName = config["logName"];
             
             // Throw exception when no logname is provided
-            if (string.IsNullOrEmpty(logName))
+            if (string.IsNullOrEmpty(this.logName))
             {
                 throw new ProviderException(SR.GetString(SR.EmptyOrMissingPropertyInConfiguration,
                     "logName", name));
             }
 
-            this.logName = logName;
-
+            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
+            // after the initialization process.
             config.Remove("logName");
         }
 
         private void InitializeSource(string name, NameValueCollection config)
         {
-            string source = config["source"];
+            this.source = config["source"];
             
             // Throw exception when no source is provided
-            if (string.IsNullOrEmpty(source))
+            if (string.IsNullOrEmpty(this.source))
             {
                 throw new ProviderException(SR.GetString(SR.EmptyOrMissingPropertyInConfiguration,
                     "source", name));
             }
 
-            this.source = source;
-
+            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
+            // after the initialization process.
             config.Remove("source");
         }
     }
