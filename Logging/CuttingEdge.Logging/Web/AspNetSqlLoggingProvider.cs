@@ -216,7 +216,8 @@ namespace CuttingEdge.Logging.Web
                 throw new ArgumentNullException("config");
             }
 
-            // Retrieve and remove values from config.
+            // Retrieve and remove values from config. We do this before calling base.Initialize(), 
+            // because the base class checks for unrecognizedd attributes.
             bool logQueryString = GetLogQueryStringFromConfig(name, config);
             bool logFormData = GetLogFormDataFromConfig(name, config);
             UserIdentityRetrievalType retrievalType = GetRetrievalTypeFromConfig(name, config);
@@ -237,7 +238,7 @@ namespace CuttingEdge.Logging.Web
         {
             try
             {
-                SqlLoggingHelper.CheckIfSchemaAlreadyHasBeenInitialized(this);
+                SqlLoggingHelper.ThrowWhenSchemaAlreadyHasBeenInitialized(this);
 
                 string createScript = SR.GetString(SR.AspNetSqlLoggingProviderSchemaScripts);
 
@@ -312,9 +313,14 @@ namespace CuttingEdge.Logging.Web
 
         private static bool GetLogQueryStringFromConfig(string name, NameValueCollection config)
         {
+            const bool DefaultValueWhenMissing = true;
+
             bool logQueryString = 
-                SqlLoggingHelper.ParseBoolConfigValue(name, "logQueryString", config["logQueryString"], true);
-            
+                SqlLoggingHelper.ParseBoolConfigValue(name, "logQueryString", config["logQueryString"],
+                DefaultValueWhenMissing);
+
+            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
+            // after the initialization process.
             config.Remove("logQueryString");
             
             return logQueryString;
@@ -322,9 +328,14 @@ namespace CuttingEdge.Logging.Web
 
         private static bool GetLogFormDataFromConfig(string name, NameValueCollection config)
         {
+            const bool DefaultValueWhenMissing = false;
+
             bool logFormData =
-                SqlLoggingHelper.ParseBoolConfigValue(name, "logFormData", config["logFormData"], false);
-            
+                SqlLoggingHelper.ParseBoolConfigValue(name, "logFormData", config["logFormData"],
+                DefaultValueWhenMissing);
+
+            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
+            // after the initialization process.
             config.Remove("logFormData");
             
             return logFormData;
@@ -361,6 +372,8 @@ namespace CuttingEdge.Logging.Web
                     name, GetUserIdentityRetrievalTypeAsString()));
             }
 
+            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
+            // after the initialization process.
             config.Remove("userNameRetrievalType");
 
             return retrievalType;
@@ -410,6 +423,8 @@ namespace CuttingEdge.Logging.Web
                     String.Format(CultureInfo.InvariantCulture, exceptionMessage, name));
             }
 
+            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
+            // after the initialization process.
             config.Remove("applicationName");
 
             return applicationName;

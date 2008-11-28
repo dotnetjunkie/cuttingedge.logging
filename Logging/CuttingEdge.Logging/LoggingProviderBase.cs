@@ -550,6 +550,8 @@ namespace CuttingEdge.Logging
                 this.threshold = LoggingEventType.Debug;
             }
 
+            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
+            // after the initialization process.
             config.Remove("threshold");
         }
 
@@ -557,6 +559,8 @@ namespace CuttingEdge.Logging
         {
             string fallbackProviderName = config["fallbackProvider"];
 
+            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
+            // after the initialization process.
             config.Remove("fallbackProvider");
 
             if (!String.IsNullOrEmpty(fallbackProviderName))

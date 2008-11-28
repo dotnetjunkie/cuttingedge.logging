@@ -25,13 +25,13 @@ namespace CuttingEdge.Logging
             return parameter;
         }
 
-        internal static void CheckIfSchemaAlreadyHasBeenInitialized(SqlLoggingProvider provider)
+        internal static void ThrowWhenSchemaAlreadyHasBeenInitialized(SqlLoggingProvider provider)
         {
             using (SqlConnection connection = new SqlConnection(provider.ConnectionString))
             {
                 connection.Open();
 
-                string query = @"
+                const string Query = @"
                     SELECT  CONVERT(int, count(*))
                     FROM    sysobjects
                     WHERE   name IN (
@@ -42,7 +42,7 @@ namespace CuttingEdge.Logging
                                 'logging_AddException'
                             );";
 
-                using (SqlCommand command = new SqlCommand(query, connection))
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
                     int sysObjectCount = (int)command.ExecuteScalar();
 

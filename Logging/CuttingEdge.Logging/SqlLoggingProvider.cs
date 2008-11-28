@@ -156,12 +156,13 @@ namespace CuttingEdge.Logging
             // Performing implementation-specific provider initialization here.
             this.InitializeConnectionString(name, config);
 
-            bool mustInitializeSchema = MustInitializeDatabaseSchema(name, config);
+            bool mustInitializeSchema = GetInitializeSchemaAttributeFromConfig(name, config);
 
-            // Always call this method last
+            // Check if the configuration is valid, before initializing the database.
             this.CheckForUnrecognizedAttributes(name, config);
 
-            // Execute creation of tables and stored procs after checking for unrecognized attributes.
+            // When the initialization of the database schema is registered in the config file, we
+            // execute creation of tables and stored procs.
             if (mustInitializeSchema)
             {
                 this.InitializeDatabaseSchema();
@@ -173,18 +174,19 @@ namespace CuttingEdge.Logging
         {
             try
             {
-                SqlLoggingHelper.CheckIfSchemaAlreadyHasBeenInitialized(this);
+                SqlLoggingHelper.ThrowWhenSchemaAlreadyHasBeenInitialized(this);
 
                 string createScript = SR.GetString(SR.SqlLoggingProviderSchemaScripts);
                 
+                // Split the script in seperate operations. SQL Server chokes on the GO statements.
                 string[] createScripts = createScript.Split(new string[] { "GO" }, StringSplitOptions.None);
 
                 SqlLoggingHelper.CreateTablesAndStoredProcedures(this, createScripts);
             }
-            catch (SqlException sex)
+            catch (SqlException ex)
             {
                 throw new ProviderException(SR.GetString(SR.InitializationOfDatabaseSchemaFailed, this.Name, 
-                    sex.Message), sex);
+                    ex.Message), ex);
             }
         }
 
@@ -258,13 +260,18 @@ namespace CuttingEdge.Logging
             }
         }
 
-        private static bool MustInitializeDatabaseSchema(string name, NameValueCollection config)
+        private static bool GetInitializeSchemaAttributeFromConfig(string name, NameValueCollection config)
         {
             string initializeSchema = config["initializeSchema"];
 
+            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
+            // after the initialization process.
             config.Remove("initializeSchema");
 
-            return SqlLoggingHelper.ParseBoolConfigValue(name, "initializeSchema", initializeSchema, false);
+            const bool DefaultValueWhenMissing = false;
+
+            return SqlLoggingHelper.ParseBoolConfigValue(name, "initializeSchema", initializeSchema, 
+                DefaultValueWhenMissing);
         }
 
         private void SaveExceptionChainToDatabase(SqlTransaction transaction, Exception exception,
@@ -301,6 +308,8 @@ namespace CuttingEdge.Logging
                     connectionStringName));
             }
 
+            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
+            // after the initialization process.
             config.Remove("connectionStringName");
 
             this.connectionString = connectionString;
