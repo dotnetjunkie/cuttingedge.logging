@@ -163,7 +163,7 @@ namespace CuttingEdge.Logging
         /// Returning an id is not supported by the current implementation;
         /// The event has been logged to a fallback provider, because of an error in the current implementation.
         /// </returns>
-        /// <exception cref="ArgumentNullException">Throrn when the supplied <paramref name="exception"/> is
+        /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/> is
         /// a null reference (Nothing in VB).</exception>
         public static object Log(Exception exception)
         {

@@ -34,6 +34,14 @@ namespace CuttingEdge.Logging
     /// <summary>Validates arguments.</summary>
     internal static class LoggingHelper
     {
+        internal static void ValideLoggerIsNotNull(ILogger logger)
+        {
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+        }
+
         internal static void ValidateExceptionIsNotNull(Exception exception)
         {
             if (exception == null)
