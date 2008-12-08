@@ -60,6 +60,7 @@
     <Compile Include="Helpers\TemplatedConfigurationWriter.cs" />
     <Compile Include="LogEntryTests.cs" />
     <Compile Include="LoggerConfigurationTests.cs" />
+    <Compile Include="LoggerExtensionsTests.cs" />
     <Compile Include="LoggerWrapperTests.cs" />
     <Compile Include="LoggingProviderBaseTests.cs" />
     <Compile Include="Helpers\LoggingProviderTestingScope.cs" />

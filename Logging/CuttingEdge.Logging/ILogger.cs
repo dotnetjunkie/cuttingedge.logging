@@ -33,12 +33,20 @@ namespace CuttingEdge.Logging
     /// Defines a method that logs a given message with type and optional source and exception to the logging
     /// store.
     /// </summary>
+    /// <remarks>
+    /// The <see cref="LoggerExtensions"/> class defines convenient extension methods for the 
+    /// <see cref="ILogger"/> interface.
+    /// </remarks>
     public interface ILogger
     {
         /// <summary>Logs the specified entry.</summary>
         /// <param name="entry">The entry to log.</param>
-        /// <returns>The id of the saved log (or null when an id is not appropriate for this type of logger.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when the given <paramref name="entry"/> is a null reference.</exception>
+        /// <returns>
+        /// The id of the saved log (or null when an id is not appropriate for this type of logger.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the given <paramref name="entry"/> is a null reference.
+        /// </exception>
         object Log(LogEntry entry);
     }
 }
