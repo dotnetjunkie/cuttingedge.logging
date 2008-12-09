@@ -201,6 +201,8 @@ namespace CuttingEdge.Logging
 
             message.AppendLine(entry.Message);
 
+            message.Append("Severity: ").AppendLine(entry.Severity.ToString());
+
             if (entry.Source != null)
             {
                 message.Append("Source: ").AppendLine(entry.Source);
@@ -210,6 +212,8 @@ namespace CuttingEdge.Logging
 
             while (exception != null)
             {
+                message.AppendLine();
+
                 message
                     .Append("Exception: ").AppendLine(exception.GetType().FullName)
                     .Append("Message: ").AppendLine(exception.Message)
