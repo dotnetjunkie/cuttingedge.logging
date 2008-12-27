@@ -28,7 +28,11 @@ namespace CuttingEdge.Logging.UnitTests
         [ExpectedException(typeof(ConfigurationErrorsException))]
         public void MissingDefaultProviderInConfigFileShouldFail()
         {
-            IConfigurationWriter config = SandboxHelpers.CreateConfiguration("MemoryLoggingProvider", null);
+            string defaultProviderName = "MemoryLoggingProvider";
+            string providerConfigurationLines = null;
+
+            IConfigurationWriter config = 
+                SandboxHelpers.CreateConfiguration(defaultProviderName, providerConfigurationLines);
 
             using (LoggingSandboxManager manager = new LoggingSandboxManager(config))
             {
@@ -48,10 +52,12 @@ namespace CuttingEdge.Logging.UnitTests
         [ExpectedException(typeof(ConfigurationErrorsException))]
         public void MissingDefaultProviderAttributeInConfigShouldFail()
         {
-            string providers =
+            string defaultProviderName = string.Empty;
+            string providerConfigurationLines =
                 SandboxHelpers.BuildProviderConfigurationLine(typeof(MemoryLoggingProvider));
 
-            IConfigurationWriter config = SandboxHelpers.CreateConfiguration(string.Empty, providers);
+            IConfigurationWriter config = 
+                SandboxHelpers.CreateConfiguration(defaultProviderName, providerConfigurationLines);
 
             using (LoggingSandboxManager manager = new LoggingSandboxManager(config))
             {
@@ -92,9 +98,12 @@ namespace CuttingEdge.Logging.UnitTests
         [TestMethod]
         public void ASimpleConfigurationShouldPass()
         {
-            string providers = SandboxHelpers.BuildProviderConfigurationLine(typeof(MemoryLoggingProvider));
+            string defaultProviderName = "MemoryLoggingProvider";
+            string providerConfigurationLines = 
+                SandboxHelpers.BuildProviderConfigurationLine(typeof(MemoryLoggingProvider));
 
-            IConfigurationWriter config = SandboxHelpers.CreateConfiguration("MemoryLoggingProvider", providers);
+            IConfigurationWriter config = 
+                SandboxHelpers.CreateConfiguration(defaultProviderName, providerConfigurationLines);
 
             using (LoggingSandboxManager manager = new LoggingSandboxManager(config))
             {
