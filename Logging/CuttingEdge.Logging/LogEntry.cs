@@ -35,7 +35,7 @@ namespace CuttingEdge.Logging
     /// The LogEntry class encapsulates content and associated properties for the information an application 
     /// sends to the logging framework.
     /// </summary>
-    [DebuggerDisplay("LoggingEvent (Severity: {Severity}, Message: {Message}, Source: {Source}, Exception: {Exception})")]
+    [DebuggerDisplay("LogEntry (Severity: {Severity}, Message: {Message}, Source: {Source}, Exception: {Exception})")]
     [Serializable]
     public class LogEntry
     {
