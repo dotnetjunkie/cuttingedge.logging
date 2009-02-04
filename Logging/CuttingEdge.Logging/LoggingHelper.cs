@@ -159,5 +159,36 @@ namespace CuttingEdge.Logging
 
             return String.IsNullOrEmpty(message) ? exception.GetType().Name : message;
         }
+
+        internal static string BuildMessageFromLogEntry(LogEntry entry)
+        {
+            StringBuilder message = new StringBuilder(256);
+
+            message.AppendLine(entry.Message);
+
+            message.Append("Severity: ").AppendLine(entry.Severity.ToString());
+
+            if (entry.Source != null)
+            {
+                message.Append("Source: ").AppendLine(entry.Source);
+            }
+
+            Exception exception = entry.Exception;
+
+            while (exception != null)
+            {
+                message.AppendLine();
+
+                message
+                    .Append("Exception: ").AppendLine(exception.GetType().FullName)
+                    .Append("Message: ").AppendLine(exception.Message)
+                    .AppendLine("Stacktrace:")
+                    .AppendLine(exception.StackTrace);
+
+                exception = exception.InnerException;
+            }
+
+            return message.ToString();
+        }
     }
 }

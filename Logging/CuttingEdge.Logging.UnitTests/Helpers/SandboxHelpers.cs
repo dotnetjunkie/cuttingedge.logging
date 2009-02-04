@@ -17,15 +17,23 @@ namespace CuttingEdge.Logging.UnitTests.Helpers
 			            $Providers$
 		            </providers>
 	            </logging>
+                $OtherConfigurations$
             </configuration>";
 
         public static IConfigurationWriter CreateConfiguration(string defaultProviderName,
             string providerConfigurationLines)
         {
+            return CreateConfiguration(defaultProviderName, providerConfigurationLines, string.Empty);
+        }
+
+        public static IConfigurationWriter CreateConfiguration(string defaultProviderName,
+            string providerConfigurationLines, string otherConfigurations)
+        {
             TemplatedConfigurationWriter writer = new TemplatedConfigurationWriter(TemplatedConfiguration);
 
             writer.Variables.Add("DefaultProvider", defaultProviderName);
             writer.Variables.Add("Providers", providerConfigurationLines);
+            writer.Variables.Add("OtherConfigurations", otherConfigurations);
 
             return writer;
         }
@@ -37,7 +45,7 @@ namespace CuttingEdge.Logging.UnitTests.Helpers
 
         public static string BuildProviderConfigurationLine(Type type, string customAttributes)
         {
-            return BuildProviderConfigurationLine(type.Name, type, null);
+            return BuildProviderConfigurationLine(type.Name, type, customAttributes);
         }
 
         public static string BuildProviderConfigurationLine(string name, Type type)

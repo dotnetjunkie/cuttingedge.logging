@@ -194,36 +194,16 @@ namespace CuttingEdge.Logging
 
         /// <summary>Builds the event log message.</summary>
         /// <param name="entry">The entry that will be used to build the message.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="entry"/> is null.</exception>
         /// <returns>The message.</returns>
         protected virtual string BuildEventLogMessage(LogEntry entry)
         {
-            StringBuilder message = new StringBuilder();
-
-            message.AppendLine(entry.Message);
-
-            message.Append("Severity: ").AppendLine(entry.Severity.ToString());
-
-            if (entry.Source != null)
+            if (entry == null)
             {
-                message.Append("Source: ").AppendLine(entry.Source);
+                throw new ArgumentNullException("entry");
             }
 
-            Exception exception = entry.Exception;
-
-            while (exception != null)
-            {
-                message.AppendLine();
-
-                message
-                    .Append("Exception: ").AppendLine(exception.GetType().FullName)
-                    .Append("Message: ").AppendLine(exception.Message)
-                    .AppendLine("Stacktrace:")
-                    .AppendLine(exception.StackTrace);
-
-                exception = exception.InnerException;
-            }
-
-            return message.ToString();
+            return LoggingHelper.BuildMessageFromLogEntry(entry);
         }
 
         private static EventLogEntryType? ConvertToEventLogEntry(LoggingEventType severity)

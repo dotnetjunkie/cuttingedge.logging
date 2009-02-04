@@ -1,18 +1,9 @@
-﻿
+﻿using System;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace CuttingEdge.Logging.UnitTests
 {
-    class WindowsEventLogLoggingProviderTester : WindowsEventLogLoggingProvider
-    {
-        public string PublicBuildEventLogMessage(LogEntry entry)
-        {
-            return this.BuildEventLogMessage(entry);
-        }
-    }
-
     /// <summary>
     /// Tests the <see cref="WindowsEventLogLoggingProvider"/> class.
     /// </summary>
@@ -59,6 +50,14 @@ Source: This is a source
 Exception: System.InvalidOperationException
 Message: Invalid operation
 Stacktrace:"));
+        }
+
+        private class WindowsEventLogLoggingProviderTester : WindowsEventLogLoggingProvider
+        {
+            public string PublicBuildEventLogMessage(LogEntry entry)
+            {
+                return this.BuildEventLogMessage(entry);
+            }
         }
     }
 }
