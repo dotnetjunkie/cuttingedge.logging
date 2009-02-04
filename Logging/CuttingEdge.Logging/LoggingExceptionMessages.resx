@@ -290,11 +290,32 @@ VALUES (4, 'Critical', 'A critical event. This indicates a fatal error or applic
   <data name="InvalidFallbackProviderPropertyInConfig" xml:space="preserve">
     <value>There was an error in the '{0}' section of the the configuration file. The given {1} with name '{2}' has a 'fallbackProvider' attribute with a value of '{3}'. No provider with that name could be found. The given fallbackProvider must be an item in the list of logging providers. Please check the configuration file for errors.</value>
   </data>
+  <data name="InvalidFormatStringAttribute" xml:space="preserve">
+    <value>Invalid value '{0}' in attribute '{1}' in provider '{2}' in config file. The value is not a valid format string.</value>
+  </data>
+  <data name="InvalidIntegerAttribute" xml:space="preserve">
+    <value>Invalid value '{0}' in attribute '{1}' in provider '{2}' in config file. Value should be an integer.</value>
+  </data>
+  <data name="InvalidMailAddressAttribute" xml:space="preserve">
+    <value>Invalid value '{0}' in attribute '{1}' in provider '{2}' in config file. Value should be a valid mail address.</value>
+  </data>
   <data name="InvalidThresholdValueInProviderConfiguration" xml:space="preserve">
     <value>Invalid value in 'threshold' attribute for provider '{0}' in the config file. Please supply one of the following values: {1}.</value>
   </data>
   <data name="LoggingSectionMissingFromConfigSettings" xml:space="preserve">
     <value>The Logger hasn't been configured properly. Please register the logger as &lt;section&gt; in the &lt;configSections&gt; of your configurations file as follows: &lt;configSections&gt;&lt;section name="logging" type="{0}, {1}" allowDefinition="MachineToApplication" /&gt;&lt;/configSections&gt;.</value>
+  </data>
+  <data name="MissingAttributeInMailSettings" xml:space="preserve">
+    <value>There was an error while initializing the provider '{0}'. Please make sure the 'configuration/system.net/mailSettings' section in the application configuration file is correctly configured. Could not find the '{1}' attribute in the '{2}' section. Please provide a configuration as follows: 
+&lt;configuration&gt;
+    &lt;system.net&gt;
+        &lt;mailSettings&gt;
+            &lt;smtp from="test@foo.com"&gt;
+                &lt;network host="smtpserver1" /&gt;
+            &lt;/smtp&gt;
+        &lt;/mailSettings&gt;
+    &lt;/system.net&gt;
+&lt;/configuration&gt;</value>
   </data>
   <data name="MissingConnectionStringAttribute" xml:space="preserve">
     <value>Empty or missing 'connectionStringName' attribute in provider '{0}' in config file.</value>
@@ -307,6 +328,9 @@ VALUES (4, 'Critical', 'A critical event. This indicates a fatal error or applic
   </data>
   <data name="NoDefaultLoggingProviderFound" xml:space="preserve">
     <value>No default Logging provider was found in the &lt;{0}&gt; section of the the configuration file or the &lt;{0}&gt; section was missing. Please provide a default provider as follows: &lt;{0} defaultProvider="[NameOfYourDefaultProvider]"&gt;&lt;add name="[NameOfYourDefaultProvider]" type="[ProviderType]" /&gt;&lt;/{0}&gt;.</value>
+  </data>
+  <data name="NoPermissionsToAccessSmtpServers" xml:space="preserve">
+    <value>There was an error while initializing the provider '{0}'. The application does not have permissions to access Simple Mail Transport Protocol (SMTP) servers. {1}</value>
   </data>
   <data name="ProviderParameterMustBeOfTypeX" xml:space="preserve">
     <value>The provider parameter must be of type {0}.</value>

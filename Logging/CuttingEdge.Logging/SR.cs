@@ -69,6 +69,13 @@ namespace CuttingEdge.Logging
         // Exception messages for LoggingWebEventProvider
         internal const string MissingLoggingProviderInConfig = "MissingLoggingProviderInConfig";
 
+        // Exception messages for MailLoggingProvider
+        internal const string InvalidIntegerAttribute = "InvalidIntegerAttribute";
+        internal const string InvalidMailAddressAttribute = "InvalidMailAddressAttribute";
+        internal const string InvalidFormatStringAttribute = "InvalidFormatStringAttribute";
+        internal const string MissingAttributeInMailSettings = "MissingAttributeInMailSettings";
+        internal const string NoPermissionsToAccessSmtpServers = "NoPermissionsToAccessSmtpServers";
+
         private static readonly ResourceManager resource =
             new ResourceManager(typeof(SR).Namespace + ".LoggingExceptionMessages", typeof(SR).Assembly);
 
