@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Configuration;
 using System.Configuration.Provider;
+using System.Web.Security;
 
 using CuttingEdge.Logging.UnitTests.Helpers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using NSandbox;
-using System.Web.Security;
 
 namespace CuttingEdge.Logging.UnitTests
 {
@@ -25,6 +25,17 @@ namespace CuttingEdge.Logging.UnitTests
             "<configSections> of your configurations file as follows: " +
             "<configSections><section name=\"logging\" type=\"CuttingEdge.Logging.LoggingSection, " +
             "CuttingEdge.Logging\" allowDefinition=\"MachineToApplication\" /></configSections>.";
+
+        private const string ValidMailConfiguration = @"
+          <system.net>
+            <mailSettings>
+              <smtp from=""test@foo.com"">
+                <network host=""smtpserver1"" port=""25"" userName=""username""
+                    password=""secret"" defaultCredentials=""true"" />
+              </smtp>
+            </mailSettings>
+          </system.net>
+        ";
 
         [TestMethod]
         [ExpectedException(typeof(ConfigurationErrorsException))]
@@ -113,17 +124,6 @@ namespace CuttingEdge.Logging.UnitTests
             }
         }
 
-        private const string ValidMailConfiguration = @"
-          <system.net>
-            <mailSettings>
-              <smtp from=""test@foo.com"">
-                <network host=""smtpserver1"" port=""25"" userName=""username""
-                    password=""secret"" defaultCredentials=""true"" />
-              </smtp>
-            </mailSettings>
-          </system.net>
-        ";
-
         [TestMethod]
         public void ValidMailLoggingProviderConfigurationShouldSucceed01()
         {
@@ -142,11 +142,27 @@ namespace CuttingEdge.Logging.UnitTests
         }
 
         [TestMethod]
+        public void ConfigurationExceptionShouldContainInnerException()
+        {
+            // Missing 'to'
+            string customAttributes = string.Empty;
+
+            try
+            {
+                ConfigureMailLoggingProvider(customAttributes, ValidMailConfiguration);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsNotNull(ex.InnerException);
+            }
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ConfigurationErrorsException))]
         public void InvalidMailLoggingProviderConfigurationShouldFail01()
         {
             // Missing 'to'
-            string customAttributes = "";
+            string customAttributes = string.Empty;
 
             ConfigureMailLoggingProvider(customAttributes, ValidMailConfiguration);
         }
@@ -161,7 +177,7 @@ namespace CuttingEdge.Logging.UnitTests
             string invalidMailConfiguration = @"
               <system.net>
                 <mailSettings>
-                  <smtp from=""test@foo.com"">
+                  <smtp>
                     <network host=""smtpserver1"" port=""25"" userName=""username""
                         password=""secret"" defaultCredentials=""true"" />
                   </smtp>
@@ -248,11 +264,40 @@ namespace CuttingEdge.Logging.UnitTests
 
         [TestMethod]
         [ExpectedException(typeof(ConfigurationErrorsException))]
+        public void InvalidMailLoggingProviderConfigurationShouldFail08()
+        {
+            string customAttributes = "to=\"dev1@cuttingedge.it\" ";
+
+            // Missing 'from'
+            string invalidMailConfiguration = @"
+              <system.net>
+                <mailSettings>
+                  <smtp from=""invalid_mailaddress.com"">
+                    <network host=""smtpserver1"" port=""25"" userName=""username""
+                        password=""secret"" defaultCredentials=""true"" />
+                  </smtp>
+                </mailSettings>
+              </system.net>";
+
+            try
+            {
+                ConfigureMailLoggingProvider(customAttributes, invalidMailConfiguration);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex.InnerException.InnerException is FormatException,
+                    "Of type " + ex.InnerException.InnerException.GetType().Name + " instead.");
+                throw;
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ConfigurationErrorsException))]
         public void ConfiguringAnInvalidTypeOfProviderShouldFail01()
         {
             string defaultProviderName = "MyTestSqlMembershipProvider";
             string providerConfigurationLines =
-                SandboxHelpers.BuildProviderConfigurationLine(typeof(MyTestSqlMembershipProvider));
+                SandboxHelpers.BuildProviderConfigurationLine(typeof(TestSqlMembershipProvider));
 
             IConfigurationWriter config = SandboxHelpers.CreateConfiguration(defaultProviderName,
                 providerConfigurationLines);
@@ -284,9 +329,5 @@ namespace CuttingEdge.Logging.UnitTests
                 }
             }
         }
-    }
-
-    class MyTestSqlMembershipProvider : SqlMembershipProvider
-    {
     }
 }

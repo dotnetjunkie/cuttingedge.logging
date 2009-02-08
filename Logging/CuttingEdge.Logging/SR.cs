@@ -77,6 +77,8 @@ namespace CuttingEdge.Logging
         internal const string InvalidFormatStringAttribute = "InvalidFormatStringAttribute";
         internal const string MissingAttributeInMailSettings = "MissingAttributeInMailSettings";
         internal const string NoPermissionsToAccessSmtpServers = "NoPermissionsToAccessSmtpServers";
+        internal const string ExampleMailConfigurationSettings = "ExampleMailConfigurationSettings";
+        internal const string PossibleInvalidMailConfigurationInConfigFile = "PossibleInvalidMailConfigurationInConfigFile";
 
         private static readonly ResourceManager resource =
             new ResourceManager(typeof(SR).Namespace + ".LoggingExceptionMessages", typeof(SR).Assembly);
