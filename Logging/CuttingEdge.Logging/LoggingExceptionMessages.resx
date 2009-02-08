@@ -332,6 +332,9 @@ VALUES (4, 'Critical', 'A critical event. This indicates a fatal error or applic
   <data name="NoPermissionsToAccessSmtpServers" xml:space="preserve">
     <value>There was an error while initializing the provider '{0}'. The application does not have permissions to access Simple Mail Transport Protocol (SMTP) servers. {1}</value>
   </data>
+  <data name="ProviderMustInheritFromType" xml:space="preserve">
+    <value>Provider must inherit from type '{0}'.</value>
+  </data>
   <data name="ProviderParameterMustBeOfTypeX" xml:space="preserve">
     <value>The provider parameter must be of type {0}.</value>
   </data>
@@ -462,6 +465,9 @@ VALUES (4, 'Critical', 'A critical event. This indicates a fatal error or applic
   </data>
   <data name="SqlProviderAlreadyInitialized" xml:space="preserve">
     <value>The provider '{0}' has already been initialized. Please remove the 'initializeSchema' attribute from the provider configuration.</value>
+  </data>
+  <data name="TypeNameMustBeSpecifiedForThisProvider" xml:space="preserve">
+    <value>Type name must be specified for this provider.</value>
   </data>
   <data name="UnrecognizedAttributeInProviderConfiguration" xml:space="preserve">
     <value>The configuration for provider '{0}' contains the unrecognized attribute with name '{1}'.</value>
