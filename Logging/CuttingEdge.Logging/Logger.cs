@@ -26,11 +26,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration;
 using System.Configuration.Provider;
 using System.Reflection;
-using System.Web.Configuration;
 
 namespace CuttingEdge.Logging
 {
@@ -117,7 +117,7 @@ namespace CuttingEdge.Logging
             {
                 InitializationException = pex;
             }
-            catch (ConfigurationErrorsException ceex)
+            catch (ConfigurationException ceex)
             {
                 InitializationException = ceex;
             }
@@ -382,6 +382,7 @@ namespace CuttingEdge.Logging
             return Logger.Provider.Log(severity, message, source);
         }
 
+        // Throws a ProviderException on failure.
         private static LoggingSection GetConfigurationSection()
         {
             // Get the feature's configuration info
@@ -406,18 +407,24 @@ namespace CuttingEdge.Logging
             return loggingSection;
         }
 
+        // Throws a ConfigurationException (or a descendant) on failure.
         private static LoggingProviderCollection LoadProviderCollection(LoggingSection section)
         {
             LoggingProviderCollection providerCollection = new LoggingProviderCollection();
 
-            ProvidersHelper.InstantiateProviders(section.Providers, providerCollection,
-                typeof(LoggingProviderBase));
+            foreach (ProviderSettings settings in section.Providers)
+            {
+                LoggingProviderBase loggingProvider = InstantiateLoggingProvider(settings);
+
+                providerCollection.Add(loggingProvider);
+            }
 
             providerCollection.SetReadOnly();
 
             return providerCollection;
         }
 
+        // Throws a ConfigurationErrorsException (descendant of ConfigurationException) on failure.
         private static LoggingProviderBase GetDefaultProvider(LoggingSection loggingSection,
             LoggingProviderCollection providerCollection)
         {
@@ -437,6 +444,7 @@ namespace CuttingEdge.Logging
         // The fallback providers must be initialized from within the this Logger class. It can't be done
         // from within the LoggingProviderBase.Initialize() method. At the time of calling 
         // LoggingProviderBase.Initialize() the collection of Providers is not yet initialized.
+        // Throws ProviderException on failure.
         private static void InitializeFallbackProviders(LoggingProviderCollection providers)
         {
             foreach (LoggingProviderBase provider in providers)
@@ -460,6 +468,7 @@ namespace CuttingEdge.Logging
             }
         }
 
+        // Throws a ConfigurationErrorsException (descendant of ConfigurationException) on failure.
         private static void ValidateProviders(LoggingProviderCollection providers)
         {
             foreach (LoggingProviderBase provider in providers)
@@ -481,7 +490,8 @@ namespace CuttingEdge.Logging
                 return false;
             }
 
-            // A HashSet<LoggingProviderBase> would be nicer, but we are targetting .NET 2.0.
+            // A HashSet<LoggingProviderBase> would be nicer, but we are targetting .NET 2.0 and we're not
+            // in a critical performance path here.
             Dictionary<LoggingProviderBase, object> referencedProviders =
                 new Dictionary<LoggingProviderBase, object>();
 
@@ -503,6 +513,64 @@ namespace CuttingEdge.Logging
 
             // post: No circular reference found.
             return false;
+        }
+
+        // Throws a ConfigurationException (or a descendant) on failure.
+        private static LoggingProviderBase InstantiateLoggingProvider(ProviderSettings providerSettings)
+        {
+            try
+            {
+                string typeName = (providerSettings.Type == null) ? null : providerSettings.Type.Trim();
+
+                if (string.IsNullOrEmpty(typeName))
+                {
+                    throw new ArgumentException(SR.GetString(SR.TypeNameMustBeSpecifiedForThisProvider));
+                }
+
+                Type providerType = Type.GetType(typeName, true, true);
+
+                if (!typeof(LoggingProviderBase).IsAssignableFrom(providerType))
+                {
+                    throw new ArgumentException(SR.GetString(SR.ProviderMustInheritFromType,
+                        typeof(LoggingProviderBase)));
+                }
+
+                LoggingProviderBase providerInstance = (LoggingProviderBase)Activator.CreateInstance(providerType);
+
+                NameValueCollection parameters = providerSettings.Parameters;
+                NameValueCollection config = new NameValueCollection(parameters.Count, StringComparer.Ordinal);
+
+                foreach (string parameter in parameters)
+                {
+                    config[parameter] = parameters[parameter];
+                }
+
+                providerInstance.Initialize(providerSettings.Name, config);
+
+                return providerInstance;
+            }
+            catch (Exception ex)
+            {
+                if (ex is ConfigurationException)
+                {
+                    throw;
+                }
+
+                PropertyInformation typeProperty = providerSettings.ElementInformation.Properties["type"];
+
+                if (ex is ArgumentException)
+                {
+                    // The exception is thrown from within this method. Therefore we do not supply an inner
+                    // exception.
+                    throw new ConfigurationErrorsException(ex.Message, typeProperty.Source,
+                        typeProperty.LineNumber);
+                }
+                else
+                {
+                    throw new ConfigurationErrorsException(ex.Message, ex, typeProperty.Source,
+                        typeProperty.LineNumber);
+                }
+            }
         }
     }
 }

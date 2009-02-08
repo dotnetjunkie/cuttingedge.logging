@@ -43,6 +43,8 @@ namespace CuttingEdge.Logging
         internal const string SectionIsNotOfCorrectType = "SectionIsNotOfCorrectType";
         internal const string NoDefaultLoggingProviderFound = "NoDefaultLoggingProviderFound";
         internal const string CircularReferenceInLoggingSection = "CircularReferenceInLoggingSection";
+        internal const string TypeNameMustBeSpecifiedForThisProvider = "TypeNameMustBeSpecifiedForThisProvider";
+        internal const string ProviderMustInheritFromType = "ProviderMustInheritFromType";
 
         // Exception messages for LoggingProviderBase class
         internal const string InvalidFallbackProviderPropertyInConfig = "InvalidFallbackProviderPropertyInConfig";

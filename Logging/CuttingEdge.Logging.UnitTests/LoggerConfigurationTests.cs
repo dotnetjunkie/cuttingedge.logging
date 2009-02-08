@@ -7,6 +7,7 @@ using CuttingEdge.Logging.UnitTests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using NSandbox;
+using System.Web.Security;
 
 namespace CuttingEdge.Logging.UnitTests
 {
@@ -160,7 +161,7 @@ namespace CuttingEdge.Logging.UnitTests
             string invalidMailConfiguration = @"
               <system.net>
                 <mailSettings>
-                  <smtp>
+                  <smtp from=""test@foo.com"">
                     <network host=""smtpserver1"" port=""25"" userName=""username""
                         password=""secret"" defaultCredentials=""true"" />
                   </smtp>
@@ -245,6 +246,23 @@ namespace CuttingEdge.Logging.UnitTests
             ConfigureMailLoggingProvider(customAttributes, ValidMailConfiguration);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ConfigurationErrorsException))]
+        public void ConfiguringAnInvalidTypeOfProviderShouldFail01()
+        {
+            string defaultProviderName = "MyTestSqlMembershipProvider";
+            string providerConfigurationLines =
+                SandboxHelpers.BuildProviderConfigurationLine(typeof(MyTestSqlMembershipProvider));
+
+            IConfigurationWriter config = SandboxHelpers.CreateConfiguration(defaultProviderName,
+                providerConfigurationLines);
+
+            using (LoggingSandboxManager manager = new LoggingSandboxManager(config))
+            {
+                manager.Logger.Initialize();
+            }
+        }
+
         private static void ConfigureMailLoggingProvider(string customAttributes, string mailConfiguration)
         {
             string defaultProviderName = "MailLoggingProvider";
@@ -256,8 +274,19 @@ namespace CuttingEdge.Logging.UnitTests
 
             using (LoggingSandboxManager manager = new LoggingSandboxManager(config))
             {
-                manager.Logger.Initialize();
+                try
+                {
+                    manager.Logger.Initialize();
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
         }
+    }
+
+    class MyTestSqlMembershipProvider : SqlMembershipProvider
+    {
     }
 }
