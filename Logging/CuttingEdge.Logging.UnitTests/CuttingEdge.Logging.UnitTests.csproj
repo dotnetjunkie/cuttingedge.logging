@@ -60,6 +60,7 @@
     <Compile Include="Helpers\SandboxHelpers.cs" />
     <Compile Include="Helpers\StubLoggingProvider.cs" />
     <Compile Include="Helpers\TemplatedConfigurationWriter.cs" />
+    <Compile Include="Helpers\TestSqlMembershipProvider.cs" />
     <Compile Include="LogEntryTests.cs" />
     <Compile Include="LoggerConfigurationTests.cs" />
     <Compile Include="LoggerExtensionsTests.cs" />

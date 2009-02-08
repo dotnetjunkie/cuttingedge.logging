@@ -31,6 +31,7 @@ using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Net.Mail;
 using System.Security;
+using System.Globalization;
 
 namespace CuttingEdge.Logging
 {
@@ -71,7 +72,7 @@ namespace CuttingEdge.Logging
     /// <item>
     ///     <attribute>to</attribute>
     ///     <description>
-    ///         A list of mail addresses, seperated by a semicolon (;). This attribute is mandatory.
+    ///         A list of mail addresses, separated by a semicolon (;). This attribute is mandatory.
     ///     </description>
     /// </item>
     /// <item>
@@ -143,7 +144,7 @@ namespace CuttingEdge.Logging
     ///                 &lt;network
     ///                     host="smtpserver1" 
     ///                     port="25" 
-    ///                     userName="username" 
+    ///                     userName="john" 
     ///                     password="secret" 
     ///                     defaultCredentials="true"
     ///                 /&gt;
@@ -181,7 +182,7 @@ namespace CuttingEdge.Logging
         /// <exception cref="ArgumentNullException">Thrown when the name of the provider is null or when the
         /// <paramref name="config"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when the name of the provider has a length of zero.</exception>
-        /// <exception cref="InvalidOperationException">Thrown wen an attempt is made to call Initialize on a
+        /// <exception cref="InvalidOperationException">Thrown when an attempt is made to call Initialize on a
         /// provider after the provider has already been initialized.</exception>
         /// <exception cref="ProviderException">Thrown when the <paramref name="config"/> contains
         /// unrecognized attributes.</exception>
@@ -205,7 +206,7 @@ namespace CuttingEdge.Logging
             this.InitializeToProperty(name, config);
             this.InitializeSubjectFormatStringProperty(name, config);
 
-            this.TestMailConfiguration(name, config);
+            TestMailConfiguration(name);
 
             // Always call this method last
             this.CheckForUnrecognizedAttributes(name, config);
@@ -265,7 +266,7 @@ namespace CuttingEdge.Logging
         {
             string exceptionType = entry.Exception != null ? entry.Exception.GetType().Name : null;
 
-            return string.Format(subjectFormatString,
+            return string.Format(CultureInfo.InvariantCulture, subjectFormatString,
                 entry.Severity, // {0}
                 entry.Message,  // {1}
                 entry.Source,   // {2}
@@ -288,7 +289,7 @@ namespace CuttingEdge.Logging
 
             foreach (string address in addressesConfigValue.Split(';'))
             {
-                if (address == String.Empty)
+                if (string.IsNullOrEmpty(address))
                 {
                     throw new ProviderException(SR.GetString(SR.InvalidMailAddressAttribute, 
                         addressesConfigValue, "to", name));
@@ -307,8 +308,8 @@ namespace CuttingEdge.Logging
 
             this.To = new ReadOnlyCollection<MailAddress>(addresses);
 
-            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
-            // after the initialization process.
+            // Remove this attribute from the configuration. This way the provider can spot unrecognized 
+            // attributes after the initialization process.
             config.Remove("to");
         }
 
@@ -343,7 +344,7 @@ namespace CuttingEdge.Logging
             config.Remove("subjectFormatString");
         }
 
-        private void TestMailConfiguration(string name, NameValueCollection config)
+        private static void TestMailConfiguration(string name)
         {
             SmtpClient client;
             try
@@ -361,16 +362,36 @@ namespace CuttingEdge.Logging
             if (String.IsNullOrEmpty(client.Host))
             {
                 throw new ProviderException(SR.GetString(SR.MissingAttributeInMailSettings, name, "host",
-                    "/smtp/network"));
+                    "/smtp/network") + " " + SR.GetString(SR.ExampleMailConfigurationSettings));
             }
 
-            using (MailMessage message = new MailMessage())
+            MailMessage message;
+
+            try
+            {
+                message = new MailMessage();
+            }
+            catch (Exception ex)
+            {
+                // We the system.net/mailSettings configuration is invalid, the MailMessage constructor might
+                // throw an exception (for instance, when the from message is not a valid mail address).
+                throw new ProviderException(
+                    SR.GetString(SR.PossibleInvalidMailConfigurationInConfigFile, typeof(MailMessage)) + " " + 
+                    ex.Message + " " + SR.GetString(SR.ExampleMailConfigurationSettings), ex);
+            }
+
+            try
             {
                 if (message.From == null)
                 {
                     throw new ProviderException(SR.GetString(SR.MissingAttributeInMailSettings, name, "from",
-                        "/smtp"));
+                        "/smtp") + " " + SR.GetString(SR.ExampleMailConfigurationSettings));
                 }
+            }
+            finally
+            {
+                // MailMessage implements IDisposable, so we must dispose it.
+                message.Dispose();
             }
         }
     }
