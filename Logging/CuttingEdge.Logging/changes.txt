@@ -1,0 +1,34 @@
+﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
+
+Version 1.1.0.0 (1.1) 2009-03-15
+	General description:
+		This new release fixes two bugs and adds a new provider: the MailLoggingProvider.
+
+	Bug fixes:
+		-Dependency with the type ‘System.Web.Configuration.ProvidersHelper’ removed. There were two problems
+		 it’s use:
+		 1. The used 'InstantiateProvider' method throws exceptions without specifying a possible inner
+		    exception (see the bug report on 
+		    http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=411215 for more 
+		    information).
+		 2. Use of the type caused the to the loading of the System.Web assembly and the check of ASP.NET 
+		    hosting permissions, while the CuttingEdge.Logging framework is a general framework that could
+		    also be used in non-web based environments.
+		-WindowsEventLogLoggingProvider now also logs the severity of the event to the event log. Two new unit
+		 tests added to check the format of that logged message.
+	
+	Code changes:
+		-A new MailLoggingProvider has been added. It's a simple provider that uses the <system.net> 
+		 configuration from the application configuration file to send events by mail.
+		-A LoggerExtensions class added containing extension methods for the ILogger interface. These
+		 extension method replace the LoggerWrapper class which is now marked as obsolete.
+		 
+	Changes to project and solutions:
+		-Reference to System.Core (.NET 3.5) added. Officially, the project is now dependent on .NET 3.5, but 
+		 it will still run on .NET 2.0. When adding the assembly to a .NET 2.0 project just ignore
+		 the warning by choosing "Yes".
+
+
+Version 1.0.0.0 (1.0) 2008-11-23
+	General description:
+		Initial release.

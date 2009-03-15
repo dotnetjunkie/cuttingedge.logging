@@ -84,7 +84,7 @@
   <ItemGroup>
     <Content Include="ExampleConfiguration.xml" />
     <Content Include="licence.txt" />
-    <Content Include="readme.txt" />
+    <Content Include="changes.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Web\AspNetSqlLoggingProviderScripts.sql">
