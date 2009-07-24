@@ -315,7 +315,7 @@ VALUES (4, 'Critical', 'A critical event. This indicates a fatal error or applic
     <value>Invalid value in 'threshold' attribute for provider '{0}' in the config file. Please supply one of the following values: {1}.</value>
   </data>
   <data name="LoggingSectionMissingFromConfigSettings" xml:space="preserve">
-    <value>The Logger hasn't been configured properly. Please register the logger as &lt;section&gt; in the &lt;configSections&gt; of your configurations file as follows: &lt;configSections&gt;&lt;section name="logging" type="{0}, {1}" allowDefinition="MachineToApplication" /&gt;&lt;/configSections&gt;.</value>
+    <value>The Logger hasn't been configured properly. Please register the logger as &lt;section&gt; element in the &lt;configSections&gt; of your configurations file as follows: &lt;configSections&gt;&lt;section name="{0}" type="{1}, {2}" allowDefinition="MachineToApplication" /&gt;&lt;/configSections&gt;.</value>
   </data>
   <data name="MissingAttributeInMailSettings" xml:space="preserve">
     <value>There was an error while initializing the provider '{0}'. Please make sure the 'configuration/system.net/mailSettings' section in the application configuration file is correctly configured. Could not find the '{1}' attribute in the '{2}' section.</value>

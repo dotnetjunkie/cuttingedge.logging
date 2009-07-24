@@ -21,8 +21,8 @@ namespace CuttingEdge.Logging.UnitTests
             "<add name=\"[NameOfYourDefaultProvider]\" type=\"[ProviderType]\" /></logging>.";
 
         private const string MissingConfigSectionsElementExceptionMessage =
-            "The Logger hasn't been configured properly. Please register the logger as <section> in the " +
-            "<configSections> of your configurations file as follows: " +
+            "The Logger hasn't been configured properly. Please register the logger as <section> element " +
+            "in the <configSections> of your configurations file as follows: " +
             "<configSections><section name=\"logging\" type=\"CuttingEdge.Logging.LoggingSection, " +
             "CuttingEdge.Logging\" allowDefinition=\"MachineToApplication\" /></configSections>.";
 
