@@ -270,7 +270,7 @@ INSERT INTO logging_EventTypes (EventTypeId, Name, Description)
 VALUES (4, 'Critical', 'A critical event. This indicates a fatal error or application crash.')</value>
   </data>
   <data name="CircularReferenceInLoggingSection" xml:space="preserve">
-    <value>There was an error in the '{0}' section of the the configuration's &lt;configSections&gt;. The given provider '{1}' is directly or indirectly circular referencing itself through the fallbackProvider attributes.</value>
+    <value>There was an error in the &lt;{0}&gt; section of the the configuration file. The given provider '{1}' is directly or indirectly circular referencing itself through the fallbackProvider attributes.</value>
   </data>
   <data name="DuplicateLoggingProviderInConfig" xml:space="preserve">
     <value>The {0} with name '{1}' has already been initialized.</value>
@@ -300,7 +300,7 @@ VALUES (4, 'Critical', 'A critical event. This indicates a fatal error or applic
     <value>Invalid value '{0}' in attribute '{1}' in provider '{2}' in config file. Value should be True or False.</value>
   </data>
   <data name="InvalidFallbackProviderPropertyInConfig" xml:space="preserve">
-    <value>There was an error in the '{0}' section of the the configuration file. The given {1} with name '{2}' has a 'fallbackProvider' attribute with a value of '{3}'. No provider with that name could be found. The given fallbackProvider must be an item in the list of logging providers. Please check the configuration file for errors.</value>
+    <value>There was an error in the &lt;{0}&gt; section of the the configuration file. The given {1} with name '{2}' has a 'fallbackProvider' attribute with a value of '{3}'. No provider with that name could be found. The given fallbackProvider must be an item in the list of logging providers. Please check the configuration file for errors.</value>
   </data>
   <data name="InvalidFormatStringAttribute" xml:space="preserve">
     <value>Invalid value '{0}' in attribute '{1}' in provider '{2}' in config file. The value is not a valid format string.</value>
