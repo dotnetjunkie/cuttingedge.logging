@@ -392,7 +392,8 @@ namespace CuttingEdge.Logging
             if (section == null)
             {
                 throw new ProviderException(SR.GetString(SR.LoggingSectionMissingFromConfigSettings,
-                    typeof(LoggingSection).FullName, typeof(LoggingSection).Assembly.GetName().Name));
+                    SectionName, typeof(LoggingSection).FullName, 
+                    typeof(LoggingSection).Assembly.GetName().Name));
             }
 
             LoggingSection loggingSection = section as LoggingSection;
