@@ -1,5 +1,11 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+Version vNext
+	Bug fixes:
+		-Fixed one of the exception messages that was thrown in case the logging provider failed to initialize.
+		 The message incorrectly referred to an error in the <configSections> section.
+
+
 Version 1.1.0.0 (1.1) 2009-03-15
 	General description:
 		This new release fixes two bugs and adds a new provider: the MailLoggingProvider.
