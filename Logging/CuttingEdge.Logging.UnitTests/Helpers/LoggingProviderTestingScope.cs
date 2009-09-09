@@ -15,7 +15,7 @@ namespace CuttingEdge.Logging.UnitTests.Helpers
         private TLogger logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LoggingProviderTestingScope"/> class.
+        /// Initializes a new instance of the LoggingProviderTestingScope class.
         /// </summary>
         public LoggingProviderTestingScope()
         {

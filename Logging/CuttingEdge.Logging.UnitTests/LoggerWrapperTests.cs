@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.Logging.UnitTests
 {
+#pragma warning disable 618
     [TestClass]
     public class LoggerWrapperTests
     {
@@ -789,4 +790,5 @@ namespace CuttingEdge.Logging.UnitTests
             Assert.AreEqual("source", entries.Source);
         }
     }
+#pragma warning restore 618
 }
