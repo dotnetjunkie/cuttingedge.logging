@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.Logging.UnitTests
 {
+#pragma warning disable 618
     /// <summary>
     /// Tests the <see cref="LoggingProviderBase"/> class.
     /// </summary>
@@ -923,4 +924,5 @@ namespace CuttingEdge.Logging.UnitTests
             Assert.AreEqual("source", entry.Source);
         }
     }
+#pragma warning restore 618
 }
