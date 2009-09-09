@@ -2,6 +2,7 @@
 
 Version vNext
 	Bug fixes:
+		-Fixed a typo in the Obsolete attribute of the LoggerWrapper class.
 		-Fixed one of the exception messages that was thrown in case the logging provider failed to initialize.
 		 The message incorrectly referred to an error in the <configSections> section.
 

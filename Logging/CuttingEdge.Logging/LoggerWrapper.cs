@@ -54,7 +54,8 @@ namespace CuttingEdge.Logging
     /// }
     /// </code>
     /// </example>
-    [Obsolete("Please us the extension methods on the ILogger interface that are defined in the CuttingEdge.Logging.LoggerExtensions class.", false)]
+    [Obsolete("Please use the extension methods on the ILogger interface that are defined in the " + 
+        "CuttingEdge.Logging.LoggerExtensions class. This class will be dropped in a later release.", false)]
     public class LoggerWrapper : ILogger
     {
         private readonly ILogger logger;
