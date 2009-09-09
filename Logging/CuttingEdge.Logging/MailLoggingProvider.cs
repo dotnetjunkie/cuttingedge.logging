@@ -29,9 +29,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
+using System.Globalization;
 using System.Net.Mail;
 using System.Security;
-using System.Globalization;
 
 namespace CuttingEdge.Logging
 {
@@ -274,6 +274,57 @@ namespace CuttingEdge.Logging
                 DateTime.Now);  // {4}
         }
 
+        private static void TestMailConfiguration(string name)
+        {
+            SmtpClient client;
+            try
+            {
+                client = new SmtpClient();
+            }
+            catch (SecurityException ex)
+            {
+                // the SmtpClient constructor will throw a SecurityException when the application doesn't
+                // have the proper rights to send mail.
+                throw new ProviderException(SR.GetString(SR.NoPermissionsToAccessSmtpServers, name,
+                    ex.Message));
+            }
+
+            if (String.IsNullOrEmpty(client.Host))
+            {
+                throw new ProviderException(SR.GetString(SR.MissingAttributeInMailSettings, name, "host",
+                    "/smtp/network") + " " + SR.GetString(SR.ExampleMailConfigurationSettings));
+            }
+
+            MailMessage message;
+
+            try
+            {
+                message = new MailMessage();
+            }
+            catch (Exception ex)
+            {
+                // We the system.net/mailSettings configuration is invalid, the MailMessage constructor might
+                // throw an exception (for instance, when the from message is not a valid mail address).
+                throw new ProviderException(
+                    SR.GetString(SR.PossibleInvalidMailConfigurationInConfigFile, typeof(MailMessage)) + " " +
+                    ex.Message + " " + SR.GetString(SR.ExampleMailConfigurationSettings), ex);
+            }
+
+            try
+            {
+                if (message.From == null)
+                {
+                    throw new ProviderException(SR.GetString(SR.MissingAttributeInMailSettings, name, "from",
+                        "/smtp") + " " + SR.GetString(SR.ExampleMailConfigurationSettings));
+                }
+            }
+            finally
+            {
+                // MailMessage implements IDisposable, so we must dispose it.
+                message.Dispose();
+            }
+        }
+
         private void InitializeToProperty(string name, NameValueCollection config)
         {
             string addressesConfigValue = config["to"];
@@ -342,57 +393,6 @@ namespace CuttingEdge.Logging
             // Remove this attribute from the config. This way the provider can spot unrecognized attributes
             // after the initialization process.
             config.Remove("subjectFormatString");
-        }
-
-        private static void TestMailConfiguration(string name)
-        {
-            SmtpClient client;
-            try
-            {
-                client = new SmtpClient();
-            }
-            catch (SecurityException ex)
-            {
-                // the SmtpClient constructor will throw a SecurityException when the application doesn't
-                // have the proper rights to send mail.
-                throw new ProviderException(SR.GetString(SR.NoPermissionsToAccessSmtpServers, name,
-                    ex.Message));
-            }
-
-            if (String.IsNullOrEmpty(client.Host))
-            {
-                throw new ProviderException(SR.GetString(SR.MissingAttributeInMailSettings, name, "host",
-                    "/smtp/network") + " " + SR.GetString(SR.ExampleMailConfigurationSettings));
-            }
-
-            MailMessage message;
-
-            try
-            {
-                message = new MailMessage();
-            }
-            catch (Exception ex)
-            {
-                // We the system.net/mailSettings configuration is invalid, the MailMessage constructor might
-                // throw an exception (for instance, when the from message is not a valid mail address).
-                throw new ProviderException(
-                    SR.GetString(SR.PossibleInvalidMailConfigurationInConfigFile, typeof(MailMessage)) + " " + 
-                    ex.Message + " " + SR.GetString(SR.ExampleMailConfigurationSettings), ex);
-            }
-
-            try
-            {
-                if (message.From == null)
-                {
-                    throw new ProviderException(SR.GetString(SR.MissingAttributeInMailSettings, name, "from",
-                        "/smtp") + " " + SR.GetString(SR.ExampleMailConfigurationSettings));
-                }
-            }
-            finally
-            {
-                // MailMessage implements IDisposable, so we must dispose it.
-                message.Dispose();
-            }
         }
     }
 }
