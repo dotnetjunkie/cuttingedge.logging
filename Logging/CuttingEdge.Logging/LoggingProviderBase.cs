@@ -479,6 +479,7 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>Implements the functionality to log the event.</summary>
+        /// <remarks>Implementations of this method must guarantee it to be thread safe.</remarks>
         /// <param name="entry">The entry to log.</param>
         /// <returns>The id of the logged event or null when an id is inappropriate.</returns>
         protected abstract object LogInternal(LogEntry entry);
