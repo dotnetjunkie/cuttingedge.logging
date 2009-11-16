@@ -41,6 +41,9 @@ namespace CuttingEdge.Logging
     {
         /// <summary>Logs the specified entry.</summary>
         /// <param name="entry">The entry to log.</param>
+        /// <remarks>
+        /// Implementations of this method must guarantee to be thread safe.
+        /// </remarks>
         /// <returns>
         /// The id of the saved log (or null when an id is not appropriate for this type of logger.
         /// </returns>
