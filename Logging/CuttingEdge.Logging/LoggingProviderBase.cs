@@ -149,13 +149,7 @@ namespace CuttingEdge.Logging
         /// a null reference (Nothing in VB).</exception>
         public object Log(Exception exception)
         {
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-
-            string message = LoggingHelper.GetExceptionMessageOrExceptionType(exception);
-
-            LogEntry entry = new LogEntry(LoggingEventType.Error, message, null, exception);
-            ILogger logger = this;
-            return logger.Log(entry);
+            return LoggerExtensions.Log(this, exception);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -172,12 +166,7 @@ namespace CuttingEdge.Logging
         /// a null reference (Nothing in VB) or the supplied <paramref name="message"/> is a null reference.</exception>
         public object Log(string message, Exception exception)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-
-            LogEntry entry = new LogEntry(LoggingEventType.Error, message, null, exception);
-            ILogger logger = this;
-            return logger.Log(entry);
+            return LoggerExtensions.Log(this, message, exception);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -192,15 +181,7 @@ namespace CuttingEdge.Logging
         /// the <paramref name="source"/> are null references (Nothing in VB).</exception>
         public object Log(Exception exception, MethodBase source)
         {
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-            LoggingHelper.ValidateSourceIsNotNull(source);
-
-            string message = LoggingHelper.GetExceptionMessageOrExceptionType(exception);
-            string methodName = LoggingHelper.BuildMethodName(source);
-
-            LogEntry entry = new LogEntry(LoggingEventType.Error, message, methodName, exception);
-            ILogger logger = this;
-            return logger.Log(entry);
+            return LoggerExtensions.Log(this, exception, source);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -218,15 +199,7 @@ namespace CuttingEdge.Logging
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         public object Log(string message, Exception exception, MethodBase source)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-            LoggingHelper.ValidateSourceIsNotNull(source);
-
-            string methodName = LoggingHelper.BuildMethodName(source);
-
-            LogEntry entry = new LogEntry(LoggingEventType.Error, message, methodName, exception);
-            ILogger logger = this;
-            return logger.Log(entry);
+            return LoggerExtensions.Log(this, message, exception, source);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -244,13 +217,7 @@ namespace CuttingEdge.Logging
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         public object Log(string message, Exception exception, string source)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-            LoggingHelper.ValidateSourceNotNullOrEmpty(source);
-
-            LogEntry entry = new LogEntry(LoggingEventType.Error, message, source, exception);
-            ILogger logger = this;
-            return logger.Log(entry);
+            return LoggerExtensions.Log(this, message, exception, source);
         }
 
         /// <summary>Logs an event.</summary>
@@ -271,16 +238,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public object Log(LoggingEventType severity, string message, Exception exception, MethodBase source)
         {
-            LoggingHelper.ValidateSeverityInValidRange(severity);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-            LoggingHelper.ValidateSourceIsNotNull(source);
-
-            string methodName = LoggingHelper.BuildMethodName(source);
-
-            LogEntry entry = new LogEntry(severity, message, methodName, exception);
-            ILogger logger = this;
-            return logger.Log(entry);
+            return LoggerExtensions.Log(this, severity, message, exception, source);
         }
 
         /// <summary>Logs an error event.</summary>
@@ -301,14 +259,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public object Log(LoggingEventType severity, string message, Exception exception, string source)
         {
-            LoggingHelper.ValidateSeverityInValidRange(severity);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateExceptionIsNotNull(exception);
-            LoggingHelper.ValidateSourceNotNullOrEmpty(source);
-
-            LogEntry entry = new LogEntry(severity, message, source, exception);
-            ILogger logger = this;
-            return logger.Log(entry);
+            return LoggerExtensions.Log(this, severity, message, exception, source);
         }
 
         /// <summary>Logs an information event.</summary>
@@ -324,11 +275,7 @@ namespace CuttingEdge.Logging
         /// null reference.</exception>
         public object Log(string message)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-
-            LogEntry entry = new LogEntry(LoggingEventType.Information, message, null, null);
-            ILogger logger = this;
-            return logger.Log(entry);
+            return LoggerExtensions.Log(this, message);
         }
 
         /// <summary>Logs an event.</summary>
@@ -346,12 +293,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public object Log(LoggingEventType severity, string message)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateSeverityInValidRange(severity);
-
-            LogEntry entry = new LogEntry(severity, message, null, null);
-            ILogger logger = this;
-            return logger.Log(entry);
+            return LoggerExtensions.Log(this, severity, message);
         }
 
         /// <summary>Logs an information event.</summary>
@@ -368,14 +310,7 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
         public object Log(string message, MethodBase source)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateSourceIsNotNull(source);
-
-            string methodName = LoggingHelper.BuildMethodName(source);
-
-            LogEntry entry = new LogEntry(LoggingEventType.Information, message, methodName, null);
-            ILogger logger = this;
-            return logger.Log(entry);
+            return LoggerExtensions.Log(this, message, source);
         }
 
         /// <summary>Logs an event.</summary>
@@ -395,15 +330,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public object Log(LoggingEventType severity, string message, MethodBase source)
         {
-            LoggingHelper.ValidateSeverityInValidRange(severity);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateSourceIsNotNull(source);
-
-            string methodName = LoggingHelper.BuildMethodName(source);
-
-            LogEntry entry = new LogEntry(severity, message, methodName, null);
-            ILogger logger = this;
-            return logger.Log(entry);
+            return LoggerExtensions.Log(this, severity, message, source);
         }
 
         /// <summary>Logs an event.</summary>
@@ -423,13 +350,7 @@ namespace CuttingEdge.Logging
         /// has an unexpected value.</exception>
         public object Log(LoggingEventType severity, string message, string source)
         {
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
-            LoggingHelper.ValidateSeverityInValidRange(severity);
-            LoggingHelper.ValidateSourceNotNullOrEmpty(source);
-
-            LogEntry entry = new LogEntry(severity, message, source, null);
-            ILogger logger = this;
-            return logger.Log(entry);
+            return LoggerExtensions.Log(this, severity, message, source);
         }
 
         /// <summary>Adds a event to the log. When logging fails, the event is forwarded to the
