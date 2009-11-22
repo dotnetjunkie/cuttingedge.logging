@@ -142,7 +142,7 @@ namespace CuttingEdge.Logging
         {
             string formattedEvent = FormatEvent(entry);
 
-            Debug.Write(formattedEvent);
+            Trace.Write(formattedEvent);
 
             // Returning an ID is inappropriate for this type of logger.
             return null;
