@@ -26,6 +26,8 @@
 
 using System;
 using System.Globalization;
+using System.IO;
+using System.Reflection;
 using System.Resources;
 
 namespace CuttingEdge.Logging
@@ -35,92 +37,277 @@ namespace CuttingEdge.Logging
     /// </summary>
     internal static class SR
     {
-        // General messages
-        internal const string ArgumentMustNotBeNullOrEmptyString = "ArgumentMustNotBeNullOrEmptyString";
-
-        // Exception messages for Logger class
-        internal const string LoggingSectionMissingFromConfigSettings = "LoggingSectionMissingFromConfigSettings";
-        internal const string SectionIsNotOfCorrectType = "SectionIsNotOfCorrectType";
-        internal const string NoDefaultLoggingProviderFound = "NoDefaultLoggingProviderFound";
-        internal const string CircularReferenceInLoggingSection = "CircularReferenceInLoggingSection";
-        internal const string TypeNameMustBeSpecifiedForThisProvider = "TypeNameMustBeSpecifiedForThisProvider";
-        internal const string ProviderMustInheritFromType = "ProviderMustInheritFromType";
-
-        // Exception messages for LoggingProviderBase class
-        internal const string InvalidFallbackProviderPropertyInConfig = "InvalidFallbackProviderPropertyInConfig";
-        internal const string DuplicateLoggingProviderInConfig = "DuplicateLoggingProviderInConfig";
-        internal const string UnrecognizedAttributeInProviderConfiguration = "UnrecognizedAttributeInProviderConfiguration";
-        internal const string InvalidThresholdValueInProviderConfiguration = "InvalidThresholdValueInProviderConfiguration";
-        internal const string InvalidBooleanAttribute = "InvalidBooleanAttribute";
-
-        // Exception messages for LoggingProviderCollection class
-        internal const string ProviderParameterMustBeOfTypeX = "ProviderParameterMustBeOfTypeX";
-
-        // Exception messages for WindowsEventLogLoggingProvider class
-        internal const string EmptyOrMissingPropertyInConfiguration = "EmptyOrMissingPropertyInConfiguration";
-
-        // Exception messages for SqlLoggingProvider
-        internal const string MissingConnectionStringAttribute = "MissingConnectionStringAttribute";
-        internal const string MissingConnectionStringInConfig = "MissingConnectionStringInConfig";
-        internal const string EventCouldNotBeLoggedWithX = "EventCouldNotBeLoggedWithX";
-        internal const string SqlLoggingProviderSchemaScripts = "SqlLoggingProviderSchemaScripts";
-        internal const string InitializationOfDatabaseSchemaFailed = "InitializationOfDatabaseSchemaFailed";
-        internal const string SqlProviderAlreadyInitialized = "SqlProviderAlreadyInitialized";
-        internal const string AspNetSqlLoggingProviderSchemaScripts = "AspNetSqlLoggingProviderSchemaScripts";
-
-        // Exception messages for LoggingWebEventProvider
-        internal const string MissingLoggingProviderInConfig = "MissingLoggingProviderInConfig";
-
-        // Exception messages for MailLoggingProvider
-        internal const string InvalidIntegerAttribute = "InvalidIntegerAttribute";
-        internal const string InvalidMailAddressAttribute = "InvalidMailAddressAttribute";
-        internal const string InvalidFormatStringAttribute = "InvalidFormatStringAttribute";
-        internal const string MissingAttributeInMailSettings = "MissingAttributeInMailSettings";
-        internal const string NoPermissionsToAccessSmtpServers = "NoPermissionsToAccessSmtpServers";
-        internal const string ExampleMailConfigurationSettings = "ExampleMailConfigurationSettings";
-        internal const string PossibleInvalidMailConfigurationInConfigFile = "PossibleInvalidMailConfigurationInConfigFile";
-
         private static readonly ResourceManager resource =
             new ResourceManager(typeof(SR).Namespace + ".LoggingExceptionMessages", typeof(SR).Assembly);
 
-        // Returns a string from the resource.
-        internal static string GetString(string name)
+        // General messages
+        internal static string ArgumentMustNotBeNullOrEmptyString()
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
-
-            return GetStringInternal(name, null);
+            return GetString("ArgumentMustNotBeNullOrEmptyString");
         }
 
-        // Returns a string from the resource and formats it with the given args in a culture-specific way.
-        internal static string GetString(string name, params object[] args)
+        // Exception messages for Logger class
+        internal static string LoggingSectionMissingFromConfigSettings(string sectionName, Type type)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
-
-            return GetStringInternal(name, args);
+            return GetString("LoggingSectionMissingFromConfigSettings", sectionName, type.FullName, 
+                type.Assembly.GetName().Name);
         }
 
-        private static string GetStringInternal(string name, params object[] args)
+        internal static string SectionIsNotOfCorrectType(string sectionName, Type expectedType,
+            Type actualType)
+        {
+            return GetString("SectionIsNotOfCorrectType", sectionName, expectedType.FullName, 
+                actualType.FullName);
+        }
+
+        internal static string NoDefaultLoggingProviderFound(string sourceName)
+        {
+            return GetString("NoDefaultLoggingProviderFound", sourceName);
+        }
+
+        internal static string CircularReferenceInLoggingSection(string sectionName, string providerName)
+        {
+            return GetString("CircularReferenceInLoggingSection", sectionName, providerName);
+        }
+
+        internal static string TypeNameMustBeSpecifiedForThisProvider(string providerName)
+        {
+            return GetString("TypeNameMustBeSpecifiedForThisProvider", providerName);
+        }
+
+        internal static string ProviderMustInheritFromType(string providerName, Type actualType,
+            Type expectedBaseType)
+        {
+            return GetString("ProviderMustInheritFromType", providerName, actualType.FullName, 
+                expectedBaseType.FullName);
+        }
+
+        // Exception messages for LoggingProviderBase class
+        internal static string InvalidFallbackProviderPropertyInConfig(string sectionName, 
+            LoggingProviderBase provider)
+        {
+            return GetString("InvalidFallbackProviderPropertyInConfig", sectionName, 
+                provider.GetType().FullName, provider.Name, provider.FallbackProviderName);
+        }
+
+        internal static string EventCouldNotBeLoggedWithX(string providerName)
+        {
+            return GetString("EventCouldNotBeLoggedWithX", providerName);
+        }
+
+        internal static string UnrecognizedAttributeInProviderConfiguration(string providerName, 
+            string attributeName)
+        {
+            return GetString("UnrecognizedAttributeInProviderConfiguration", providerName, 
+                attributeName);
+        }
+
+        internal static string InvalidThresholdValueInProviderConfiguration(string providerName)
+        {
+            string values = GetEventTypeValuesAsString();
+            return GetString("InvalidThresholdValueInProviderConfiguration", providerName, values);
+        }
+
+        internal static string InvalidBooleanAttribute(string value, string attributeName, string providerName)
+        {
+            return GetString("InvalidBooleanAttribute", value, attributeName, providerName);
+        }
+
+        // Exception messages for LoggingProviderCollection class
+        internal static string ProviderParameterMustBeOfTypeX(Type argumentType)
+        {
+            return GetString("ProviderParameterMustBeOfTypeX", argumentType.Name);
+        }
+
+        // Exception messages for WindowsEventLogLoggingProvider class
+        internal static string EmptyOrMissingPropertyInConfiguration(string propertyName, string providerName)
+        {
+            return GetString("EmptyOrMissingPropertyInConfiguration", propertyName, providerName);
+        }
+
+        // Exception messages for SqlLoggingProvider
+        internal static string MissingConnectionStringAttribute(string connectionStringName)
+        {
+            return GetString("MissingConnectionStringAttribute", connectionStringName);
+        }
+
+        internal static string MissingConnectionStringInConfig(string connectionStringName)
+        {
+            return GetString("MissingConnectionStringInConfig", connectionStringName);
+        }
+
+        internal static string SqlLoggingProviderSchemaScripts()
+        {
+            const string ScriptResource = "CuttingEdge.Logging.SqlLoggingProviderScripts.sql";
+
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(ScriptResource))
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
+
+        internal static string InitializationOfDatabaseSchemaFailed(string providerName, 
+            string exceptionMessage)
+        {
+            return GetString("InitializationOfDatabaseSchemaFailed", providerName, exceptionMessage);
+        }
+
+        internal static string SqlProviderAlreadyInitialized(string providerName)
+        {
+            return GetString("SqlProviderAlreadyInitialized", providerName);
+        }
+
+        internal static string AspNetSqlLoggingProviderSchemaScripts()
+        {
+            const string ScriptResource = "CuttingEdge.Logging.Web.AspNetSqlLoggingProviderScripts.sql";
+
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(ScriptResource))
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
+
+        // Exception messages for LoggingWebEventProvider
+        internal static string MissingLoggingProviderInConfig(string loggingProviderName, 
+            string loggingWebEventProviderName)
+        {
+            return GetString("MissingLoggingProviderInConfig", loggingProviderName, 
+                loggingWebEventProviderName);
+        }
+
+        internal static string InvalidMailAddressAttribute(string attributeValue, string attributeName,
+            string providerName)
+        {
+            return GetString("InvalidMailAddressAttribute", attributeValue, attributeName, 
+                providerName);
+        }
+
+        internal static string InvalidFormatStringAttribute(string attributeValue, string attributeName,
+            string providerName, string exceptionMessage)
+        {
+            return GetString("InvalidFormatStringAttribute", attributeValue, attributeName,
+                providerName) + " " + exceptionMessage;
+        }
+
+        internal static string MissingAttributeInMailSettings(string providerName, string attributeName,
+            string sectionName)
+        {
+            return GetString("MissingAttributeInMailSettings", providerName, attributeName, 
+                sectionName);
+        }
+
+        internal static string NoPermissionsToAccessSmtpServers(string providerName, string exceptionMessage)
+        {
+            return GetString("NoPermissionsToAccessSmtpServers", providerName, exceptionMessage);
+        }
+
+        internal static string ExampleMailConfigurationSettings()
+        {
+            return GetString("ExampleMailConfigurationSettings");
+        }
+
+        internal static string PossibleInvalidMailConfigurationInConfigFile(Type messageType, 
+            string exceptionMessage)
+        {
+            return GetString("PossibleInvalidMailConfigurationInConfigFile", messageType.FullName) +
+                " " + exceptionMessage;
+        }
+
+        // Exception messages for AspNetSqlLoggingProvider
+        internal static string EmptyOrMissingApplicationNameAttributeInConfig(string providerName)
+        {
+            return GetString("EmptyOrMissingApplicationNameAttributeInConfig", providerName);
+        }
+
+        internal static string ApplicationNameAttributeInConfigTooLong(string providerName, 
+            int maximumNumberOfCharacters)
+        {
+            return GetString("ApplicationNameAttributeInConfigTooLong", providerName, 
+                maximumNumberOfCharacters);
+        }
+
+        internal static string InvalidUseNameRetrievalTypeAttributeInConfig(string providerName)
+        {
+            string values = GetUserIdentityRetrievalTypeAsString();
+            return GetString("InvalidUseNameRetrievalTypeAttributeInConfig", providerName, values);
+        }
+
+        internal static string MissingUserNameRetrievalTypeAttributeInConfig(string providerName)
+        {
+            string values = GetUserIdentityRetrievalTypeAsString();
+            return GetString("MissingUserNameRetrievalTypeAttributeInConfig", providerName, values);
+        }
+
+        internal static string TypeNameCouldNotBeResolvedForProvider(string providerName, string typeName,
+            string exceptionMessage)
+        {
+            return GetString("TypeNameCouldNotBeResolvedForProvider", providerName, typeName, 
+                exceptionMessage);
+        }
+
+        internal static string TypeCouldNotBeCreatedForProvider(string providerName, Type providerType,
+            string exceptionMessage)
+        {
+            return GetString("TypeCouldNotBeCreatedForProvider", providerName, providerType.FullName,
+                exceptionMessage);
+        }
+
+        private static string GetString(string name, params object[] args)
         {
             string format = resource.GetString(name, CultureInfo.CurrentUICulture);
 
-            if (format == null)
-            {
-                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
-                    "The supplied string '{0}' could not be found in the resource.", name), "name");
-            }
-
-            if (args == null)
+            if (args == null || args.Length == 0)
             {
                 return format;
             }
 
             return string.Format(CultureInfo.CurrentCulture, format, args);
+        }
+
+        private static string GetEventTypeValuesAsString()
+        {
+            string values = String.Empty;
+
+            Array types = Enum.GetValues(typeof(LoggingEventType));
+
+            int lastIndex = types.Length - 1;
+            for (int index = 0; index < types.Length; index++)
+            {
+                if (index > 0)
+                {
+                    values += index == lastIndex ? " or " : ", ";
+                }
+
+                values += types.GetValue(index).ToString();
+            }
+
+            return values;
+        }
+
+        private static string GetUserIdentityRetrievalTypeAsString()
+        {
+            string values = String.Empty;
+
+            Array types = Enum.GetValues(typeof(CuttingEdge.Logging.Web.UserIdentityRetrievalType));
+
+            int lastIndex = types.Length - 1;
+            for (int index = 0; index < types.Length; index++)
+            {
+                if (index > 0)
+                {
+                    values += index == lastIndex ? " or " : ", ";
+                }
+
+                values += types.GetValue(index).ToString();
+            }
+
+            return values;
         }
     }
 }

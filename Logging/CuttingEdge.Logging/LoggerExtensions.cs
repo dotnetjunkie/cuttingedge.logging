@@ -51,7 +51,6 @@ namespace CuttingEdge.Logging
         public static object Log(this ILogger logger, string message, Exception exception)
         {
             LoggingHelper.ValideLoggerIsNotNull(logger);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateExceptionIsNotNull(exception);
 
             LogEntry entry = new LogEntry(LoggingEventType.Error, message, null, exception);
@@ -61,7 +60,7 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an error event to the wrapped <see cref="Logger"/>.</summary>
         /// <param name="logger">The logger.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -89,7 +88,7 @@ namespace CuttingEdge.Logging
         /// <param name="logger">The logger.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -105,7 +104,6 @@ namespace CuttingEdge.Logging
         public static object Log(this ILogger logger, string message, Exception exception, MethodBase source)
         {
             LoggingHelper.ValideLoggerIsNotNull(logger);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceIsNotNull(source);
 
@@ -119,7 +117,7 @@ namespace CuttingEdge.Logging
         /// <param name="logger">The logger.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -135,7 +133,6 @@ namespace CuttingEdge.Logging
         public static object Log(this ILogger logger, string message, Exception exception, string source)
         {
             LoggingHelper.ValideLoggerIsNotNull(logger);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 
@@ -148,7 +145,7 @@ namespace CuttingEdge.Logging
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -168,7 +165,6 @@ namespace CuttingEdge.Logging
         {
             LoggingHelper.ValideLoggerIsNotNull(logger);
             LoggingHelper.ValidateSeverityInValidRange(severity);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceIsNotNull(source);
 
@@ -183,7 +179,7 @@ namespace CuttingEdge.Logging
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -203,7 +199,6 @@ namespace CuttingEdge.Logging
         {
             LoggingHelper.ValideLoggerIsNotNull(logger);
             LoggingHelper.ValidateSeverityInValidRange(severity);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateExceptionIsNotNull(exception);
             LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 
@@ -227,7 +222,6 @@ namespace CuttingEdge.Logging
         public static object Log(this ILogger logger, string message)
         {
             LoggingHelper.ValideLoggerIsNotNull(logger);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
 
             LogEntry entry = new LogEntry(LoggingEventType.Information, message, null, null);
             return logger.Log(entry);
@@ -254,7 +248,6 @@ namespace CuttingEdge.Logging
         {
             LoggingHelper.ValideLoggerIsNotNull(logger);
             LoggingHelper.ValidateSeverityInValidRange(severity);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
 
             LogEntry entry = new LogEntry(severity, message, null, null);
             return logger.Log(entry);
@@ -263,7 +256,7 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an information event to the wrapped <see cref="Logger"/>.</summary>
         /// <param name="logger">The logger.</param>
         /// <param name="message">The description of the event.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -273,12 +266,11 @@ namespace CuttingEdge.Logging
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="exception"/> is
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/>,
-        /// <paramref name="source"/> or <paramref name="logger"/> are null referencess (Nothing in VB).
+        /// <paramref name="source"/> or <paramref name="logger"/> are null references (Nothing in VB).
         /// </exception>
         public static object Log(this ILogger logger, string message, MethodBase source)
         {
             LoggingHelper.ValideLoggerIsNotNull(logger);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateSourceIsNotNull(source);
 
             string methodName = LoggingHelper.BuildMethodName(source);
@@ -291,7 +283,7 @@ namespace CuttingEdge.Logging
         /// <param name="logger">The logger.</param>
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -310,7 +302,6 @@ namespace CuttingEdge.Logging
         {
             LoggingHelper.ValideLoggerIsNotNull(logger);
             LoggingHelper.ValidateSeverityInValidRange(severity);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateSourceIsNotNull(source);
 
             string methodName = LoggingHelper.BuildMethodName(source);
@@ -323,7 +314,7 @@ namespace CuttingEdge.Logging
         /// <param name="logger">The logger.</param>
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -340,7 +331,6 @@ namespace CuttingEdge.Logging
         public static object Log(this ILogger logger, LoggingEventType severity, string message, string source)
         {
             LoggingHelper.ValideLoggerIsNotNull(logger);
-            LoggingHelper.ValidateMessageNotNullOrEmpty(message);
             LoggingHelper.ValidateSeverityInValidRange(severity);
             LoggingHelper.ValidateSourceNotNullOrEmpty(source);
 

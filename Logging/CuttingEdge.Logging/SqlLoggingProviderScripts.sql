@@ -1,13 +1,5 @@
-﻿SET XACT_ABORT ON
-
-BEGIN TRAN
-
-
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
+﻿-- Following SQL statements allow creating the tables and stored procedures in a SQL 2000 (or up) database,
+-- needed for the SqlLoggingProvider.
 
 CREATE TABLE [dbo].[logging_EventTypes](
 	[EventTypeId] [int] NOT NULL,
@@ -19,6 +11,8 @@ CREATE TABLE [dbo].[logging_EventTypes](
 ) ON [PRIMARY]
 ) ON [PRIMARY]
 
+
+GO
 
 
 CREATE TABLE [dbo].[logging_Events](
@@ -33,6 +27,8 @@ CREATE TABLE [dbo].[logging_Events](
 ) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
+
+GO
 
 
 CREATE TABLE [dbo].[logging_Exceptions](
@@ -64,6 +60,8 @@ BEGIN
 
 	SELECT CONVERT(int, SCOPE_IDENTITY());
 END
+
+
 GO
 
 
@@ -82,6 +80,8 @@ BEGIN
 
 	SELECT CONVERT(int, SCOPE_IDENTITY());
 END
+
+
 GO
 
 
@@ -108,7 +108,7 @@ ALTER TABLE [dbo].[logging_Events] CHECK CONSTRAINT [FK_logging_Events_logging_E
 
 
 INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
-VALUES (0, 'Debug', 'A debug event. This indicates a verbose event, usefull during development.')
+VALUES (0, 'Debug', 'A debug event. This indicates a verbose event, useful during development.')
 
 INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
 VALUES (1, 'Information', 'An information event. This indicates a significant, successful operation.')
@@ -121,6 +121,3 @@ VALUES (3, 'Error', 'An error event. This indicates a significant problem the us
 
 INSERT INTO logging_EventTypes (EventTypeId, Name, Description) 
 VALUES (4, 'Critical', 'A critical event. This indicates a fatal error or application crash.')
-
-
-COMMIT

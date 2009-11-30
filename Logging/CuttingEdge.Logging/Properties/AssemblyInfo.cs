@@ -27,6 +27,7 @@
 using System;
 using System.Reflection;
 using System.Resources;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -35,7 +36,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("CuttingEdge.Logging")]
 [assembly: AssemblyDescription("Generic logging provider model.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Cutting Edge")]
+[assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
 [assembly: AssemblyProduct("CuttingEdge.Logging")]
 [assembly: AssemblyCopyright("Copyright © 2008 S. van Deursen")]
 [assembly: AssemblyTrademark("")]
@@ -59,8 +60,12 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("1.1.5.0")]
+[assembly: AssemblyFileVersion("1.1.5.0")]
 
 [assembly: CLSCompliant(true)]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
+
+#if DEBUG // We don't want the InternalsVisibleToAttribute to be added in the release assembly.
+[assembly: InternalsVisibleTo("CuttingEdge.Logging.Tests.Unit")]
+#endif

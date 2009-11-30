@@ -39,46 +39,44 @@ namespace CuttingEdge.Logging.Web
     /// <list>
     /// <item>1. Add a &lt;section&gt; to the &lt;configSections&gt; section pointing at the 
     /// <see cref="LoggingSection"/> class.</item>
-    /// <item>Add a &lt;logging&gt; section to the &lt;configuration&gt; to configer the logging providers to
+    /// <item>Add a &lt;logging&gt; section to the &lt;configuration&gt; to configure the logging providers to
     /// use.</item>
     /// <item>Add the <see cref="AspNetExceptionLoggingModule"/> to the &lt;system.web&gt;/&lt;httpModules&gt; 
-    /// section. This enables a global 'catch all' the logs unhandeld exceptions in your web application using
+    /// section. This enables a global 'catch all' the logs unhandled exceptions in your web application using
     /// the default logging provider you defined in step 2.</item>
     /// </list>
     /// The following snippet shows an example of how your web.config might look like.
-    /// <code lang="xml">
-    /// &lt;?xml version="1.0"?&gt;
-    /// &lt;configuration&gt;
-    ///     &lt;configSections&gt;
-    ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" /&gt;
-    ///     &lt;/configSections&gt;
-    ///     &lt;logging defaultProvider="WindowsEventLogLoggingProvider"&gt;
-    ///         &lt;providers&gt;
-    ///             &lt;add 
+    /// <code lang="xml"><![CDATA[
+    /// <?xml version="1.0"?>
+    /// <configuration>
+    ///     <configSections>
+    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
+    ///             allowDefinition="MachineToApplication" />
+    ///     </configSections>
+    ///     <logging defaultProvider="WindowsEventLogLoggingProvider">
+    ///         <providers>
+    ///             <add 
     ///                 name="WindowsEventLogLoggingProvider"
     ///                 type="CuttingEdge.Logging.WindowsEventLogLoggingProvider, CuttingEdge.Logging"
     ///                    threshold="Information"
     ///                 source="MyWebApplication"
     ///                 logName="MyWebApplication"
     ///                 description="Windows event log logging provider"
-    ///             /&gt;
-    ///         &lt;/providers&gt;
-    ///     &lt;/logging&gt;
-    ///     &lt;system.web&gt;
-    ///         &lt;httpModules&gt;
-    ///             &lt;add name="ExceptionLogger" 
-    ///                 type="CuttingEdge.Logging.Web.AspNetExceptionLoggingModule, CuttingEdge.Logging"/&gt;
-    ///         &lt;/httpModules&gt;
-    ///     &lt;/system.web&gt;
-    /// &lt;/configuration&gt;
-    /// </code>
+    ///             />
+    ///         </providers>
+    ///     </logging>
+    ///     <system.web>
+    ///         <httpModules>
+    ///             <add name="ExceptionLogger" 
+    ///                 type="CuttingEdge.Logging.Web.AspNetExceptionLoggingModule, CuttingEdge.Logging"/>
+    ///         </httpModules>
+    ///     </system.web>
+    /// </configuration>
+    /// ]]></code>
     /// </example>
     public class AspNetExceptionLoggingModule : IHttpModule
     {
-        /// <summary>
-        /// Initializes static members of the AspNetExceptionLoggingModule class.
-        /// </summary>
+        /// <summary>Initializes static members of the AspNetExceptionLoggingModule class.</summary>
         static AspNetExceptionLoggingModule()
         {
             // Ensure that the Logger configuration is loaded and correct. An exception will be thrown
@@ -95,9 +93,7 @@ namespace CuttingEdge.Logging.Web
             // nothing to dispose
         }
 
-        /// <summary>
-        /// Initializes a module and prepares it to handle requests. 
-        /// </summary>
+        /// <summary>Initializes a module and prepares it to handle requests.</summary>
         /// <param name="context">The <see cref="HttpApplication"/>.</param>
         public void Init(HttpApplication context)
         {
@@ -106,28 +102,54 @@ namespace CuttingEdge.Logging.Web
                 throw new ArgumentNullException("context");
             }
 
-            context.Error += this.LogException;
+            context.Error += Log;
         }
 
-        private void LogException(object sender, EventArgs e)
+        private static void Log(object sender, EventArgs e)
         {
             HttpApplication context = (HttpApplication)sender;
 
             Exception exception = context.Server.GetLastError();
 
+            bool shouldLog = IsLoggableException(exception);
+
+            if (shouldLog)
+            {
+                LogException(exception);
+            }
+        }
+
+        private static bool IsLoggableException(Exception exception)
+        {
+            if (exception == null)
+            {
+                return false;
+            }
+
             // Don't log if we're experiencing a Thread Abort. Thread aborts are pretty normal in ASP.NET
             // applications and are usually caused by a Response.End or Response.Redirect calls.
-            if (exception != null && !(exception is ThreadAbortException))
-            {
-                // Often exceptions are wrapped by ASP.NET in a HttpUnhandledException. When this is the
-                // case, we use the wrapped exception.
-                if (exception is HttpUnhandledException && exception.InnerException != null)
-                {
-                    exception = exception.InnerException;
-                }
+            return !(exception is ThreadAbortException);
+        }
 
-                // We use the default LoggingProvider and we simply expect logging to succeed.
-                Logger.Log(exception);
+        private static void LogException(Exception exception)
+        {
+            Exception exceptionToLog = ExtractUsefulExceptionToLog(exception);
+
+            // We use the default LoggingProvider and we simply expect logging to succeed.
+            Logger.Log(exceptionToLog);
+        }
+
+        private static Exception ExtractUsefulExceptionToLog(Exception exception)
+        {
+            // Often exceptions are wrapped by ASP.NET in a HttpUnhandledException. When this is the case, we
+            // use the wrapped exception.
+            if (exception.InnerException != null && exception is HttpUnhandledException)
+            {
+                return exception.InnerException;
+            }
+            else
+            {
+                return exception;
             }
         }
     }

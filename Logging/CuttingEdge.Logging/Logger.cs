@@ -45,45 +45,45 @@ namespace CuttingEdge.Logging
     /// Logging section, which can also be accessed as members of the
     /// <see cref="LoggingSection"/> class. The following configuration file example shows
     /// how to specify values declaratively for the Logging section.
-    /// <code lang="xml">
-    /// &lt;?xml version="1.0"?&gt;
-    /// &lt;configuration&gt;
-    ///     &lt;configSections&gt;
-    ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" /&gt;
-    ///     &lt;/configSections&gt;
-    ///     &lt;connectionStrings&gt;
-    ///         &lt;add name="SqlLogging" 
-    ///             connectionString="Data Source=localhost;Integrated Security=SSPI;Initial Catalog=Logging;" /&gt;
-    ///     &lt;/connectionStrings&gt;
-    ///     &lt;logging defaultProvider="SqlLoggingProvider"&gt;
-    ///         &lt;providers&gt;
-    ///             &lt;add 
+    /// <code lang="xml"><![CDATA[
+    /// <?xml version="1.0"?>
+    /// <configuration>
+    ///     <configSections>
+    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
+    ///             allowDefinition="MachineToApplication" />
+    ///     </configSections>
+    ///     <connectionStrings>
+    ///         <add name="SqlLogging" 
+    ///             connectionString="Data Source=localhost;Integrated Security=SSPI;Initial Catalog=Logging;" />
+    ///     </connectionStrings>
+    ///     <logging defaultProvider="SqlLoggingProvider">
+    ///         <providers>
+    ///             <add 
     ///                 name="SqlLoggingProvider"
     ///                 type="CuttingEdge.Logging.SqlLoggingProvider, CuttingEdge.Logging"
     ///                 fallbackProvider="WindowsEventLogLoggingProvider"
     ///                 threshold="Information"
     ///                 connectionStringName="SqlLogging"
     ///                 description="SQL logging provider"
-    ///             /&gt;
-    ///             &lt;add 
+    ///             />
+    ///             <add 
     ///                 name="WindowsEventLogLoggingProvider"
     ///                 type="CuttingEdge.Logging.WindowsEventLogLoggingProvider, CuttingEdge.Logging"
     ///                 threshold="Warning"
     ///                 source="MyWebApplication"
     ///                 logName="MyWebApplication"
     ///                 description="Windows event log logging provider"
-    ///             /&gt;
-    ///         &lt;/providers&gt;
-    ///     &lt;/logging&gt;
-    ///     &lt;system.web&gt;
-    ///         &lt;httpModules&gt;
-    ///             &lt;add name="ExceptionLogger" 
-    ///                 type="CuttingEdge.Logging.Web.AspNetExceptionLoggingModule, CuttingEdge.Logging"/&gt;
-    ///         &lt;/httpModules&gt;
-    ///     &lt;/system.web&gt;
-    /// &lt;/configuration&gt;
-    /// </code>
+    ///             />
+    ///         </providers>
+    ///     </logging>
+    ///     <system.web>
+    ///         <httpModules>
+    ///             <add name="ExceptionLogger" 
+    ///                 type="CuttingEdge.Logging.Web.AspNetExceptionLoggingModule, CuttingEdge.Logging"/>
+    ///         </httpModules>
+    ///     </system.web>
+    /// </configuration>
+    /// ]]></code>
     /// </example>
     public static class Logger
     {
@@ -115,6 +115,9 @@ namespace CuttingEdge.Logging
             }
             catch (ProviderException pex)
             {
+                // When a ProviderException or ConfigurationException is thrown, we store those and throw them
+                // when one of the public methods of Logger is called. This way the original exceptions are 
+                // thrown and not a TypeInitializeException that wraps the original.
                 InitializationException = pex;
             }
             catch (ConfigurationException ceex)
@@ -190,7 +193,7 @@ namespace CuttingEdge.Logging
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -207,7 +210,7 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -226,7 +229,7 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -246,7 +249,7 @@ namespace CuttingEdge.Logging
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -268,7 +271,7 @@ namespace CuttingEdge.Logging
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -324,7 +327,7 @@ namespace CuttingEdge.Logging
 
         /// <summary>Logs an information event to the default <see cref="Provider"/>.</summary>
         /// <param name="message">The description of the event.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -343,7 +346,7 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -364,7 +367,7 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an event to the default <see cref="Provider"/>.</summary>
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 
         /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
@@ -385,24 +388,20 @@ namespace CuttingEdge.Logging
         // Throws a ProviderException on failure.
         private static LoggingSection GetConfigurationSection()
         {
-            // Get the feature's configuration info
             object section = ConfigurationManager.GetSection(SectionName);
 
-            // Throw exception when null
             if (section == null)
             {
-                throw new ProviderException(SR.GetString(SR.LoggingSectionMissingFromConfigSettings,
-                    SectionName, typeof(LoggingSection).FullName, 
-                    typeof(LoggingSection).Assembly.GetName().Name));
+                throw new ProviderException(
+                    SR.LoggingSectionMissingFromConfigSettings(SectionName, typeof(LoggingSection)));
             }
 
             LoggingSection loggingSection = section as LoggingSection;
 
-            // Throw exception when invalid cast
             if (loggingSection == null)
             {
-                throw new ProviderException(SR.GetString(SR.SectionIsNotOfCorrectType, SectionName,
-                    typeof(LoggingSection).FullName, section.GetType().FullName));
+                throw new ProviderException(
+                    SR.SectionIsNotOfCorrectType(SectionName, typeof(LoggingSection), section.GetType()));
             }
 
             return loggingSection;
@@ -435,8 +434,8 @@ namespace CuttingEdge.Logging
             {
                 PropertyInformation property = loggingSection.ElementInformation.Properties["defaultProvider"];
 
-                throw new ConfigurationErrorsException(SR.GetString(SR.NoDefaultLoggingProviderFound,
-                    SectionName), property.Source, property.LineNumber);
+                throw new ConfigurationErrorsException(
+                    SR.NoDefaultLoggingProviderFound(SectionName), property.Source, property.LineNumber);
             }
 
             return defaultProvider;
@@ -450,22 +449,27 @@ namespace CuttingEdge.Logging
         {
             foreach (LoggingProviderBase provider in providers)
             {
-                if (provider.FallbackProviderName != null)
+                InitializeFallbackProvider(provider, providers);
+            }
+        }
+
+        private static void InitializeFallbackProvider(LoggingProviderBase provider,
+            LoggingProviderCollection providers)
+        {
+            if (provider.FallbackProviderName != null)
+            {
+                // Fetch the fallback provider with the defined name from the providers collection
+                LoggingProviderBase fallbackProvider = providers[provider.FallbackProviderName];
+
+                // Throw an exception when that provider could not be found.
+                if (fallbackProvider == null)
                 {
-                    // Fetch the fallback provider with the defined name from the providers collection
-                    LoggingProviderBase fallbackProvider = providers[provider.FallbackProviderName];
-
-                    // Throw an exception when that provider could not be found.
-                    if (fallbackProvider == null)
-                    {
-                        throw new ProviderException(SR.GetString(SR.InvalidFallbackProviderPropertyInConfig,
-                            SectionName, provider.GetType().FullName, provider.Name, 
-                            provider.FallbackProviderName));
-                    }
-
-                    // Initialize the provider's fallback provider with the found provider.
-                    provider.FallbackProvider = fallbackProvider;
+                    throw new ProviderException(
+                        SR.InvalidFallbackProviderPropertyInConfig(SectionName, provider));
                 }
+
+                // Initialize the provider's fallback provider with the found provider.
+                provider.FallbackProvider = fallbackProvider;
             }
         }
 
@@ -479,7 +483,7 @@ namespace CuttingEdge.Logging
                 if (circularReferenceFound)
                 {
                     throw new ConfigurationErrorsException(
-                        SR.GetString(SR.CircularReferenceInLoggingSection, SectionName, provider.Name));
+                        SR.CircularReferenceInLoggingSection(Logger.SectionName, provider.Name));
                 }
             }
         }
@@ -491,21 +495,20 @@ namespace CuttingEdge.Logging
                 return false;
             }
 
-            // A HashSet<LoggingProviderBase> would be nicer, but we are targetting .NET 2.0 and we're not
-            // in a critical performance path here.
-            Dictionary<LoggingProviderBase, object> referencedProviders =
-                new Dictionary<LoggingProviderBase, object>();
+            // A HashSet<LoggingProviderBase> would be nicer (and faster), but we are targeting .NET 2.0 and 
+            // we're not in a critical performance path here.
+            var providersInChain = new Dictionary<LoggingProviderBase, object>();
 
             do
             {
-                if (referencedProviders.ContainsKey(provider))
+                if (providersInChain.ContainsKey(provider))
                 {
                     // Circular reference found in the chain of providers that are directly or indirectly
                     // linked by the given provider.
                     return true;
                 }
 
-                referencedProviders.Add(provider, null);
+                providersInChain.Add(provider, null);
 
                 // Move to the next provider
                 provider = provider.FallbackProvider;
@@ -517,61 +520,117 @@ namespace CuttingEdge.Logging
         }
 
         // Throws a ConfigurationException (or a descendant) on failure.
-        private static LoggingProviderBase InstantiateLoggingProvider(ProviderSettings providerSettings)
+        private static LoggingProviderBase InstantiateLoggingProvider(ProviderSettings settings)
         {
             try
             {
-                string typeName = (providerSettings.Type == null) ? null : providerSettings.Type.Trim();
+                var provider = CreateNewProviderInstance(settings);
 
-                if (string.IsNullOrEmpty(typeName))
-                {
-                    throw new ArgumentException(SR.GetString(SR.TypeNameMustBeSpecifiedForThisProvider));
-                }
+                InitializeProvider(provider, settings);
 
-                Type providerType = Type.GetType(typeName, true, true);
-
-                if (!typeof(LoggingProviderBase).IsAssignableFrom(providerType))
-                {
-                    throw new ArgumentException(SR.GetString(SR.ProviderMustInheritFromType,
-                        typeof(LoggingProviderBase)));
-                }
-
-                LoggingProviderBase providerInstance = (LoggingProviderBase)Activator.CreateInstance(providerType);
-
-                NameValueCollection parameters = providerSettings.Parameters;
-                NameValueCollection config = new NameValueCollection(parameters.Count, StringComparer.Ordinal);
-
-                foreach (string parameter in parameters)
-                {
-                    config[parameter] = parameters[parameter];
-                }
-
-                providerInstance.Initialize(providerSettings.Name, config);
-
-                return providerInstance;
+                return provider;
             }
             catch (Exception ex)
             {
-                if (ex is ConfigurationException)
-                {
-                    throw;
-                }
-
-                PropertyInformation typeProperty = providerSettings.ElementInformation.Properties["type"];
-
-                if (ex is ArgumentException)
-                {
-                    // The exception is thrown from within this method. Therefore we do not supply an inner
-                    // exception.
-                    throw new ConfigurationErrorsException(ex.Message, typeProperty.Source,
-                        typeProperty.LineNumber);
-                }
-                else
-                {
-                    throw new ConfigurationErrorsException(ex.Message, ex, typeProperty.Source,
-                        typeProperty.LineNumber);
-                }
+                throw BuildMoreExpressiveException(ex, settings);
             }
+        }
+
+        private static LoggingProviderBase CreateNewProviderInstance(ProviderSettings settings)
+        {
+            Type providerType = GetProviderType(settings);
+
+            try
+            {
+                return (LoggingProviderBase)Activator.CreateInstance(providerType);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(
+                    SR.TypeCouldNotBeCreatedForProvider(settings.Name, providerType, ex.Message), ex);
+            }
+        }
+
+        private static void InitializeProvider(LoggingProviderBase provider, ProviderSettings settings)
+        {
+            string providerName = settings.Name;
+
+            NameValueCollection configuration = BuildProviderConfiguration(settings);
+
+            provider.Initialize(providerName, configuration);
+        }
+
+        private static Exception BuildMoreExpressiveException(Exception thrownException, 
+            ProviderSettings settings)
+        {
+            PropertyInformation providerInfo = settings.ElementInformation.Properties["type"];
+
+            if (thrownException is ArgumentException)
+            {
+                // The exception is thrown from within this method. Therefore we do not supply an inner
+                // exception.
+                return new ConfigurationErrorsException(thrownException.Message, 
+                    thrownException.InnerException, providerInfo.Source, providerInfo.LineNumber);
+            }
+            else
+            {
+                return new ConfigurationErrorsException(thrownException.Message, thrownException, 
+                    providerInfo.Source, providerInfo.LineNumber);
+            }
+        }
+
+        private static Type GetProviderType(ProviderSettings settings)
+        {
+            string typeName = GetNonEmptyTypeName(settings);
+
+            Type providerType;
+
+            try
+            {
+                const bool ThrowOnError = true;
+                const bool IgnoreCase = true;
+
+                providerType = Type.GetType(typeName, ThrowOnError, IgnoreCase);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(
+                    SR.TypeNameCouldNotBeResolvedForProvider(settings.Name, typeName, ex.Message), ex);
+            }
+
+            if (!typeof(LoggingProviderBase).IsAssignableFrom(providerType))
+            {
+                throw new ArgumentException(
+                    SR.ProviderMustInheritFromType(settings.Name, providerType, typeof(LoggingProviderBase)));
+            }
+
+            return providerType;
+        }
+
+        private static string GetNonEmptyTypeName(ProviderSettings settings)
+        {
+            string typeName = (settings.Type == null) ? null : settings.Type.Trim();
+
+            if (string.IsNullOrEmpty(typeName))
+            {
+                throw new ArgumentException(SR.TypeNameMustBeSpecifiedForThisProvider(settings.Name));
+            }
+
+            return typeName;
+        }
+
+        private static NameValueCollection BuildProviderConfiguration(ProviderSettings settings)
+        {
+            NameValueCollection parameters = settings.Parameters;
+
+            var providerConfiguration = new NameValueCollection(parameters.Count, StringComparer.Ordinal);
+
+            foreach (string parameter in parameters)
+            {
+                providerConfiguration[parameter] = parameters[parameter];
+            }
+
+            return providerConfiguration;
         }
     }
 }

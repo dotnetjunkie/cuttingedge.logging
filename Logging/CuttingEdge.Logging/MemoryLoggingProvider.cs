@@ -79,27 +79,27 @@ namespace CuttingEdge.Logging
     /// Logging section, which can also be accessed as members of the <see cref="LoggingSection"/> class.
     /// The following configuration file example shows how to specify values declaratively for the
     /// Logging section.
-    /// <code lang="xml">
-    /// &lt;?xml version="1.0"?&gt;
-    /// &lt;configuration&gt;
-    ///     &lt;configSections&gt;
-    ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" /&gt;
-    ///     &lt;/configSections&gt;
-    ///     &lt;logging defaultProvider="MemoryLoggingProvider"&gt;
-    ///         &lt;providers&gt;
-    ///             &lt;add 
+    /// <code lang="xml"><![CDATA[
+    /// <?xml version="1.0"?>
+    /// <configuration>
+    ///     <configSections>
+    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
+    ///             allowDefinition="MachineToApplication" />
+    ///     </configSections>
+    ///     <logging defaultProvider="MemoryLoggingProvider">
+    ///         <providers>
+    ///             <add 
     ///                 name="MemoryLoggingProvider"
     ///                 type="CuttingEdge.Logging.MemoryLoggingProvider, CuttingEdge.Logging"
     ///                 description="Memory logging provider"
     ///                 threshold="Debug"
-    ///             /&gt;
-    ///         &lt;/providers&gt;
-    ///     &lt;/logging&gt;
-    /// &lt;/configuration&gt;
-    /// </code>
+    ///             />
+    ///         </providers>
+    ///     </logging>
+    /// </configuration>
+    /// ]]></code>
     /// The following example shows how to use the class:
-    /// <code lang="cs">
+    /// <code lang="cs"><![CDATA[
     /// Logger.Log(LoggingEventType.Error, "This is an error");
     /// 
     /// MemoryLoggingProvider memoryLogger = (MemoryLoggingProvider)Logger.Provider;
@@ -111,7 +111,7 @@ namespace CuttingEdge.Logging
     /// 
     /// // Clear the cache
     /// memoryLogger.Clear();
-    /// </code>
+    /// ]]></code>
     /// </example>
     public class MemoryLoggingProvider : LoggingProviderBase
     {
@@ -150,7 +150,7 @@ namespace CuttingEdge.Logging
         /// <exception cref="ArgumentNullException">Thrown when the name of the provider is null or when the
         /// <paramref name="config"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when the name of the provider has a length of zero.</exception>
-        /// <exception cref="InvalidOperationException">Thrown wen an attempt is made to call Initialize on a
+        /// <exception cref="InvalidOperationException">Thrown when an attempt is made to call Initialize on a
         /// provider after the provider has already been initialized.</exception>
         /// <exception cref="ProviderException">Thrown when the <paramref name="config"/> contains
         /// unrecognized attributes.</exception>
@@ -169,8 +169,6 @@ namespace CuttingEdge.Logging
 
             // Call initialize first.
             base.Initialize(name, config);
-
-            // Performing implementation-specific provider initialization here.
 
             // Always call this method last
             this.CheckForUnrecognizedAttributes(name, config);

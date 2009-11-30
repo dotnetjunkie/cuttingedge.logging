@@ -1,0 +1,119 @@
+﻿<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2E3ED9A6-9377-4260-8561-498AFE03C90E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CuttingEdge.Logging.Tests.Unit</RootNamespace>
+    <AssemblyName>CuttingEdge.Logging.Tests.Unit</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <WarningsAsErrors>28, 67, 78, 105, 108, 109, 114, 162, 164, 168, 169, 183, 184, 197, 219, 251, 252, 253, 278, 279, 280, 282, 402, 414, 419, 420, 422, 429, 435, 436, 437, 440, 444, 458, 464, 465, 467, 469, 472, 602, 612, 618, 626, 628, 642, 649, 652, 657, 658, 659, 660, 661, 665, 672, 675, 684, 688, 693, 728, 809, 824, 1030, 1058, 1060, 1200, 1201, 1202, 1203, 1522, 1570, 1571, 1572, 1573, 1574, 1580, 1581, 1584, 1587, 1589, 1590, 1591, 1592, 1598, 1607, 1610, 1616, 1633, 1634, 1635, 1645, 1658, 1668, 1682, 1683, 1684, 1685, 1687, 1690, 1691, 1692, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1707, 1709, 1710, 1711, 1712, 1717, 1718, 1720, 1723, 1911, 1927, 1956, 1957, 2002, 2014, 2023, 2029, 3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 3010, 3011, 3012, 3013, 3014, 3015, 3016, 3017, 3018, 3019, 3021, 3022, 3023, 3024, 3026, 3027, 5000</WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <WarningsAsErrors>28, 67, 78, 105, 108, 109, 114, 162, 164, 168, 169, 183, 184, 197, 219, 251, 252, 253, 278, 279, 280, 282, 402, 414, 419, 420, 422, 429, 435, 436, 437, 440, 444, 458, 464, 465, 467, 469, 472, 602, 612, 618, 626, 628, 642, 649, 652, 657, 658, 659, 660, 661, 665, 672, 675, 684, 688, 693, 728, 809, 824, 1030, 1058, 1060, 1200, 1201, 1202, 1203, 1522, 1570, 1571, 1572, 1573, 1574, 1580, 1581, 1584, 1587, 1589, 1590, 1591, 1592, 1598, 1607, 1610, 1616, 1633, 1634, 1635, 1645, 1658, 1668, 1682, 1683, 1684, 1685, 1687, 1690, 1691, 1692, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1707, 1709, 1710, 1711, 1712, 1717, 1718, 1720, 1723, 1911, 1927, 1956, 1957, 2002, 2014, 2023, 2029, 3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 3010, 3011, 3012, 3013, 3014, 3015, 3016, 3017, 3018, 3019, 3021, 3022, 3023, 3024, 3026, 3027, 5000</WarningsAsErrors>
+    <NoWarn>618</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="NSandbox, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\SharedAssemblies\NSandbox.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ConsoleLoggingProviderTests.cs" />
+    <Compile Include="DebugLoggingProviderTests.cs" />
+    <Compile Include="Helpers\AssertHelper.cs" />
+    <Compile Include="Helpers\ConfigurationBuilder.cs" />
+    <Compile Include="Helpers\LoggingConfigurationBuilder.cs" />
+    <Compile Include="Helpers\ProviderConfigLine.cs" />
+    <Compile Include="Helpers\RemoteDomain.cs" />
+    <Compile Include="Helpers\LoggingAppDomainManager.cs" />
+    <Compile Include="Helpers\SandboxHelpers.cs" />
+    <Compile Include="Helpers\TemplatedConfigurationWriter.cs" />
+    <Compile Include="Helpers\UnitTestAppDomainManager.cs" />
+    <Compile Include="Helpers\UnitTestRemoteSandbox.cs" />
+    <Compile Include="LogEntryTests.cs" />
+    <Compile Include="LoggerExtensionsTests.cs" />
+    <Compile Include="LoggerTests\LogExceptionMethodBaseTests.cs" />
+    <Compile Include="LoggerTests\LogLoggingEventTypeStringExceptionMethodBaseTests.cs" />
+    <Compile Include="LoggerTests\LogLoggingEventTypeStringExceptionStringTests.cs" />
+    <Compile Include="LoggerTests\LogLoggingEventTypeStringMethodBaseTests.cs" />
+    <Compile Include="LoggerTests\LogLoggingEventTypeStringStringTests.cs" />
+    <Compile Include="LoggerTests\LogLoggingEventTypeStringTests.cs" />
+    <Compile Include="LoggerTests\LogStringExceptionMethodBaseTests.cs" />
+    <Compile Include="LoggerTests\LogStringExceptionStringTests.cs" />
+    <Compile Include="LoggerTests\LogStringExceptionTests.cs" />
+    <Compile Include="LoggerTests\LogStringMethodBaseTests.cs" />
+    <Compile Include="LoggerTests\LogStringTests.cs" />
+    <Compile Include="LoggerTests\LogExceptionTests.cs" />
+    <Compile Include="LoggerTests\LoggerTests.cs" />
+    <Compile Include="LoggingHelperTests.cs" />
+    <Compile Include="LoggingProviderBaseTests.cs" />
+    <Compile Include="Helpers\LoggingProviderScope.cs" />
+    <Compile Include="LoggingEventTypeTests.cs" />
+    <Compile Include="LoggingProviderCollectionTests.cs" />
+    <Compile Include="MailLoggingProviderTests.cs" />
+    <Compile Include="MemoryLoggingProviderTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Helpers\UnitTestingLoggingProvider.cs" />
+    <Compile Include="SqlLoggingProviderTests.cs" />
+    <Compile Include="Web\AspNetSqlLoggingProviderTests.cs" />
+    <Compile Include="Web\LoggingWebEventProviderTests.cs" />
+    <Compile Include="WindowsEventLogLoggingProviderTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CuttingEdge.Logging.Tests.Common\CuttingEdge.Logging.Tests.Common.csproj">
+      <Project>{119C5660-11E3-4DE3-855E-FA610542715E}</Project>
+      <Name>CuttingEdge.Logging.Tests.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CuttingEdge.Logging\CuttingEdge.Logging.csproj">
+      <Project>{740C36FE-5353-4862-907A-693511194CC1}</Project>
+      <Name>CuttingEdge.Logging</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

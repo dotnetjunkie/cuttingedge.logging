@@ -120,43 +120,46 @@ namespace CuttingEdge.Logging
     /// Logging section, which can also be accessed as members of the <see cref="LoggingSection"/> class.
     /// The following configuration file example shows how to specify values declaratively for the
     /// Logging section.
-    /// <code lang="xml">
-    /// &lt;?xml version="1.0"?&gt;
-    /// &lt;configuration&gt;
-    ///     &lt;configSections&gt;
-    ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" /&gt;
-    ///     &lt;/configSections&gt;
-    ///     &lt;logging defaultProvider="MailLoggingProvider"&gt;
-    ///         &lt;providers&gt;
-    ///             &lt;add 
+    /// <code lang="xml"><![CDATA[
+    /// <?xml version="1.0"?>
+    /// <configuration>
+    ///     <configSections>
+    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
+    ///             allowDefinition="MachineToApplication" />
+    ///     </configSections>
+    ///     <logging defaultProvider="MailLoggingProvider">
+    ///         <providers>
+    ///             <add 
     ///                 name="MailLoggingProvider"
+    ///                 type="CuttingEdge.Logging.MailLoggingProvider, CuttingEdge.Logging"
     ///                 description="Mail logging provider"
     ///                 threshold="Information"
     ///                 to="developer1@cuttingedge.it;developer2@cuttingedge.it"
-    ///                 type="CuttingEdge.Logging.MailLoggingProvider, CuttingEdge.Logging"
-    ///             /&gt;
-    ///         &lt;/providers&gt;
-    ///     &lt;/logging&gt;
-    ///     &lt;system.net&gt;
-    ///         &lt;mailSettings&gt;
-    ///             &lt;smtp from="test@foo.com"&gt;
-    ///                 &lt;network
+    ///                 subjectFormatString="Application error. {1} (Severity: {0})"
+    ///             />
+    ///         </providers>
+    ///     </logging>
+    ///     <system.net>
+    ///         <mailSettings>
+    ///             <smtp from="test@foo.com">
+    ///                 <network
     ///                     host="smtpserver1" 
     ///                     port="25" 
     ///                     userName="john" 
     ///                     password="secret" 
     ///                     defaultCredentials="true"
-    ///                 /&gt;
-    ///             &lt;/smtp&gt;
-    ///         &lt;/mailSettings&gt;
-    ///     &lt;/system.net&gt;   
-    /// &lt;/configuration&gt;
-    /// </code>
+    ///                 />
+    ///             </smtp>
+    ///         </mailSettings>
+    ///     </system.net>   
+    /// </configuration>
+    /// ]]></code>
     /// </example> 
     public class MailLoggingProvider : LoggingProviderBase
     {
-        private string subjectFormatString = "{0}: {1}";
+        private const string SubjectFormatStringAttribute = "subjectFormatString";
+
+        private string subjectFormatString;
 
         /// <summary>Gets the specified list of email addresses to send the logging messages to.</summary>
         /// <value>A collection of email addresses.</value>
@@ -203,13 +206,30 @@ namespace CuttingEdge.Logging
             base.Initialize(name, config);
 
             // Performing implementation-specific provider initialization here.
-            this.InitializeToProperty(name, config);
-            this.InitializeSubjectFormatStringProperty(name, config);
-
-            TestMailConfiguration(name);
+            this.InitializeToProperty(config);
+            this.InitializeSubjectFormatStringProperty(config);
+            this.ValidateDotNetMailConfiguration();
 
             // Always call this method last
             this.CheckForUnrecognizedAttributes(name, config);
+        }
+
+        internal static MailPriority DetermineMailPriority(LoggingEventType severity)
+        {
+            return severity == LoggingEventType.Critical ? MailPriority.High : MailPriority.Normal;
+        }
+
+        internal static string BuildMailMessageSubject(string subjectFormatString, LogEntry entry, 
+            DateTime currentTime)
+        {
+            string exceptionType = entry.Exception != null ? entry.Exception.GetType().Name : null;
+
+            return string.Format(CultureInfo.InvariantCulture, subjectFormatString,
+                entry.Severity, // {0}
+                entry.Message,  // {1}
+                entry.Source,   // {2}
+                exceptionType,  // {3}
+                currentTime);   // {4}
         }
 
         /// <summary>Sends the given <paramref name="entry"/> as mail message.</summary>
@@ -218,7 +238,7 @@ namespace CuttingEdge.Logging
         protected override object LogInternal(LogEntry entry)
         {
             // Create and configure the smtp client
-            SmtpClient smtpClient = new SmtpClient();
+            var smtpClient = new SmtpClient();
 
             MailMessage mailMessage = this.BuildMailMessage(entry);
 
@@ -233,19 +253,20 @@ namespace CuttingEdge.Logging
         /// <returns>A new <see cref="MailMessage"/>.</returns>
         protected virtual MailMessage BuildMailMessage(LogEntry entry)
         {
-            MailMessage mailMessage = new MailMessage();
-            
-            mailMessage.Subject = MailLoggingProvider.BuildSubject(this.SubjectFormatString, entry);
-            mailMessage.Body = this.BuildMailBody(entry);
-            mailMessage.Priority =
-                entry.Severity == LoggingEventType.Critical ? MailPriority.High : MailPriority.Normal;
+            MailMessage message = new MailMessage();
+
+            var currentTime = DateTime.Now;
+
+            message.Subject = BuildMailMessageSubject(this.subjectFormatString, entry, currentTime);
+            message.Body = this.BuildMailBody(entry);
+            message.Priority = DetermineMailPriority(entry.Severity);
 
             foreach (MailAddress address in this.To)
             {
-                mailMessage.To.Add(address);
+                message.To.Add(address);
             }
 
-            return mailMessage;
+            return message;
         }
 
         /// <summary>Builds the event log message.</summary>
@@ -254,86 +275,19 @@ namespace CuttingEdge.Logging
         /// <returns>The message.</returns>
         protected virtual string BuildMailBody(LogEntry entry)
         {
-            if (entry == null)
-            {
-                throw new ArgumentNullException("entry");
-            }
-
             return LoggingHelper.BuildMessageFromLogEntry(entry);
         }
 
-        private static string BuildSubject(string subjectFormatString, LogEntry entry)
+        private void InitializeToProperty(NameValueCollection config)
         {
-            string exceptionType = entry.Exception != null ? entry.Exception.GetType().Name : null;
+            const string To = "to";
 
-            return string.Format(CultureInfo.InvariantCulture, subjectFormatString,
-                entry.Severity, // {0}
-                entry.Message,  // {1}
-                entry.Source,   // {2}
-                exceptionType,  // {3}
-                DateTime.Now);  // {4}
-        }
-
-        private static void TestMailConfiguration(string name)
-        {
-            SmtpClient client;
-            try
-            {
-                client = new SmtpClient();
-            }
-            catch (SecurityException ex)
-            {
-                // the SmtpClient constructor will throw a SecurityException when the application doesn't
-                // have the proper rights to send mail.
-                throw new ProviderException(SR.GetString(SR.NoPermissionsToAccessSmtpServers, name,
-                    ex.Message));
-            }
-
-            if (String.IsNullOrEmpty(client.Host))
-            {
-                throw new ProviderException(SR.GetString(SR.MissingAttributeInMailSettings, name, "host",
-                    "/smtp/network") + " " + SR.GetString(SR.ExampleMailConfigurationSettings));
-            }
-
-            MailMessage message;
-
-            try
-            {
-                message = new MailMessage();
-            }
-            catch (Exception ex)
-            {
-                // We the system.net/mailSettings configuration is invalid, the MailMessage constructor might
-                // throw an exception (for instance, when the from message is not a valid mail address).
-                throw new ProviderException(
-                    SR.GetString(SR.PossibleInvalidMailConfigurationInConfigFile, typeof(MailMessage)) + " " +
-                    ex.Message + " " + SR.GetString(SR.ExampleMailConfigurationSettings), ex);
-            }
-
-            try
-            {
-                if (message.From == null)
-                {
-                    throw new ProviderException(SR.GetString(SR.MissingAttributeInMailSettings, name, "from",
-                        "/smtp") + " " + SR.GetString(SR.ExampleMailConfigurationSettings));
-                }
-            }
-            finally
-            {
-                // MailMessage implements IDisposable, so we must dispose it.
-                message.Dispose();
-            }
-        }
-
-        private void InitializeToProperty(string name, NameValueCollection config)
-        {
-            string addressesConfigValue = config["to"];
+            string addressesConfigValue = config[To];
 
             // Throw exception when no from is provided
             if (string.IsNullOrEmpty(addressesConfigValue))
             {
-                throw new ProviderException(SR.GetString(SR.EmptyOrMissingPropertyInConfiguration, "to",
-                    name));
+                throw new ProviderException(SR.EmptyOrMissingPropertyInConfiguration(To, this.Name));
             }
 
             List<MailAddress> addresses = new List<MailAddress>();
@@ -342,8 +296,8 @@ namespace CuttingEdge.Logging
             {
                 if (string.IsNullOrEmpty(address))
                 {
-                    throw new ProviderException(SR.GetString(SR.InvalidMailAddressAttribute, 
-                        addressesConfigValue, "to", name));
+                    throw new ProviderException(
+                        SR.InvalidMailAddressAttribute(addressesConfigValue, To, this.Name));
                 }
 
                 try
@@ -352,8 +306,8 @@ namespace CuttingEdge.Logging
                 }
                 catch (FormatException)
                 {
-                    throw new ProviderException(SR.GetString(SR.InvalidMailAddressAttribute, address, "to",
-                        name));
+                    throw new ProviderException(
+                        SR.InvalidMailAddressAttribute(address, To, this.Name));
                 }
             }
 
@@ -361,38 +315,115 @@ namespace CuttingEdge.Logging
 
             // Remove this attribute from the configuration. This way the provider can spot unrecognized 
             // attributes after the initialization process.
-            config.Remove("to");
+            config.Remove(To);
         }
 
-        private void InitializeSubjectFormatStringProperty(string name, NameValueCollection config)
+        private void InitializeSubjectFormatStringProperty(NameValueCollection config)
         {
-            string formatString = config["subjectFormatString"];
+            string subjectFormatString = config[SubjectFormatStringAttribute];
 
             // SubjectFormatString is an optional property.
-            if (!String.IsNullOrEmpty(formatString))
+            if (!String.IsNullOrEmpty(subjectFormatString))
             {
-                try
-                {
-                    // Test is the formatString is formatted correctly.
-                    LogEntry entry = new LogEntry(LoggingEventType.Error, "Message", null, null);
-                    BuildSubject(formatString, entry);
-                }
-                catch (FormatException ex)
-                {
-                    throw new ProviderException(SR.GetString(SR.InvalidFormatStringAttribute, formatString, 
-                        "subjectFormatString", name) + " " + ex.Message, ex);
-                }
+                this.TestIfSubjectFormatStringIsFormattedCorrectly(subjectFormatString);
 
-                this.subjectFormatString = formatString;
+                this.subjectFormatString = subjectFormatString;
             }
             else
             {
                 // No subjectFormatString is specified: we use the default.
+                this.subjectFormatString = "{0}: {1}";
             }
 
-            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
-            // after the initialization process.
-            config.Remove("subjectFormatString");
+            // Remove this attribute from the configuration. This way the provider can spot unrecognized 
+            // attributes after the initialization process.
+            config.Remove(SubjectFormatStringAttribute);
+        }
+
+        private void TestIfSubjectFormatStringIsFormattedCorrectly(string subjectFormatString)
+        {
+            try
+            {
+                // Test is the formatString is formatted correctly.
+                LogEntry testEntry = new LogEntry(LoggingEventType.Error, "Message", null, null);
+                
+                BuildMailMessageSubject(subjectFormatString, testEntry, DateTime.MaxValue);
+            }
+            catch (FormatException ex)
+            {
+                string exceptionMessage =
+                    SR.InvalidFormatStringAttribute(subjectFormatString, SubjectFormatStringAttribute, 
+                    this.Name, ex.Message);
+
+                throw new ProviderException(exceptionMessage, ex);
+            }
+        }
+
+        private void ValidateDotNetMailConfiguration()
+        {
+            this.TestCreatingSmtpClient();
+
+            this.TestCreatingMailMessage();
+        }
+
+        private void TestCreatingSmtpClient()
+        {
+            SmtpClient client;
+
+            try
+            {
+                client = new SmtpClient();
+            }
+            catch (SecurityException ex)
+            {
+                // the SmtpClient constructor will throw a SecurityException when the application doesn't
+                // have the proper rights to send mail.
+                throw new ProviderException(
+                    SR.NoPermissionsToAccessSmtpServers(this.Name, ex.Message));
+            }
+
+            if (String.IsNullOrEmpty(client.Host))
+            {
+                throw new ProviderException(SR.MissingAttributeInMailSettings(this.Name, "host", 
+                    "/smtp/network") + " " + SR.ExampleMailConfigurationSettings());
+            }
+        }
+
+        private void TestCreatingMailMessage()
+        {
+            MailMessage message = null;
+
+            try
+            {
+                try
+                {
+                    message = new MailMessage();
+                }
+                catch (Exception ex)
+                {
+                    // We the system.net/mailSettings configuration is invalid, the MailMessage
+                    // constructor might throw an exception (for instance, when the from message is not a
+                    // valid mail address).
+                    throw new ProviderException(
+                        SR.PossibleInvalidMailConfigurationInConfigFile(typeof(MailMessage), ex.Message) +
+                        " " + SR.ExampleMailConfigurationSettings(), ex);
+                }
+
+                if (message.From == null)
+                {
+                    // The system.net/mailSettings configuration is missing the 'from' mail address.
+                    throw new ProviderException(SR.MissingAttributeInMailSettings(this.Name, 
+                        "from", "/smtp") + " " + SR.ExampleMailConfigurationSettings());
+                }
+            }
+            finally
+            {
+                if (message != null)
+                {
+                    // MailMessage implements IDisposable, so we must dispose it.
+                    message.Dispose();
+                }
+            }
         }
     }
 }

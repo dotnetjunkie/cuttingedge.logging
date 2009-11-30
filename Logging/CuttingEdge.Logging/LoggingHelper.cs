@@ -31,7 +31,7 @@ using System.Text;
 
 namespace CuttingEdge.Logging
 {
-    /// <summary>Validates arguments.</summary>
+    /// <summary>Helper methods for logging framework.</summary>
     internal static class LoggingHelper
     {
         internal static void ValideLoggerIsNotNull(ILogger logger)
@@ -47,23 +47,6 @@ namespace CuttingEdge.Logging
             if (exception == null)
             {
                 throw new ArgumentNullException("exception");
-            }
-        }
-
-        internal static void ValidateMessageNotNullOrEmpty(string message)
-        {
-            if (String.IsNullOrEmpty(message))
-            {
-                if (message != null)
-                {
-                    throw new ArgumentException(SR.GetString(SR.ArgumentMustNotBeNullOrEmptyString),
-                        "message");
-                }
-                else
-                {
-                    throw new ArgumentNullException("message",
-                        SR.GetString(SR.ArgumentMustNotBeNullOrEmptyString));
-                }
             }
         }
 
@@ -89,30 +72,20 @@ namespace CuttingEdge.Logging
             {
                 if (source != null)
                 {
-                    throw new ArgumentException(SR.GetString(SR.ArgumentMustNotBeNullOrEmptyString),
-                        "source");
+                    throw new ArgumentException(SR.ArgumentMustNotBeNullOrEmptyString(), "source");
                 }
                 else
                 {
-                    throw new ArgumentNullException("source",
-                        SR.GetString(SR.ArgumentMustNotBeNullOrEmptyString));
+                    throw new ArgumentNullException("source", SR.ArgumentMustNotBeNullOrEmptyString());
                 }
             }
         }
 
         internal static string BuildMethodName(MethodBase method)
         {
-            if (method == null)
-            {
-                return null;
-            }
-
             ParameterInfo[] parameters = method.GetParameters();
 
-            int initialCapacity =
-                method.DeclaringType.FullName.Length +
-                method.Name.Length + (15 * parameters.Length) +
-                20;
+            int initialCapacity = EstimateInitialCapacity(method, parameters);
 
             StringBuilder methodName = new StringBuilder(initialCapacity);
 
@@ -122,31 +95,7 @@ namespace CuttingEdge.Logging
                  .Append(method.Name)
                  .Append("(");
 
-            for (int index = 0; index < parameters.Length; index++)
-            {
-                ParameterInfo parameter = parameters[index];
-
-                if (index > 0)
-                {
-                    methodName.Append(", ");
-                }
-
-                if (parameter.IsOut == true)
-                {
-                    methodName.Append("out ");
-                }
-
-                if (parameter.IsRetval == true)
-                {
-                    methodName.Append("ret ");
-                    methodName.Insert(0, " ");
-                    methodName.Insert(0, parameter.ParameterType.Name);
-                }
-                else
-                {
-                    methodName.Append(parameter.ParameterType.Name);
-                }
-            }
+            BuildParameters(methodName, parameters);
 
             methodName.Append(")");
 
@@ -162,6 +111,11 @@ namespace CuttingEdge.Logging
 
         internal static string BuildMessageFromLogEntry(LogEntry entry)
         {
+            if (entry == null)
+            {
+                throw new ArgumentNullException("entry");
+            }
+
             StringBuilder message = new StringBuilder(256);
 
             message.AppendLine(entry.Message);
@@ -173,8 +127,79 @@ namespace CuttingEdge.Logging
                 message.Append("Source: ").AppendLine(entry.Source);
             }
 
-            Exception exception = entry.Exception;
+            AppendExceptionInformation(entry.Exception, message);
 
+            return message.ToString();
+        }
+
+        internal static string FormatEvent(LogEntry entry)
+        {
+            StringBuilder builder = new StringBuilder(256);
+
+            builder.AppendLine("LoggingEvent:");
+            builder.Append("Severity:\t").AppendLine(entry.Severity.ToString());
+            builder.Append("Message:\t").AppendLine(entry.Message);
+
+            if (entry.Source != null)
+            {
+                builder.Append("Source:\t").AppendLine(entry.Source);
+            }
+
+            if (entry.Exception != null)
+            {
+                builder.Append("Exception:\t").AppendLine(entry.Exception.Message);
+                builder.AppendLine(entry.Exception.StackTrace);
+                builder.AppendLine();
+            }
+
+            return builder.ToString();
+        }
+
+        private static int EstimateInitialCapacity(MethodBase method, ParameterInfo[] parameters)
+        {
+            const int AverageLengthOfParameterName = 15;
+            const int ExtraLengthJustToBeSure = 20;
+
+            return method.DeclaringType.FullName.Length + method.Name.Length +
+                (AverageLengthOfParameterName * parameters.Length) + ExtraLengthJustToBeSure;
+        }
+
+        private static void BuildParameters(StringBuilder methodName, ParameterInfo[] parameters)
+        {
+            for (int index = 0; index < parameters.Length; index++)
+            {
+                if (index > 0)
+                {
+                    methodName.Append(", ");
+                }
+
+                ParameterInfo parameter = parameters[index];
+
+                BuildParameter(methodName, parameter);
+            }
+        }
+
+        private static void BuildParameter(StringBuilder methodName, ParameterInfo parameter)
+        {
+            if (parameter.IsOut == true)
+            {
+                methodName.Append("out ");
+            }
+
+            if (parameter.IsRetval == true)
+            {
+                methodName.Append("ret ");
+                methodName.Insert(0, " ");
+                methodName.Insert(0, parameter.ParameterType.Name);
+            }
+            else
+            {
+                methodName.Append(parameter.ParameterType.Name);
+            }
+        }
+
+        private static void AppendExceptionInformation(Exception exception, StringBuilder message)
+        {
             while (exception != null)
             {
                 message.AppendLine();
@@ -182,13 +207,11 @@ namespace CuttingEdge.Logging
                 message
                     .Append("Exception: ").AppendLine(exception.GetType().FullName)
                     .Append("Message: ").AppendLine(exception.Message)
-                    .AppendLine("Stacktrace:")
+                    .AppendLine("StackTrace:")
                     .AppendLine(exception.StackTrace);
 
                 exception = exception.InnerException;
             }
-
-            return message.ToString();
         }
     }
 }

@@ -59,44 +59,44 @@ namespace CuttingEdge.Logging.Web
     /// </remarks>
     /// <example>
     /// This example demonstrates how to configure the <see cref="LoggingWebEventProvider"/> in the web.config
-    /// file. The config must contain a valid logging provider configuration. The 
+    /// file. The configuration must contain a valid logging provider configuration. The 
     /// <see cref="DebugLoggingProvider"/> is used in this example.
-    /// <code lang="xml">
-    /// &lt;?xml version="1.0"?&gt;
-    /// &lt;configuration&gt;
-    ///     &lt;configSections&gt;
-    ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" /&gt;
-    ///     &lt;/configSections&gt;
-    ///     &lt;logging defaultProvider="DebugLoggingProvider"&gt;
-    ///         &lt;providers&gt;
-    ///             &lt;add 
+    /// <code lang="xml"><![CDATA[
+    /// <?xml version="1.0"?>
+    /// <configuration>
+    ///     <configSections>
+    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
+    ///             allowDefinition="MachineToApplication" />
+    ///     </configSections>
+    ///     <logging defaultProvider="DebugLoggingProvider">
+    ///         <providers>
+    ///             <add 
     ///                 name="DebugLoggingProvider"
     ///                 type="CuttingEdge.Logging.DebugLoggingProvider, CuttingEdge.Logging"
     ///                 description="Debug logging provider"
     ///                 threshold="Debug"
-    ///             /&gt;
-    ///         &lt;/providers&gt;
-    ///     &lt;/logging&gt;   
-    ///     &lt;system.web&gt;
-    ///         &lt;healthMonitoring heartbeatInterval="0" enabled="true"&gt;
-    ///             &lt;providers&gt;
-    ///                 &lt;add name="LoggingWebEventProvider" 
+    ///             />
+    ///         </providers>
+    ///     </logging>   
+    ///     <system.web>
+    ///         <healthMonitoring heartbeatInterval="0" enabled="true">
+    ///             <providers>
+    ///                 <add name="LoggingWebEventProvider" 
     ///                     type="CuttingEdge.Logging.Web.LoggingWebEventProvider, CuttingEdge.Logging" 
     ///                     loggingProvider="AspNetSqlLoggingProvider"
-    ///                     /&gt;
-    ///             &lt;/providers&gt;
-    ///             &lt;rules&gt;
-    ///                 &lt;add name="Custom Event Provider"
+    ///                     />
+    ///             </providers>
+    ///             <rules>
+    ///                 <add name="Custom Event Provider"
     ///                      eventName="All Events"
     ///                      provider="LoggingWebEventProvider"
     ///                      profile="Default"
-    ///                     /&gt;
-    ///             &lt;/rules&gt;
-    ///         &lt;/healthMonitoring&gt;
-    ///     &lt;/system.web&gt;
-    /// &lt;/configuration&gt;
-    /// </code>
+    ///                     />
+    ///             </rules>
+    ///         </healthMonitoring>
+    ///     </system.web>
+    /// </configuration>
+    /// ]]></code>
     /// See the &lt;healthMonitoring&gt; web.config configuration element for more information about
     /// configuring <see cref="WebEventProvider"/> classes and logging <see cref="WebBaseEvent"/> objects.
     /// </example> 
@@ -134,13 +134,13 @@ namespace CuttingEdge.Logging.Web
 
             base.Initialize(name, config);
 
-            this.InitializeLoggingProvider(name, config);
+            this.InitializeLoggingProvider(config);
 
             // The config argument should contain no elements.
             if (config.Count > 0)
             {
-                throw new ProviderException(SR.GetString(SR.UnrecognizedAttributeInProviderConfiguration,
-                    name, config.GetKey(0)));
+                string invalidKey = config.GetKey(0);
+                throw new ProviderException(SR.UnrecognizedAttributeInProviderConfiguration(name, invalidKey));
             }
         }
 
@@ -168,33 +168,21 @@ namespace CuttingEdge.Logging.Web
         {
         }
 
-        private static Exception GetException(WebBaseEvent eventRaised)
-        {
-            WebBaseErrorEvent errorEvent = eventRaised as WebBaseErrorEvent;
-
-            if (errorEvent != null)
-            {
-                return errorEvent.ErrorException;
-            }
-
-            return null;
-        }
-
         private static LogEntry CreateLogEntry(WebBaseEvent eventRaised)
         {
-            LoggingEventType eventType = GetEventType(eventRaised);
+            LoggingEventType eventType = GetEventTypeFromWebEvent(eventRaised);
 
-            string message = string.Format(CultureInfo.InstalledUICulture, "{0} (Event Code: {1})",
+            string message = string.Format(CultureInfo.InvariantCulture, "{0} (Event Code: {1})",
                 eventRaised.Message, eventRaised.EventCode);
 
             string source = eventRaised.GetType().Name;
 
-            Exception exception = GetException(eventRaised);
+            Exception exception = GetExceptionFromWebEvent(eventRaised);
 
             return new LogEntry(eventType, message, source, exception);
         }
 
-        private static LoggingEventType GetEventType(WebBaseEvent eventRaised)
+        private static LoggingEventType GetEventTypeFromWebEvent(WebBaseEvent eventRaised)
         {
             if (eventRaised is WebFailureAuditEvent)
             {
@@ -211,9 +199,23 @@ namespace CuttingEdge.Logging.Web
             }
         }
 
-        private void InitializeLoggingProvider(string name, NameValueCollection config)
+        private static Exception GetExceptionFromWebEvent(WebBaseEvent eventRaised)
         {
-            string loggingProviderName = config["loggingProvider"];
+            WebBaseErrorEvent errorEvent = eventRaised as WebBaseErrorEvent;
+
+            if (errorEvent != null)
+            {
+                return errorEvent.ErrorException;
+            }
+
+            return null;
+        }
+
+        private void InitializeLoggingProvider(NameValueCollection config)
+        {
+            const string LoggingProviderAttribute = "loggingProvider";
+
+            string loggingProviderName = config[LoggingProviderAttribute];
 
             // Throw exception when no connectionStringName is provided
             if (string.IsNullOrEmpty(loggingProviderName))
@@ -226,14 +228,14 @@ namespace CuttingEdge.Logging.Web
 
                 if (this.loggingProvider == null)
                 {
-                    throw new ProviderException(SR.GetString(SR.MissingLoggingProviderInConfig,
-                        loggingProviderName, name));
+                    throw new ProviderException(SR.MissingLoggingProviderInConfig(loggingProviderName,
+                        this.Name));
                 }
             }
 
-            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
-            // after the initialization process.
-            config.Remove("loggingProvider");
+            // Remove this attribute from the configuration. This way the provider can spot unrecognized 
+            // attributes after the initialization process.
+            config.Remove(LoggingProviderAttribute);
         }
     }
 }

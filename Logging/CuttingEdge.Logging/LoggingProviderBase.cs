@@ -53,33 +53,16 @@ namespace CuttingEdge.Logging
     /// </remarks>
     public abstract class LoggingProviderBase : ProviderBase, ILogger
     {
-        private LoggingProviderBase fallbackProvider;
         private string fallbackProviderName;
         private LoggingEventType threshold;
 
         /// <summary>
         /// Gets the supplied fallback provider that the <see cref="Logger"/> class will use when logging
-        /// failed on this logging provider. When no fallback provider is defined in the config file,
+        /// failed on this logging provider. When no fallback provider is defined in the configuration file,
         /// <b>null</b> (Nothing in VB) is returned.
         /// </summary>
         /// <value>The fallback provider.</value>
-        public LoggingProviderBase FallbackProvider
-        {
-            get
-            {
-                return this.fallbackProvider;
-            }
-
-            internal set
-            {
-                if (this.fallbackProvider != null)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                this.fallbackProvider = value;
-            }
-        }
+        public LoggingProviderBase FallbackProvider { get; internal set; }
 
         /// <summary>
         /// Gets the <see cref="LoggingEventType"/> logging threshold. The threshold can be set through
@@ -113,7 +96,7 @@ namespace CuttingEdge.Logging
         /// <exception cref="ArgumentNullException">Thrown when the name of the provider is null or when the
         /// <paramref name="config"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when the name of the provider has a length of zero.</exception>
-        /// <exception cref="InvalidOperationException">Thrown wen an attempt is made to call Initialize on a 
+        /// <exception cref="InvalidOperationException">Thrown when an attempt is made to call Initialize on a 
         /// provider after the provider has already been initialized.</exception>
         /// <exception cref="ProviderException">Thrown when the <paramref name="config"/> contains
         /// unrecognized attributes.</exception>
@@ -133,7 +116,7 @@ namespace CuttingEdge.Logging
             base.Initialize(name, config);
 
             // Perform feature-specific provider initialization.
-            this.InitializeThreshold(name, config);
+            this.InitializeThreshold(config);
 
             this.InitializeFallbackProvider(config);
         }
@@ -171,7 +154,7 @@ namespace CuttingEdge.Logging
 
         /// <summary>Logs an error event.</summary>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current <see cref="Threshold"/> level;
         /// Returning an id is not supported by the current implementation;
@@ -187,7 +170,7 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an error event.</summary>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current <see cref="Threshold"/> level;
         /// Returning an id is not supported by the current implementation;
@@ -205,7 +188,7 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an error event.</summary>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current <see cref="Threshold"/> level;
         /// Returning an id is not supported by the current implementation;
@@ -224,7 +207,7 @@ namespace CuttingEdge.Logging
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current <see cref="Threshold"/> level;
         /// Returning an id is not supported by the current implementation;
@@ -245,7 +228,7 @@ namespace CuttingEdge.Logging
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
         /// <param name="exception">The exception that has to be logged.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current <see cref="Threshold"/> level;
         /// Returning an id is not supported by the current implementation;
@@ -298,7 +281,7 @@ namespace CuttingEdge.Logging
 
         /// <summary>Logs an information event.</summary>
         /// <param name="message">The description of the event.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current <see cref="Threshold"/> level;
         /// Returning an id is not supported by the current implementation;
@@ -316,7 +299,7 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an event.</summary>
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current <see cref="Threshold"/> level;
         /// Returning an id is not supported by the current implementation;
@@ -336,7 +319,7 @@ namespace CuttingEdge.Logging
         /// <summary>Logs an event.</summary>
         /// <param name="severity">The severity of the event.</param>
         /// <param name="message">The description of the event.</param>
-        /// <param name="source">A source where the event occured.</param>
+        /// <param name="source">A source where the event occurred.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current <see cref="Threshold"/> level;
         /// Returning an id is not supported by the current implementation;
@@ -387,10 +370,8 @@ namespace CuttingEdge.Logging
                     throw;
                 }
 
-                // When there is a fallback provider, we let the fallback provider log the event.
                 this.LogToFallbackProvider(entry);
 
-                // We also log the failure of the current provider
                 this.LogProviderFailureToFallbackProvider(ex);
 
                 // We return null, because the fallback provider returns a different type of id, then the
@@ -421,50 +402,22 @@ namespace CuttingEdge.Logging
                     name = this.GetType().Name;
                 }
 
-                throw new ProviderException(SR.GetString(SR.UnrecognizedAttributeInProviderConfiguration,
-                    name, config.GetKey(0)));
+                string attribute = config.GetKey(0);
+
+                throw new ProviderException(SR.UnrecognizedAttributeInProviderConfiguration(name, attribute));
             }
         }
 
-        private static string GetEventTypeValuesAsString()
+        private void InitializeThreshold(NameValueCollection config)
         {
-            string values = String.Empty;
+            const string ThresholdAttribute = "threshold";
 
-            Array types = Enum.GetValues(typeof(LoggingEventType));
-
-            int lastIndex = types.Length - 1;
-            for (int index = 0; index < types.Length; index++)
-            {
-                if (index > 0)
-                {
-                    values += index == lastIndex ? " or " : ", ";
-                }
-
-                values += types.GetValue(index).ToString();
-            }
-
-            return values;
-        }
-
-        private void InitializeThreshold(string name, NameValueCollection config)
-        {
-            string thresholdConfigValue = config["threshold"];
+            string thresholdConfigValue = config[ThresholdAttribute];
 
             // The threshold attribute is optional.
             if (!string.IsNullOrEmpty(thresholdConfigValue))
             {
-                LoggingEventType threshold;
-                try
-                {
-                    threshold = (LoggingEventType)Enum.Parse(typeof(LoggingEventType), thresholdConfigValue, true);
-                }
-                catch (ArgumentException)
-                {
-                    throw new ProviderException(SR.GetString(SR.InvalidThresholdValueInProviderConfiguration,
-                        name, GetEventTypeValuesAsString()));
-                }
-
-                this.threshold = threshold;
+                this.threshold = this.ConvertToLoggingEventType(thresholdConfigValue);
             }
             else
             {
@@ -472,17 +425,32 @@ namespace CuttingEdge.Logging
                 this.threshold = LoggingEventType.Debug;
             }
 
-            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
-            // after the initialization process.
-            config.Remove("threshold");
+            // Remove this attribute from the configuration. This way the provider can spot unrecognized 
+            // attributes after the initialization process.
+            config.Remove(ThresholdAttribute);
+        }
+
+        private LoggingEventType ConvertToLoggingEventType(string value)
+        {
+            try
+            {
+                const bool IgnoreCase = true;
+
+                // .NET 2.0 does not have a convenient Enum.TryParse method.
+                return (LoggingEventType)Enum.Parse(typeof(LoggingEventType), value, IgnoreCase);
+            }
+            catch (ArgumentException)
+            {
+                throw new ProviderException(SR.InvalidThresholdValueInProviderConfiguration(this.Name));
+            }
         }
 
         private void InitializeFallbackProvider(NameValueCollection config)
         {
             string fallbackProviderName = config["fallbackProvider"];
 
-            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
-            // after the initialization process.
+            // Remove this attribute from the configuration. This way the provider can spot unrecognized 
+            // attributes after the initialization process.
             config.Remove("fallbackProvider");
 
             if (!String.IsNullOrEmpty(fallbackProviderName))
@@ -501,12 +469,13 @@ namespace CuttingEdge.Logging
 
         private void LogProviderFailureToFallbackProvider(Exception exception)
         {
-            string failureMessage = SR.GetString(SR.EventCouldNotBeLoggedWithX, this.GetType().Name);
+            string failureMessage = SR.EventCouldNotBeLoggedWithX(this.Name);
+
+            string source = this.GetType().FullName;
+
+            var entry = new LogEntry(LoggingEventType.Error, failureMessage, source, exception);
 
             ILogger fallbackProvider = this.FallbackProvider;
-
-            LogEntry entry = 
-                new LogEntry(LoggingEventType.Error, failureMessage, this.GetType().FullName, exception);
 
             fallbackProvider.Log(entry);
         }
