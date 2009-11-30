@@ -32,7 +32,7 @@ namespace CuttingEdge.Logging
     public enum LoggingEventType
     {
         /// <summary>
-        /// A debug event. This indicates a verbose event, usefull during development.
+        /// A debug event. This indicates a verbose event, useful during development.
         /// </summary>
         Debug = 0,
 

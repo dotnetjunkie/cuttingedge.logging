@@ -1,0 +1,3 @@
+NSandbox is used for testing multiple configurations of CuttingEdge.Loggging in isolation. For more information on NSandbox, follow this link:
+
+http://thevalerios.net/matt/2008/10/announcing-nsandbox-on-sourceforge/

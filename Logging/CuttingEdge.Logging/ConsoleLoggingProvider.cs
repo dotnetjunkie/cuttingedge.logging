@@ -73,28 +73,37 @@ namespace CuttingEdge.Logging
     /// Logging section, which can also be accessed as members of the <see cref="LoggingSection"/> class.
     /// The following configuration file example shows how to specify values declaratively for the
     /// Logging section.
-    /// <code lang="xml">
-    /// &lt;?xml version="1.0"?&gt;
-    /// &lt;configuration&gt;
-    ///     &lt;configSections&gt;
-    ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" /&gt;
-    ///     &lt;/configSections&gt;
-    ///     &lt;logging defaultProvider="ConsoleLoggingProvider"&gt;
-    ///         &lt;providers&gt;
-    ///             &lt;add 
+    /// <code lang="xml"><![CDATA[
+    /// <?xml version="1.0"?>
+    /// <configuration>
+    ///     <configSections>
+    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
+    ///             allowDefinition="MachineToApplication" />
+    ///     </configSections>
+    ///     <logging defaultProvider="ConsoleLoggingProvider">
+    ///         <providers>
+    ///             <add 
     ///                 name="ConsoleLoggingProvider"
     ///                 type="CuttingEdge.Logging.ConsoleLoggingProvider, CuttingEdge.Logging"
     ///                 description="Console logging provider"
     ///                 threshold="Warning"
-    ///             /&gt;
-    ///         &lt;/providers&gt;
-    ///     &lt;/logging&gt;
-    /// &lt;/configuration&gt;
-    /// </code>
+    ///             />
+    ///         </providers>
+    ///     </logging>
+    /// </configuration>
+    /// ]]></code>
     /// </example>
     public class ConsoleLoggingProvider : LoggingProviderBase
     {
+        // writeToConsole is a Seam for testing.
+        private Action<string> writeToConsole;
+
+        /// <summary>Initializes a new instance of the <see cref="ConsoleLoggingProvider"/> class.</summary>
+        public ConsoleLoggingProvider()
+        {
+            this.SetWriteToConsole((formattedEvent) => Console.Write(formattedEvent));
+        }
+
         /// <summary>
         /// Initializes the provider.
         /// </summary>
@@ -108,7 +117,7 @@ namespace CuttingEdge.Logging
         /// <exception cref="ArgumentNullException">Thrown when the name of the provider is null or when the
         /// <paramref name="config"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when the name of the provider has a length of zero.</exception>
-        /// <exception cref="InvalidOperationException">Thrown wen an attempt is made to call Initialize on a
+        /// <exception cref="InvalidOperationException">Thrown when an attempt is made to call Initialize on a
         /// provider after the provider has already been initialized.</exception>
         /// <exception cref="ProviderException">Thrown when the <paramref name="config"/> contains
         /// unrecognized attributes.</exception>
@@ -132,6 +141,11 @@ namespace CuttingEdge.Logging
             this.CheckForUnrecognizedAttributes(name, config);
         }
 
+        internal void SetWriteToConsole(Action<string> writeToConsole)
+        {
+            this.writeToConsole = writeToConsole;
+        }
+
         /// <summary>
         /// Implements the functionality to log the event.
         /// </summary>
@@ -139,35 +153,12 @@ namespace CuttingEdge.Logging
         /// <returns>Returns null.</returns>
         protected override object LogInternal(LogEntry entry)
         {
-            string formattedEvent = FormatEvent(entry);
+            string formattedEvent = LoggingHelper.FormatEvent(entry);
 
-            Console.Write(formattedEvent);
+            this.writeToConsole(formattedEvent);
 
             // Returning an ID is inappropriate for this type of logger.
             return null;
-        }
-
-        private static string FormatEvent(LogEntry entry)
-        {
-            StringBuilder builder = new StringBuilder(256);
-            
-            builder.AppendLine("LoggingEvent:");
-            builder.Append("Severity:\t").AppendLine(entry.Severity.ToString());
-            builder.Append("Message:\t").AppendLine(entry.Message);
-
-            if (entry.Source != null)
-            {
-                builder.Append("Source\t").AppendLine(entry.Source);
-            }
-
-            if (entry.Exception != null)
-            {
-                builder.Append("Exception:\t").AppendLine(entry.Exception.Message);
-                builder.AppendLine(entry.Exception.StackTrace);
-                builder.AppendLine();
-            }
-
-            return builder.ToString();
         }
     }
 }

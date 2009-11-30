@@ -70,14 +70,14 @@ namespace CuttingEdge.Logging
     /// <item>
     ///     <attribute>connectionStringName</attribute>
     ///     <description>
-    ///         The the connection string provided with this provider. This attribute is mandatory.
+    ///         The connection string provided with this provider. This attribute is mandatory.
     ///     </description>
     /// </item>  
     /// <item>
     ///     <attribute>initializeSchema</attribute>
     ///     <description>
     ///         When this boolean attribute is set to true, the provider will try to create the needed tables 
-    ///         and stored spocedures in the database. This attribute is optional and false by default.
+    ///         and stored procedures in the database. This attribute is optional and false by default.
     ///     </description>
     /// </item>  
     /// </list>
@@ -90,31 +90,31 @@ namespace CuttingEdge.Logging
     /// logging section, which can also be accessed as members of the <see cref="LoggingSection"/> class.
     /// The following configuration file example shows how to specify values declaratively for the
     /// logging section.
-    /// <code lang="xml">
-    /// &lt;?xml version="1.0"?&gt;
-    /// &lt;configuration&gt;
-    ///     &lt;configSections&gt;
-    ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" /&gt;
-    ///     &lt;/configSections&gt;
-    ///     &lt;connectionStrings&gt;
-    ///         &lt;add name="SqlLogging" 
-    ///             connectionString="Data Source=.;Integrated Security=SSPI;Initial Catalog=Logging;" /&gt;
-    ///     &lt;/connectionStrings&gt;
-    ///     &lt;logging defaultProvider="SqlLoggingProvider"&gt;
-    ///         &lt;providers&gt;
-    ///             &lt;add 
+    /// <code lang="xml"><![CDATA[
+    /// <?xml version="1.0"?>
+    /// <configuration>
+    ///     <configSections>
+    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
+    ///             allowDefinition="MachineToApplication" />
+    ///     </configSections>
+    ///     <connectionStrings>
+    ///         <add name="SqlLogging" 
+    ///             connectionString="Data Source=.;Integrated Security=SSPI;Initial Catalog=Logging;" />
+    ///     </connectionStrings>
+    ///     <logging defaultProvider="SqlLoggingProvider">
+    ///         <providers>
+    ///             <add 
     ///                 name="SqlLoggingProvider"
     ///                 type="CuttingEdge.Logging.SqlLoggingProvider, CuttingEdge.Logging"
     ///                 threshold="Information"
     ///                 connectionStringName="SqlLogging"
     ///                 initializeSchema="True"
     ///                 description="SQL logging provider"
-    ///             /&gt;
-    ///         &lt;/providers&gt;
-    ///     &lt;/logging&gt;
-    /// &lt;/configuration&gt;
-    /// </code>
+    ///             />
+    ///         </providers>
+    ///     </logging>
+    /// </configuration>
+    /// ]]></code>
     /// </example>
     public class SqlLoggingProvider : LoggingProviderBase
     {
@@ -133,7 +133,7 @@ namespace CuttingEdge.Logging
         /// attributes specified in the configuration for this provider.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="config"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when the name of the provider has a length of zero.</exception>
-        /// <exception cref="InvalidOperationException">Thrown wen an attempt is made to call Initialize on a
+        /// <exception cref="InvalidOperationException">Thrown when an attempt is made to call Initialize on a
         /// provider after the provider has already been initialized.</exception>
         /// <exception cref="ProviderException">Thrown when the <paramref name="config"/> contains
         /// unrecognized attributes or when the connectionStringName attribute is not configured properly.</exception>
@@ -154,15 +154,15 @@ namespace CuttingEdge.Logging
             base.Initialize(name, config);
 
             // Performing implementation-specific provider initialization here.
-            this.InitializeConnectionString(name, config);
+            this.InitializeConnectionString(config);
 
-            bool mustInitializeSchema = GetInitializeSchemaAttributeFromConfig(name, config);
+            bool mustInitializeSchema = this.GetInitializeSchemaAttributeFromConfig(config);
 
             // Check if the configuration is valid, before initializing the database.
             this.CheckForUnrecognizedAttributes(name, config);
 
-            // When the initialization of the database schema is registered in the config file, we
-            // execute creation of tables and stored procs.
+            // When the initialization of the database schema is registered in the configuration file, we
+            // execute creation of tables and stored procedures.
             if (mustInitializeSchema)
             {
                 this.InitializeDatabaseSchema();
@@ -176,17 +176,16 @@ namespace CuttingEdge.Logging
             {
                 SqlLoggingHelper.ThrowWhenSchemaAlreadyHasBeenInitialized(this);
 
-                string createScript = SR.GetString(SR.SqlLoggingProviderSchemaScripts);
+                string createScript = SR.SqlLoggingProviderSchemaScripts();
                 
-                // Split the script in seperate operations. SQL Server chokes on the GO statements.
+                // Split the script in separate operations. SQL Server chokes on the GO statements.
                 string[] createScripts = createScript.Split(new string[] { "GO" }, StringSplitOptions.None);
 
                 SqlLoggingHelper.CreateTablesAndStoredProcedures(this, createScripts);
             }
             catch (SqlException ex)
             {
-                throw new ProviderException(SR.GetString(SR.InitializationOfDatabaseSchemaFailed, this.Name, 
-                    ex.Message), ex);
+                throw new ProviderException(SR.InitializationOfDatabaseSchemaFailed(this.Name, ex.Message), ex);
             }
         }
 
@@ -260,18 +259,20 @@ namespace CuttingEdge.Logging
             }
         }
 
-        private static bool GetInitializeSchemaAttributeFromConfig(string name, NameValueCollection config)
+        private bool GetInitializeSchemaAttributeFromConfig(NameValueCollection config)
         {
-            string initializeSchema = config["initializeSchema"];
+            const string InitializeSchemaAttribute = "initializeSchema";
 
-            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
-            // after the initialization process.
-            config.Remove("initializeSchema");
+            string initializeSchema = config[InitializeSchemaAttribute];
+
+            // Remove this attribute from the configuration. This way the provider can spot unrecognized
+            // attributes after the initialization process.
+            config.Remove(InitializeSchemaAttribute);
 
             const bool DefaultValueWhenMissing = false;
 
-            return SqlLoggingHelper.ParseBoolConfigValue(name, "initializeSchema", initializeSchema, 
-                DefaultValueWhenMissing);
+            return SqlLoggingHelper.ParseBoolConfigValue(this.Name, InitializeSchemaAttribute,
+                initializeSchema, DefaultValueWhenMissing);
         }
 
         private void SaveExceptionChainToDatabase(SqlTransaction transaction, Exception exception,
@@ -288,31 +289,31 @@ namespace CuttingEdge.Logging
             }
         }
 
-        private void InitializeConnectionString(string name, NameValueCollection config)
+        private void InitializeConnectionString(NameValueCollection config)
         {
-            string connectionStringName = config["connectionStringName"];
+            const string ConnectionStringNameAttribute = "connectionStringName";
+
+            string connectionStringName = config[ConnectionStringNameAttribute];
 
             // Throw exception when no connectionStringName is provided
             if (string.IsNullOrEmpty(connectionStringName))
             {
-                throw new ProviderException(SR.GetString(SR.MissingConnectionStringAttribute, name));
+                throw new ProviderException(SR.MissingConnectionStringAttribute(this.Name));
             }
 
-            string connectionString =
-                ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
+            var settings = ConfigurationManager.ConnectionStrings[connectionStringName];
 
             // Throw exception when connection string is missing from the <connectionStrings> section.
-            if (String.IsNullOrEmpty(connectionString))
+            if (settings == null || String.IsNullOrEmpty(settings.ConnectionString))
             {
-                throw new ProviderException(SR.GetString(SR.MissingConnectionStringInConfig,
-                    connectionStringName));
+                throw new ProviderException(SR.MissingConnectionStringInConfig(connectionStringName));
             }
 
             // Remove this attribute from the config. This way the provider can spot unrecognized attributes
             // after the initialization process.
-            config.Remove("connectionStringName");
+            config.Remove(ConnectionStringNameAttribute);
 
-            this.connectionString = connectionString;
+            this.connectionString = settings.ConnectionString;
         }
     }
 }

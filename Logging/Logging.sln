@@ -3,20 +3,35 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging", "CuttingEdge.Logging\CuttingEdge.Logging.csproj", "{740C36FE-5353-4862-907A-693511194CC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging.UnitTests", "CuttingEdge.Logging.UnitTests\CuttingEdge.Logging.UnitTests.csproj", "{2E3ED9A6-9377-4260-8561-498AFE03C90E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging.Tests.Unit", "CuttingEdge.Logging.Tests.Unit\CuttingEdge.Logging.Tests.Unit.csproj", "{2E3ED9A6-9377-4260-8561-498AFE03C90E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging.Tests.Integration", "CuttingEdge.Logging.Tests.Integration\CuttingEdge.Logging.Tests.Integration.csproj", "{6869A971-ADEC-4F74-B572-10A1A90751EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging.Tests.Common", "CuttingEdge.Logging.Tests.Common\CuttingEdge.Logging.Tests.Common.csproj", "{119C5660-11E3-4DE3-855E-FA610542715E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SharedAssemblies", "SharedAssemblies", "{BEABBE67-5EFE-4383-8161-C7E92E24CB3F}"
+	ProjectSection(SolutionItems) = preProject
+		SharedAssemblies\NSandbox.dll = SharedAssemblies\NSandbox.dll
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
+		SccNumberOfProjects = 5
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs08.codeplex.com/
 		SccLocalPath0 = .
-		SccProjectUniqueName1 = CuttingEdge.Logging.UnitTests\\CuttingEdge.Logging.UnitTests.csproj
-		SccProjectName1 = CuttingEdge.Logging.UnitTests
-		SccLocalPath1 = CuttingEdge.Logging.UnitTests
-		SccProjectUniqueName2 = CuttingEdge.Logging\\CuttingEdge.Logging.csproj
-		SccProjectName2 = CuttingEdge.Logging
-		SccLocalPath2 = CuttingEdge.Logging
+		SccProjectUniqueName1 = CuttingEdge.Logging\\CuttingEdge.Logging.csproj
+		SccProjectName1 = CuttingEdge.Logging
+		SccLocalPath1 = CuttingEdge.Logging
+		SccProjectUniqueName2 = CuttingEdge.Logging.Tests.Unit\\CuttingEdge.Logging.Tests.Unit.csproj
+		SccProjectName2 = CuttingEdge.Logging.Tests.Unit
+		SccLocalPath2 = CuttingEdge.Logging.Tests.Unit
+		SccProjectUniqueName3 = CuttingEdge.Logging.Tests.Integration\\CuttingEdge.Logging.Tests.Integration.csproj
+		SccProjectName3 = CuttingEdge.Logging.Tests.Integration
+		SccLocalPath3 = CuttingEdge.Logging.Tests.Integration
+		SccProjectUniqueName4 = CuttingEdge.Logging.Tests.Common\\CuttingEdge.Logging.Tests.Common.csproj
+		SccProjectName4 = CuttingEdge.Logging.Tests.Common
+		SccLocalPath4 = CuttingEdge.Logging.Tests.Common
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +46,14 @@ Global
 		{2E3ED9A6-9377-4260-8561-498AFE03C90E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E3ED9A6-9377-4260-8561-498AFE03C90E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E3ED9A6-9377-4260-8561-498AFE03C90E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6869A971-ADEC-4F74-B572-10A1A90751EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6869A971-ADEC-4F74-B572-10A1A90751EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6869A971-ADEC-4F74-B572-10A1A90751EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6869A971-ADEC-4F74-B572-10A1A90751EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{119C5660-11E3-4DE3-855E-FA610542715E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{119C5660-11E3-4DE3-855E-FA610542715E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{119C5660-11E3-4DE3-855E-FA610542715E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{119C5660-11E3-4DE3-855E-FA610542715E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

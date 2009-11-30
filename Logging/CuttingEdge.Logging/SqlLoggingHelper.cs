@@ -48,8 +48,7 @@ namespace CuttingEdge.Logging
 
                     if (sysObjectCount > 0)
                     {
-                        throw new ProviderException(SR.GetString(SR.SqlProviderAlreadyInitialized,
-                            provider.Name));
+                        throw new ProviderException(SR.SqlProviderAlreadyInitialized(provider.Name));
                     }
                 }
             }
@@ -58,17 +57,15 @@ namespace CuttingEdge.Logging
         internal static void CreateTablesAndStoredProcedures(SqlLoggingProvider provider, 
             string[] createScripts)
         {
-            using (SqlConnection connection = new SqlConnection(provider.ConnectionString))
+            using (var connection = new SqlConnection(provider.ConnectionString))
             {
                 connection.Open();
 
-                using (SqlTransaction transaction = connection.BeginTransaction())
+                using (var transaction = connection.BeginTransaction())
                 {
-                    string createScript = SR.GetString(SR.SqlLoggingProviderSchemaScripts);
-
                     foreach (string script in createScripts)
                     {
-                        using (SqlCommand command = new SqlCommand(script, connection, transaction))
+                        using (var command = new SqlCommand(script, connection, transaction))
                         {
                             command.ExecuteNonQuery();
                         }
@@ -93,8 +90,7 @@ namespace CuttingEdge.Logging
             }
             catch (FormatException)
             {
-                throw new ProviderException(SR.GetString(SR.InvalidBooleanAttribute, value, attributeName,
-                    providerName));
+                throw new ProviderException(SR.InvalidBooleanAttribute(value, attributeName, providerName));
             }
         }
     }

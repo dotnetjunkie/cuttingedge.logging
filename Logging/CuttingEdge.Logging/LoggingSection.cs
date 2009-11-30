@@ -39,22 +39,26 @@ namespace CuttingEdge.Logging
     /// Logging section, which can also be accessed as members of the <see cref="LoggingSection"/> 
     /// class. The following configuration file example shows how to specify values declaratively for the 
     /// Logging section.
-    /// <code lang="xml">
-    ///     &lt;configSections&gt;
-    ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" /&gt;
-    ///     &lt;/configSections&gt;
-    ///     &lt;logging defaultProvider="EventLogLoggingProvider"&gt;
-    ///             &lt;add 
+    /// <code lang="xml"><![CDATA[
+    /// <configuration>
+    ///     <configSections>
+    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
+    ///             allowDefinition="MachineToApplication" />
+    ///     </configSections>
+    ///     <logging defaultProvider="EventLogLoggingProvider">
+    ///         <providers>
+    ///             <add 
     ///                 name="EventLogLoggingProvider"
     ///                 type="CuttingEdge.Logging.WindowsEventLogLoggingProvider, CuttingEdge.Logging"
     ///                 threshold="Warning"
     ///                 source="MyWebApplication"
     ///                 logName="MyWebApplication"
     ///                 description="Windows event log logging provider"
-    ///             /&gt;
-    ///     &lt;/logging&gt;
-    /// </code>
+    ///             />
+    ///         </providers>
+    ///     </logging>
+    /// </configuration>
+    /// ]]></code>
     /// </example>
     public sealed class LoggingSection : ConfigurationSection
     {

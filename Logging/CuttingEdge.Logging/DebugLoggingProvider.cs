@@ -74,31 +74,38 @@ namespace CuttingEdge.Logging
     /// Logging section, which can also be accessed as members of the <see cref="LoggingSection"/> class.
     /// The following configuration file example shows how to specify values declaratively for the
     /// Logging section.
-    /// <code lang="xml">
-    /// &lt;?xml version="1.0"?&gt;
-    /// &lt;configuration&gt;
-    ///     &lt;configSections&gt;
-    ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" /&gt;
-    ///     &lt;/configSections&gt;
-    ///     &lt;logging defaultProvider="DebugLoggingProvider"&gt;
-    ///         &lt;providers&gt;
-    ///             &lt;add 
+    /// <code lang="xml"><![CDATA[
+    /// <?xml version="1.0"?>
+    /// <configuration>
+    ///     <configSections>
+    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
+    ///             allowDefinition="MachineToApplication" />
+    ///     </configSections>
+    ///     <logging defaultProvider="DebugLoggingProvider">
+    ///         <providers>
+    ///             <add 
     ///                 name="DebugLoggingProvider"
     ///                 type="CuttingEdge.Logging.DebugLoggingProvider, CuttingEdge.Logging"
     ///                 description="Debug logging provider"
     ///                 threshold="Warning"
-    ///             /&gt;
-    ///         &lt;/providers&gt;
-    ///     &lt;/logging&gt;
-    /// &lt;/configuration&gt;
-    /// </code>
+    ///             />
+    ///         </providers>
+    ///     </logging>
+    /// </configuration>
+    /// ]]></code>
     /// </example>
     public class DebugLoggingProvider : LoggingProviderBase
     {
-        /// <summary>
-        /// Initializes the provider.
-        /// </summary>
+        // writeToDebugWindow is a Seam for testing.
+        private Action<string> writeToDebugWindow;
+
+        /// <summary>Initializes a new instance of the <see cref="DebugLoggingProvider"/> class.</summary>
+        public DebugLoggingProvider()
+        {
+            this.SetWriteToDebugWindow((formattedEvent) => Trace.Write(formattedEvent));
+        }
+
+        /// <summary>Initializes the provider.</summary>
         /// <param name="name">The friendly name of the provider.</param>
         /// <param name="config">A collection of the name/value pairs representing the provider-specific
         /// attributes specified in the configuration for this provider.</param>
@@ -109,7 +116,7 @@ namespace CuttingEdge.Logging
         /// <exception cref="ArgumentNullException">Thrown when the name of the provider is null or when the
         /// <paramref name="config"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when the name of the provider has a length of zero.</exception>
-        /// <exception cref="InvalidOperationException">Thrown wen an attempt is made to call Initialize on a
+        /// <exception cref="InvalidOperationException">Thrown when an attempt is made to call Initialize on a
         /// provider after the provider has already been initialized.</exception>
         /// <exception cref="ProviderException">Thrown when the <paramref name="config"/> contains
         /// unrecognized attributes.</exception>
@@ -133,42 +140,22 @@ namespace CuttingEdge.Logging
             this.CheckForUnrecognizedAttributes(name, config);
         }
 
-        /// <summary>
-        /// Implements the functionality to log the event.
-        /// </summary>
+        internal void SetWriteToDebugWindow(Action<string> writeToDebugWindow)
+        {
+            this.writeToDebugWindow = writeToDebugWindow;
+        }
+
+        /// <summary>Implements the functionality to log the event.</summary>
         /// <param name="entry">The entry to log.</param>
         /// <returns>Returns null.</returns>
         protected override object LogInternal(LogEntry entry)
         {
-            string formattedEvent = FormatEvent(entry);
+            string formattedEvent = LoggingHelper.FormatEvent(entry);
 
-            Trace.Write(formattedEvent);
+            this.writeToDebugWindow(formattedEvent);
 
             // Returning an ID is inappropriate for this type of logger.
             return null;
-        }
-
-        private static string FormatEvent(LogEntry entry)
-        {
-            StringBuilder builder = new StringBuilder(256);
-
-            builder.AppendLine("LoggingEvent:");
-            builder.Append("Severity:\t").AppendLine(entry.Severity.ToString());
-            builder.Append("Message:\t").AppendLine(entry.Message);
-
-            if (entry.Source != null)
-            {
-                builder.Append("Source\t").AppendLine(entry.Source);
-            }
-
-            if (entry.Exception != null)
-            {
-                builder.Append("Exception:\t").AppendLine(entry.Exception.Message);
-                builder.AppendLine(entry.Exception.StackTrace);
-                builder.AppendLine();
-            }
-
-            return builder.ToString();
         }
     }
 }

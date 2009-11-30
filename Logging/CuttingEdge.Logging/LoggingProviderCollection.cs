@@ -56,8 +56,8 @@ namespace CuttingEdge.Logging
 
             if (!(provider is LoggingProviderBase))
             {
-                throw new ArgumentException(SR.GetString(SR.ProviderParameterMustBeOfTypeX, 
-                    typeof(LoggingProviderBase).Name), "provider");
+                throw new ArgumentException(SR.ProviderParameterMustBeOfTypeX(typeof(LoggingProviderBase)), 
+                    "provider");
             }
 
             base.Add(provider);

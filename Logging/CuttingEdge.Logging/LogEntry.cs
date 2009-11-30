@@ -63,13 +63,11 @@ namespace CuttingEdge.Logging
             {
                 if (message != null)
                 {
-                    throw new ArgumentException(SR.GetString(SR.ArgumentMustNotBeNullOrEmptyString),
-                        "message");
+                    throw new ArgumentException(SR.ArgumentMustNotBeNullOrEmptyString(), "message");
                 }
                 else
                 {
-                    throw new ArgumentNullException("message",
-                        SR.GetString(SR.ArgumentMustNotBeNullOrEmptyString));
+                    throw new ArgumentNullException("message", SR.ArgumentMustNotBeNullOrEmptyString());
                 }
             }
 

@@ -85,27 +85,27 @@ namespace CuttingEdge.Logging
     /// Logging section, which can also be accessed as members of the
     /// <see cref="LoggingSection"/> class. The following configuration file example shows
     /// how to specify values declaratively for the Logging section.
-    /// <code lang="xml">
-    /// &lt;?xml version="1.0"?&gt;
-    /// &lt;configuration&gt;
-    ///     &lt;configSections&gt;
-    ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" /&gt;
-    ///     &lt;/configSections&gt;
-    ///     &lt;logging defaultProvider="WindowsEventLogLoggingProvider"&gt;
-    ///         &lt;providers&gt;
-    ///             &lt;add 
+    /// <code lang="xml"><![CDATA[
+    /// <?xml version="1.0"?>
+    /// <configuration>
+    ///     <configSections>
+    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
+    ///             allowDefinition="MachineToApplication" />
+    ///     </configSections>
+    ///     <logging defaultProvider="WindowsEventLogLoggingProvider">
+    ///         <providers>
+    ///             <add 
     ///                 name="WindowsEventLogLoggingProvider"
     ///                 type="CuttingEdge.Logging.WindowsEventLogLoggingProvider, CuttingEdge.Logging"
     ///                 threshold="Warning"
     ///                 source="MyApplication"
     ///                 logName="MyApplication"
     ///                 description="Windows event log logging provider"
-    ///             /&gt;
-    ///         &lt;/providers&gt;
-    ///     &lt;/logging&gt;
-    /// &lt;/configuration&gt;
-    /// </code>
+    ///             />
+    ///         </providers>
+    ///     </logging>
+    /// </configuration>
+    /// ]]></code>
     /// </example>
     public class WindowsEventLogLoggingProvider : LoggingProviderBase
     {
@@ -113,6 +113,13 @@ namespace CuttingEdge.Logging
         private string logName;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="WindowsEventLogLoggingProvider"/> class.
+        /// </summary>
+        public WindowsEventLogLoggingProvider()
+        {
+        }
+
+         /// <summary>
         /// Gets the source name to register and use when writing to the event log. This is the source name by
         /// which the application is registered on the local computer.
         /// </summary>
@@ -153,11 +160,29 @@ namespace CuttingEdge.Logging
             base.Initialize(name, config);
 
             // Performing implementation-specific provider initialization here.
-            this.InitializeSource(name, config);
-            this.InitializeLogName(name, config);
+            this.InitializeSource(config);
+            this.InitializeLogName(config);
             
             // Always call this method last
             this.CheckForUnrecognizedAttributes(name, config);
+        }
+
+        internal virtual void WriteEntryToEventLog(WindowsEventLogLoggingProvider provider,
+            string eventLogMessage)
+        {
+            using (EventLog eventLog = CreateEventLog(provider))
+            {
+                eventLog.WriteEntry(eventLogMessage);
+            }
+        }
+
+        internal virtual void WriteEntryToEventLog(WindowsEventLogLoggingProvider provider,
+            string eventLogMessage, EventLogEntryType type)
+        {
+            using (EventLog eventLog = CreateEventLog(provider))
+            {
+                eventLog.WriteEntry(eventLogMessage, type);
+            }
         }
 
         /// <summary>Implements the functionality to log the event.</summary>
@@ -167,25 +192,15 @@ namespace CuttingEdge.Logging
         {
             EventLogEntryType? eventLogType = ConvertToEventLogEntry(entry.Severity);
 
-            using (EventLog eventLog = new EventLog(this.logName))
+            string eventLogMessage = this.BuildEventLogMessage(entry);
+
+            if (eventLogType != null)
             {
-                if (!EventLog.SourceExists(this.source))
-                {
-                    EventLog.CreateEventSource(this.source, this.logName);
-                }
-
-                eventLog.Source = this.source;
-
-                string eventLogMessage = this.BuildEventLogMessage(entry);
-
-                if (eventLogType != null)
-                {
-                    eventLog.WriteEntry(eventLogMessage, eventLogType.Value);
-                }
-                else
-                {
-                    eventLog.WriteEntry(eventLogMessage);
-                }
+                this.WriteEntryToEventLog(this, eventLogMessage, eventLogType.Value);
+            }
+            else
+            {
+                this.WriteEntryToEventLog(this, eventLogMessage);
             }
 
             // Returning an ID is inappropriate for this type of logger.
@@ -198,12 +213,28 @@ namespace CuttingEdge.Logging
         /// <returns>The message.</returns>
         protected virtual string BuildEventLogMessage(LogEntry entry)
         {
-            if (entry == null)
+            return LoggingHelper.BuildMessageFromLogEntry(entry);
+        }
+
+        private static EventLog CreateEventLog(WindowsEventLogLoggingProvider provider)
+        {
+            EventLog eventLog = new EventLog(provider.LogName);
+            try
             {
-                throw new ArgumentNullException("entry");
+                if (!EventLog.SourceExists(provider.Source))
+                {
+                    EventLog.CreateEventSource(provider.Source, provider.LogName);
+                }
+
+                eventLog.Source = provider.Source;
+            }
+            catch
+            {
+                eventLog.Dispose();
+                throw;
             }
 
-            return LoggingHelper.BuildMessageFromLogEntry(entry);
+            return eventLog;
         }
 
         private static EventLogEntryType? ConvertToEventLogEntry(LoggingEventType severity)
@@ -230,36 +261,38 @@ namespace CuttingEdge.Logging
             }
         }
 
-        private void InitializeLogName(string name, NameValueCollection config)
+        private void InitializeLogName(NameValueCollection config)
         {
-            this.logName = config["logName"];
+            const string LogName = "logName";
+
+            this.logName = config[LogName];
             
             // Throw exception when no logname is provided
             if (string.IsNullOrEmpty(this.logName))
             {
-                throw new ProviderException(SR.GetString(SR.EmptyOrMissingPropertyInConfiguration,
-                    "logName", name));
+                throw new ProviderException(SR.EmptyOrMissingPropertyInConfiguration(LogName, this.Name));
             }
 
             // Remove this attribute from the config. This way the provider can spot unrecognized attributes
             // after the initialization process.
-            config.Remove("logName");
+            config.Remove(LogName);
         }
 
-        private void InitializeSource(string name, NameValueCollection config)
+        private void InitializeSource(NameValueCollection config)
         {
-            this.source = config["source"];
+            const string Source = "source";
+
+            this.source = config[Source];
             
             // Throw exception when no source is provided
             if (string.IsNullOrEmpty(this.source))
             {
-                throw new ProviderException(SR.GetString(SR.EmptyOrMissingPropertyInConfiguration,
-                    "source", name));
+                throw new ProviderException(SR.EmptyOrMissingPropertyInConfiguration(Source, this.Name));
             }
 
             // Remove this attribute from the config. This way the provider can spot unrecognized attributes
             // after the initialization process.
-            config.Remove("source");
+            config.Remove(Source);
         }
     }
 }

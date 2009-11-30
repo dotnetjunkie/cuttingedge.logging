@@ -1,11 +1,42 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
-Version vNext
+Version 1.1.5.0 (1.1.5) 2009-11-30
+	General description:
+		Some minor bug fixes were fixed for this release, project code was cleaned up, and unit testing library
+		was almost completely rewritten. 
+	
 	Bug fixes:
+		-When configuring an provider with no default constructor the thrown exception was not very descriptive.
+		-SqlLoggingProvider and AspNetSqlLoggingProvider threw NullReferenceException (WorkItem 4763)
+		-Logger threw TypeLoadException when invalid value was set in type attribute (WorkItem 4762)
+		-DebugLoggingProvider did not log in release builds. (WorkItem 4721)
+		 The logger called the static Trace.Write method which was marked with the ConditionalAttribute.
 		-Fixed a typo in the Obsolete attribute of the LoggerWrapper class.
 		-Fixed one of the exception messages that was thrown in case the logging provider failed to initialize.
 		 The message incorrectly referred to an error in the <configSections> section.
-
+	
+	Code changes:
+		-Several typo's in code comments and XML comments fixed.
+		-A lot of refactoring done, such as:
+			-Code in CuttingEdge.Logging assembly cleaned up.
+			-SR (String resources) class now uses more convenient format methods instead of static fields.
+			 By using methods, code coverage (NCover) can signal which resource messages aren't used.
+			-Unit testing library almost completely rewritten. A lot of tests were badly named or tested too
+			 much. Many tests were added to achieve better coverage percentage.
+		-The Obsolete attribute on the LoggerWrapper class is now flagged as compile error. The LoggerWrapper
+		 will be removed in a later release.
+	
+	Changes to project and solutions:
+		-New project CuttingEdge.Logging.Tests.Integration added. This test project needs a SQL server database
+		 to test the SqlLoggingProvider and AspNetSqlLoggingProvider.
+		-Project CuttingEdge.Logging.Tests.Common added and AppDomain sandboxing classes moved to this library.
+		-Project CuttingEdge.Logging.UnitTests is renamed to CuttingEdge.Logging.Tests.Unit.
+		-InternalsVisibleToAttribute defined in CuttingEdge.Logging assembly (debug mode only) to allow
+		 better Unit Testing.
+		-'Treat warnings as errors' is now selected in project settings.
+		-StyleCop.Settings file is moved to solution folder. Unit Test project overwrites some settings.
+		-TRACE flag is now on in release builds
+		
 
 Version 1.1.0.0 (1.1) 2009-03-15
 	General description:

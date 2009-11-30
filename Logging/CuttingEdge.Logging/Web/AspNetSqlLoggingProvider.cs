@@ -67,14 +67,14 @@ namespace CuttingEdge.Logging.Web
     /// <item>
     ///     <attribute>connectionStringName</attribute>
     ///     <description>
-    ///         The the connection string provided with this provider. This attribute is mandatory.
+    ///         The connection string provided with this provider. This attribute is mandatory.
     ///     </description>
     /// </item>  
     /// <item>
     ///     <attribute>initializeSchema</attribute>
     ///     <description>
     ///         When this boolean attribute is set to true, the provider will try to create the needed tables 
-    ///         and stored spocedures in the database. This attribute is optional and false by default.
+    ///         and stored procedures in the database. This attribute is optional and false by default.
     ///     </description>
     /// </item>
     /// <item>
@@ -124,20 +124,20 @@ namespace CuttingEdge.Logging.Web
     /// Logging section, which can also be accessed as members of the <see cref="LoggingSection"/> class.
     /// The following configuration file example shows how to specify values declaratively for the
     /// Logging section.
-    /// <code lang="xml">
-    /// &lt;?xml version="1.0"?&gt;
-    /// &lt;configuration&gt;
-    ///     &lt;configSections&gt;
-    ///         &lt;section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" /&gt;
-    ///     &lt;/configSections&gt;
-    ///     &lt;connectionStrings&gt;
-    ///         &lt;add name="SqlLogging" 
-    ///             connectionString="Data Source=.;Integrated Security=SSPI;Initial Catalog=Logging;" /&gt;
-    ///     &lt;/connectionStrings&gt;
-    ///     &lt;logging defaultProvider="AspNetSqlLoggingProvider"&gt;
-    ///         &lt;providers&gt;
-    ///             &lt;add 
+    /// <code lang="xml"><![CDATA[
+    /// <?xml version="1.0"?>
+    /// <configuration>
+    ///     <configSections>
+    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
+    ///             allowDefinition="MachineToApplication" />
+    ///     </configSections>
+    ///     <connectionStrings>
+    ///         <add name="SqlLogging" 
+    ///             connectionString="Data Source=.;Integrated Security=SSPI;Initial Catalog=Logging;" />
+    ///     </connectionStrings>
+    ///     <logging defaultProvider="AspNetSqlLoggingProvider">
+    ///         <providers>
+    ///             <add 
     ///                 name="AspNetSqlLoggingProvider"
     ///                 type="CuttingEdge.Logging.Web.AspNetSqlLoggingProvider, CuttingEdge.Logging"
     ///                 description="ASP.NET SQL logging provider example"
@@ -148,22 +148,22 @@ namespace CuttingEdge.Logging.Web
     ///                 userNameRetrievalType="Membership"
     ///                 logQueryString="True"
     ///                 logFormData="False"
-    ///             /&gt;
-    ///         &lt;/providers&gt;
-    ///     &lt;/logging&gt;
-    ///     &lt;system.web&gt;
-    ///         &lt;httpModules&gt;
-    ///             &lt;add name="ExceptionLogger" 
-    ///                 type="CuttingEdge.Logging.Web.AspNetExceptionLoggingModule, CuttingEdge.Logging"/&gt;
-    ///         &lt;/httpModules&gt;
-    ///     &lt;/system.web&gt;
-    /// &lt;/configuration&gt;
-    /// </code>
-    /// </example> 
+    ///             />
+    ///         </providers>
+    ///     </logging>
+    ///     <system.web>
+    ///         <httpModules>
+    ///             <add name="ExceptionLogger" 
+    ///                 type="CuttingEdge.Logging.Web.AspNetExceptionLoggingModule, CuttingEdge.Logging"/>
+    ///         </httpModules>
+    ///     </system.web>
+    /// </configuration>
+    /// ]]></code>
+    /// </example>
     public class AspNetSqlLoggingProvider : SqlLoggingProvider
     {
-        private bool logQueryString = true;
-        private bool logFormData = true;
+        private bool logQueryString;
+        private bool logFormData;
         private string applicationName;
         private UserIdentityRetrievalType retrievalType;
 
@@ -205,7 +205,7 @@ namespace CuttingEdge.Logging.Web
         /// attributes specified in the configuration for this provider.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="config"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when the name of the provider has a length of zero.</exception>
-        /// <exception cref="InvalidOperationException">Thrown wen an attempt is made to call Initialize on a
+        /// <exception cref="InvalidOperationException">Thrown when an attempt is made to call Initialize on a
         /// provider after the provider has already been initialized.</exception>
         /// <exception cref="ProviderException">Thrown when the <paramref name="config"/> contains
         /// unrecognized attributes or when the connectionStringName attribute is not configured properly.</exception>
@@ -217,7 +217,7 @@ namespace CuttingEdge.Logging.Web
             }
 
             // Retrieve and remove values from config. We do this before calling base.Initialize(), 
-            // because the base class checks for unrecognizedd attributes.
+            // because the base class checks for unrecognized attributes.
             bool logQueryString = GetLogQueryStringFromConfig(name, config);
             bool logFormData = GetLogFormDataFromConfig(name, config);
             UserIdentityRetrievalType retrievalType = GetRetrievalTypeFromConfig(name, config);
@@ -226,7 +226,8 @@ namespace CuttingEdge.Logging.Web
             // Then call initialize (base.Initialize checks for unrecognized attributes)
             base.Initialize(name, config);
 
-            // Set fields after base.Initialize  (this prevents the provider from being altered afterwards)
+            // Set fields after base.Initialize (this prevents the provider from being altered by calling
+            // Initialize a second time).
             this.logQueryString = logQueryString;
             this.logFormData = logFormData;
             this.retrievalType = retrievalType;
@@ -240,16 +241,15 @@ namespace CuttingEdge.Logging.Web
             {
                 SqlLoggingHelper.ThrowWhenSchemaAlreadyHasBeenInitialized(this);
 
-                string createScript = SR.GetString(SR.AspNetSqlLoggingProviderSchemaScripts);
+                string createScript = SR.AspNetSqlLoggingProviderSchemaScripts();
 
                 string[] createScripts = createScript.Split(new string[] { "GO" }, StringSplitOptions.None);
 
                 SqlLoggingHelper.CreateTablesAndStoredProcedures(this, createScripts);
             }
-            catch (SqlException sex)
+            catch (SqlException ex)
             {
-                throw new ProviderException(SR.GetString(SR.InitializationOfDatabaseSchemaFailed, this.Name,
-                    sex.Message), sex);
+                throw new ProviderException(SR.InitializationOfDatabaseSchemaFailed(this.Name, ex.Message), ex);
             }
         }
 
@@ -262,11 +262,10 @@ namespace CuttingEdge.Logging.Web
         protected override int SaveEventToDatabase(SqlTransaction transaction, LoggingEventType severity,
             string message, string source)
         {
-            RequestLogData requestLogData =
+            var requestLogData =
                 new RequestLogData(HttpContext.Current, this.logQueryString, this.logFormData);
 
-            using (SqlCommand command =
-                new SqlCommand("dbo.logging_AddEvent", transaction.Connection, transaction))
+            using (var command = new SqlCommand("dbo.logging_AddEvent", transaction.Connection, transaction))
             {
                 command.CommandType = CommandType.StoredProcedure;
 
@@ -296,7 +295,7 @@ namespace CuttingEdge.Logging.Web
         protected override int SaveExceptionToDatabase(SqlTransaction transaction, Exception exception,
             int parentEventId, int? parentExceptionId)
         {
-            using (SqlCommand command =
+            using (var command =
                 new SqlCommand("dbo.logging_AddException", transaction.Connection, transaction))
             {
                 command.CommandType = CommandType.StoredProcedure;
@@ -314,47 +313,47 @@ namespace CuttingEdge.Logging.Web
         private static bool GetLogQueryStringFromConfig(string name, NameValueCollection config)
         {
             const bool DefaultValueWhenMissing = true;
+            const string LogQueryStringAttribute = "logQueryString";
 
-            bool logQueryString = 
-                SqlLoggingHelper.ParseBoolConfigValue(name, "logQueryString", config["logQueryString"],
-                DefaultValueWhenMissing);
+            bool logQueryString =
+                SqlLoggingHelper.ParseBoolConfigValue(name, LogQueryStringAttribute, 
+                config[LogQueryStringAttribute], DefaultValueWhenMissing);
 
-            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
-            // after the initialization process.
-            config.Remove("logQueryString");
+            // Remove this attribute from the configuration. This way the provider can spot unrecognized 
+            // attributes after the initialization process.
+            config.Remove(LogQueryStringAttribute);
             
             return logQueryString;
         }
 
         private static bool GetLogFormDataFromConfig(string name, NameValueCollection config)
         {
+            const string LogFormDataAttribute = "logFormData";
+
             const bool DefaultValueWhenMissing = false;
 
             bool logFormData =
-                SqlLoggingHelper.ParseBoolConfigValue(name, "logFormData", config["logFormData"],
+                SqlLoggingHelper.ParseBoolConfigValue(name, LogFormDataAttribute, config[LogFormDataAttribute],
                 DefaultValueWhenMissing);
 
             // Remove this attribute from the config. This way the provider can spot unrecognized attributes
             // after the initialization process.
-            config.Remove("logFormData");
+            config.Remove(LogFormDataAttribute);
             
             return logFormData;
         }
 
-        private static UserIdentityRetrievalType GetRetrievalTypeFromConfig(string name,
+        private static UserIdentityRetrievalType GetRetrievalTypeFromConfig(string providerName,
             NameValueCollection config)
         {
-            string userNameRetrievalType = config["userNameRetrievalType"];
+            const string UserNameRetrievalTypeAttribute = "userNameRetrievalType";
+
+            string userNameRetrievalType = config[UserNameRetrievalTypeAttribute];
 
             // Throw exception when no userNameRetrievalType is provided
             if (string.IsNullOrEmpty(userNameRetrievalType))
             {
-                string exceptionMessage =
-                    "Empty or missing userNameRetrievalType attribute in provider '{0}' in config file. " +
-                    "Please supply one of the following values: {1}.";
-
-                throw new ProviderException(String.Format(CultureInfo.InvariantCulture, exceptionMessage,
-                    name, GetUserIdentityRetrievalTypeAsString()));
+                throw new ProviderException(SR.MissingUserNameRetrievalTypeAttributeInConfig(providerName));
             }
 
             UserIdentityRetrievalType retrievalType;
@@ -365,67 +364,38 @@ namespace CuttingEdge.Logging.Web
             }
             catch (ArgumentException)
             {
-                string exceptionMessage = "Invalid userNameRetrievalType attribute in provider '{0}' in " +
-                    "the config file. Please supply one of the following values: {1}.";
-
-                throw new ProviderException(String.Format(CultureInfo.InvariantCulture, exceptionMessage,
-                    name, GetUserIdentityRetrievalTypeAsString()));
+                throw new ProviderException(SR.InvalidUseNameRetrievalTypeAttributeInConfig(providerName));
             }
 
-            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
-            // after the initialization process.
-            config.Remove("userNameRetrievalType");
+            // Remove this attribute from the configuration. This way the provider can spot unrecognized 
+            // attributes after the initialization process.
+            config.Remove(UserNameRetrievalTypeAttribute);
 
             return retrievalType;
         }
 
-        private static string GetUserIdentityRetrievalTypeAsString()
-        {
-            string values = String.Empty;
-
-            Array types = Enum.GetValues(typeof(UserIdentityRetrievalType));
-
-            int lastIndex = types.Length - 1;
-            for (int index = 0; index < types.Length; index++)
-            {
-                if (index > 0)
-                {
-                    values += index == lastIndex ? " or " : ", ";
-                }
-
-                values += types.GetValue(index).ToString();
-            }
-
-            return values;
-        }
-
         private static string GetApplicationNameFromConfig(string name, NameValueCollection config)
         {
-            string applicationName = config["applicationName"];
+            const string ApplicationNameAttribute = "applicationName";
+            const int MaxApplicationNameLength = 255;
+
+            string applicationName = config[ApplicationNameAttribute];
 
             // Throw exception when no applicationName is provided
             if (string.IsNullOrEmpty(applicationName))
             {
-                string exceptionMessage =
-                    "Empty or missing applicationName attribute in provider '{0}' in config file.";
-
-                throw new ProviderException(
-                    String.Format(CultureInfo.InvariantCulture, exceptionMessage, name));
+                throw new ProviderException(SR.EmptyOrMissingApplicationNameAttributeInConfig(name));
             }
 
-            if (applicationName.Length > 255)
+            if (applicationName.Length > MaxApplicationNameLength)
             {
-                string exceptionMessage =
-                    "The supplied applicationName attribute in provider '{0}' in config file is longer " +
-                    "than 255 characters.";
-
                 throw new ProviderException(
-                    String.Format(CultureInfo.InvariantCulture, exceptionMessage, name));
+                    SR.ApplicationNameAttributeInConfigTooLong(name, MaxApplicationNameLength));
             }
 
             // Remove this attribute from the config. This way the provider can spot unrecognized attributes
             // after the initialization process.
-            config.Remove("applicationName");
+            config.Remove(ApplicationNameAttribute);
 
             return applicationName;
         }
@@ -447,10 +417,8 @@ namespace CuttingEdge.Logging.Web
             }
         }
 
-        /// <summary>
-        /// Encapsulates the <see cref="HttpContext"/> to easy access the request data.
-        /// </summary>
-        private class RequestLogData
+        /// <summary>Encapsulates the <see cref="HttpContext"/> to easy access the request data.</summary>
+        private sealed class RequestLogData
         {
             internal readonly string QueryString;
 
