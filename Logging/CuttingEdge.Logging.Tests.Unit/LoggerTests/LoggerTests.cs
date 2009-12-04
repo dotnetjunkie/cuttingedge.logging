@@ -49,6 +49,24 @@ namespace CuttingEdge.Logging.Tests.Unit.LoggerTests
         }
 
         [TestMethod]
+        public void Providers_RequestingAProviderByName_IsCaseInsensitive()
+        {
+            // Arrange
+            LoggingProviderBase expectedProvider = Logger.Provider;
+            string lowerCaseProviderName = expectedProvider.Name.ToLowerInvariant();
+            
+            // Act
+            LoggingProviderBase sameProvider1 = Logger.Providers[expectedProvider.Name.ToLowerInvariant()];
+            LoggingProviderBase sameProvider2 = Logger.Providers[expectedProvider.Name.ToUpperInvariant()];
+            
+            // Assert
+            Assert.AreEqual(expectedProvider, sameProvider1, 
+                "Requesting a provider by name is expected to be case insensitive.");
+            Assert.AreEqual(expectedProvider, sameProvider2, 
+                "Requesting a provider by name is expected to be case insensitive.");
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(NotSupportedException))]
         public void Providers_CallingAddMethod_ThrowsException()
         {
