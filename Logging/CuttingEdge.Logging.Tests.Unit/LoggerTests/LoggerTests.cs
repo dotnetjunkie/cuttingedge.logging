@@ -75,6 +75,36 @@ namespace CuttingEdge.Logging.Tests.Unit.LoggerTests
         }
 
         [TestMethod]
+        public void Configuration_ProviderNameWithDots_Succeeds()
+        {
+            // Arrange
+            string correctProviderName = "Provider.Name.With.Dots.In.It";
+
+            var configBuilder = new ConfigurationBuilder()
+            {
+                Logging = new LoggingConfigurationBuilder()
+                {
+                    DefaultProvider = correctProviderName,
+                    Providers =
+                    {
+                        // <provider name="Provider.Name.With.Dots.In.It" type="MemoryLoggingProvider..." />
+                        new ProviderConfigLine()
+                        {
+                            Name = correctProviderName,
+                            Type = typeof(MemoryLoggingProvider),
+                        }
+                    }
+                }
+            };
+
+            using (var manager = new UnitTestAppDomainManager(configBuilder.Build()))
+            {
+                // Act
+                manager.DomainUnderTest.InitializeLoggingSystem();
+            }
+        }
+
+        [TestMethod]
         public void Configuration_WithInvalidSection_ThrowsException()
         {
             string incorrectSectionTypeName = typeof(IncorrectSection).FullName + ", " +
