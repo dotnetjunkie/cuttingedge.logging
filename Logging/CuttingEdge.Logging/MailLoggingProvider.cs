@@ -40,13 +40,18 @@ namespace CuttingEdge.Logging
     /// </summary>
     /// <remarks>
     /// <para>
+    /// Returning an identifier for the logged event is not appropriate for this provider. This provider will
+    /// always return null (Nothing in VB) from the <see cref="ILogger.Log(LogEntry)">Log</see> method.
+    /// </para>
+    /// <para>
     /// This class is used by the <see cref="Logger"/> class to provide Logging services for an 
     /// application that can connect to a configured SMTP Server. The <see cref="MailLoggingProvider"/> uses
     /// the configuration of the &lt;system.net&gt;/&lt;mailSettings&gt; section on the application 
     /// configuration file.
     /// </para>
     /// <para>
-    /// The table below shows the list of valid attributes for the <see cref="MailLoggingProvider"/>:
+    /// The table below shows the list of valid attributes for the <see cref="MailLoggingProvider"/>
+    /// configuration:
     /// <list type="table">
     /// <listheader>
     ///     <attribute>Attribute</attribute>
