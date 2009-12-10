@@ -38,7 +38,12 @@ namespace CuttingEdge.Logging
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The table below shows the list of valid attributes for the <see cref="SqlLoggingProvider"/>:
+    /// Returning an identifier for the logged event is not appropriate for this provider. This provider will
+    /// always return null (Nothing in VB) from the <see cref="ILogger.Log(LogEntry)">Log</see> method.
+    /// </para>
+    /// <para>
+    /// The table below shows the list of valid attributes for the <see cref="WindowsEventLogLoggingProvider"/>
+    /// configuration:
     /// <list type="table">  
     /// <listheader>
     ///     <attribute>Attribute</attribute>

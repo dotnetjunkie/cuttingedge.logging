@@ -40,16 +40,23 @@ namespace CuttingEdge.Logging
     /// Defines the contract that is implemented to provide Logging services using custom Logging providers. 
     /// </summary>
     /// <remarks>
-    /// <p>Logging is designed to enable you to easily use a number of different Logging providers for your 
+    /// <para>Logging is designed to enable you to easily use a number of different Logging providers for your 
     /// applications. You can use the supplied Logging providers that are included with this assembly, or you 
-    /// can implement your own provider.</p>
-    /// <p>
+    /// can implement your own provider.</para>
+    /// <para>
     /// When implementing a custom Logging provider, you are required to inherit this abstract
-    /// <b>LoggingProviderBase</b> class.</p>
-    /// <p>
+    /// <b>LoggingProviderBase</b> class.</para>
+    /// <para>
     /// The <b>LoggingProviderBase</b> abstract class inherits from the <see cref="ProviderBase"/> abstract 
     /// class. <b>LoggingProviderBase</b> implementations must also implement the required members of 
-    /// <see cref="ProviderBase"/>.</p>
+    /// <see cref="ProviderBase"/>.</para>
+    /// <para>
+    /// <b>Note: </b> Concrete implementations of this type should be thread-safe. The Logger services will
+    /// instantiate a single instance of a configured type and the instance can be called from multiple
+    /// threads. Also note that users are allowed to configure multiple multiple providers of the same type,
+    /// even with exactly the same configuration. Implementations must be aware of this and need to take
+    /// appropriate actions to ensure correctness.
+    /// </para>
     /// </remarks>
     public abstract class LoggingProviderBase : ProviderBase, ILogger
     {

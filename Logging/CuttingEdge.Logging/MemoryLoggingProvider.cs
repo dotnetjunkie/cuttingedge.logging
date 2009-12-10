@@ -37,6 +37,19 @@ namespace CuttingEdge.Logging
     /// </summary>
     /// <remarks>
     /// <para>
+    /// When the <b>MemoryLoggingProvider</b> succeeds storing the event in the internal list, the
+    /// <see cref="ILogger.Log(LogEntry)">Log</see> method will return an <see cref="Int32"/> with the
+    /// index of the logging event in the internal collection. Note that when <see cref="Clear"/> is called,
+    /// counting will start over. Please note that the provider will return null when the event was not 
+    /// stored. This happens in the following situations:
+    /// <list>
+    ///     <item>The provider's <see cref="LoggingProviderBase.Threshold">Threshold</see> was set higher than
+    ///     the event's <see cref="LogEntry.Severity">Severity</see>.</item>
+    ///     <item>There was an exception logging the event, but it was logged successfully to the
+    ///     <see cref="LoggingProviderBase.FallbackProvider">FallbackProvider</see>.</item>
+    /// </list>
+    /// </para>
+    /// <para>
     /// This class is used by the <see cref="Logger"/> class to provide Logging services that logs to an
     /// in-memory cache.
     /// </para>
@@ -46,7 +59,8 @@ namespace CuttingEdge.Logging
     /// This could lead to <see cref="OutOfMemoryException"/>s in production environments.
     /// </para>
     /// <para>
-    /// The table below shows the list of valid attributes for the <see cref="MemoryLoggingProvider"/>:
+    /// The table below shows the list of valid attributes for the <see cref="MemoryLoggingProvider"/>
+    /// configuration:
     /// <list type="table">  
     /// <listheader>
     ///     <attribute>Attribute</attribute>

@@ -37,11 +37,16 @@ namespace CuttingEdge.Logging
     /// </summary>
     /// <remarks>
     /// <para>
+    /// Returning an identifier for the logged event is not appropriate for this provider. This provider will
+    /// always return null (Nothing in VB) from the <see cref="ILogger.Log(LogEntry)">Log</see> method.
+    /// </para>
+    /// <para>
     /// This class is used by the <see cref="Logger"/> class to provide Logging services to the 
     /// <see cref="Debug"/> output.
     /// </para>
     /// <para>
-    /// The table below shows the list of valid attributes for the <see cref="DebugLoggingProvider"/>:
+    /// The table below shows the list of valid attributes for the <see cref="DebugLoggingProvider"/>
+    /// configuration:
     /// <list type="table">  
     /// <listheader>
     ///     <attribute>Attribute</attribute>
