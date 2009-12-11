@@ -36,14 +36,14 @@ namespace CuttingEdge.Logging.Web
     /// <example>
     /// This example demonstrates how to configure the provider in a web.config to enable logging.
     /// You should add the following parts to the web.config:
-    /// <list>
-    /// <item>1. Add a &lt;section&gt; to the &lt;configSections&gt; section pointing at the 
-    /// <see cref="LoggingSection"/> class.</item>
-    /// <item>Add a &lt;logging&gt; section to the &lt;configuration&gt; to configure the logging providers to
-    /// use.</item>
-    /// <item>Add the <see cref="AspNetExceptionLoggingModule"/> to the &lt;system.web&gt;/&lt;httpModules&gt; 
-    /// section. This enables a global 'catch all' the logs unhandled exceptions in your web application using
-    /// the default logging provider you defined in step 2.</item>
+    /// <list type="number">
+    ///     <item>Add a &lt;section&gt; to the &lt;configSections&gt; section pointing at the 
+    ///         <see cref="LoggingSection"/> class.</item>
+    ///     <item>Add a &lt;logging&gt; section to the &lt;configuration&gt; section to configure the logging
+    ///         providers to use.</item>
+    ///     <item>Add the <see cref="AspNetExceptionLoggingModule"/> to the &lt;httpModules&gt; section of the 
+    ///         &lt;system.web&gt; section. This enables a global 'catch all' and logs unhandled exceptions in
+    ///          your web application using the default logging provider you defined in step 2.</item>
     /// </list>
     /// The following snippet shows an example of how your web.config might look like.
     /// <code lang="xml"><![CDATA[
