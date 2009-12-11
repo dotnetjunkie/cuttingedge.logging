@@ -39,10 +39,10 @@ namespace CuttingEdge.Logging
     /// <para>
     /// When the <b>MemoryLoggingProvider</b> succeeds storing the event in the internal list, the
     /// <see cref="ILogger.Log(LogEntry)">Log</see> method will return an <see cref="Int32"/> with the
-    /// index of the logging event in the internal collection. Note that when <see cref="Clear"/> is called,
-    /// counting will start over. Please note that the provider will return null when the event was not 
-    /// stored. This happens in the following situations:
-    /// <list>
+    /// index of the logging event in the internal collection. Note that when <see cref="Clear">Clear</see> is
+    /// called, counting will start over. Please note that the provider will return null when the event was
+    /// not stored. This happens in the following situations:
+    /// <list type="bullet">
     ///     <item>The provider's <see cref="LoggingProviderBase.Threshold">Threshold</see> was set higher than
     ///     the event's <see cref="LogEntry.Severity">Severity</see>.</item>
     ///     <item>There was an exception logging the event, but it was logged successfully to the
