@@ -1,5 +1,32 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+Version vNext
+	General description:
+	
+	Bug fixes:
+	
+	Code changes:
+		-A new CompositeLoggingProvider added for work item 4844.
+		 Some internal changes had to be made to the Logger and LoggingProviderBase to make this possible.
+		 The static Logger facade checked the configured providers for circular references during 
+		 initialization to prevent stack overflows when providers logged to their fallback provider. The 
+		 CompositeLoggingProvider allows referencing multiple providers and it was important to be able to
+		 also check these references during initialization. To achieve this, two internal virtual methods were
+		 added to the LoggingProviderBase class and the circular reference checking code in the Logger class
+		 was refactored and extracted to it's own class: CircularReferenceFinder.
+		-A new CompositeException was added for the CompositeLoggingProvider (work item 4844).
+		 The CompositeLoggingProvider can log to multiple providers and logging to other providers will
+		 continue, even when a providers failed. This means that this could lead to multiple failing providers.
+		 To be able to throw an exception that contains multiple inner exceptions, the new CompositeException
+		 was created. Its no coincidence that this exception looks a lot like the AggregateException of
+		  .NET 4.0. We can't however use AggregateException for two reasons:
+		     1. .NET 4.0 is currently still in beta.
+		     2. CuttingEdge.Logging must stay compatible with .NET 2.0 for some time to come.
+		 By copying the AggregateException API we'll be able to let CompositeException inherit from 
+		 AggregateException in a later release. This way a future version of CompositeLoggingProvider will be
+		 able to throw an AggregateException while not introducing a breaking change in the library :-).
+
+
 Version 1.1.5.0 (1.1.5) 2009-11-30
 	General description:
 		Some minor bug fixes were fixed for this release, project code was cleaned up, and unit testing library
@@ -29,7 +56,7 @@ Version 1.1.5.0 (1.1.5) 2009-11-30
 	Changes to project and solutions:
 		-New project CuttingEdge.Logging.Tests.Integration added. This test project needs a SQL server database
 		 to test the SqlLoggingProvider and AspNetSqlLoggingProvider.
-		-Project CuttingEdge.Logging.Tests.Common added and AppDomain sandboxing classes moved to this library.
+		-Project CuttingEdge.Logging.Tests.Common added and AppDomain sand boxing classes moved to this library.
 		-Project CuttingEdge.Logging.UnitTests is renamed to CuttingEdge.Logging.Tests.Unit.
 		-InternalsVisibleToAttribute defined in CuttingEdge.Logging assembly (debug mode only) to allow
 		 better Unit Testing.

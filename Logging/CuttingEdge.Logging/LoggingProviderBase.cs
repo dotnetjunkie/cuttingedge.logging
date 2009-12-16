@@ -25,10 +25,10 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration.Provider;
-using System.Globalization;
 using System.Reflection;
 
 namespace CuttingEdge.Logging
@@ -385,6 +385,32 @@ namespace CuttingEdge.Logging
                 // user would expect.
                 return null;
             }
+        }
+
+        internal virtual void CompleteInitialization(LoggingProviderCollection configuredProviders,
+            LoggingProviderBase defaultProvider)
+        {
+            // Default implementation is empty.
+        }
+
+        /// <summary>
+        /// Returns a list of providers that this provider is referencing. Normally this method returns one
+        /// single element when the provider contains a <see cref="FallbackProvider"/> and no elements when
+        /// there is no <see cref="FallbackProvider"/>. Other implementations however, can override this
+        /// implementation. The <see cref="CompositeLoggingProvider"/> does this. The <see cref="Logger"/>
+        /// class uses this information to detect circular references during initialization.
+        /// </summary>
+        /// <returns>A list of referenced <see cref="LoggingProviderBase"/> instances.</returns>
+        internal virtual List<LoggingProviderBase> GetReferencedProviders()
+        {
+            var referencedProviders = new List<LoggingProviderBase>();
+
+            if (this.FallbackProvider != null)
+            {
+                referencedProviders.Add(this.FallbackProvider);
+            }
+
+            return referencedProviders;
         }
 
         /// <summary>Implements the functionality to log the event.</summary>

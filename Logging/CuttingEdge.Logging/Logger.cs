@@ -38,7 +38,7 @@ namespace CuttingEdge.Logging
     // source: http://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=26
 
     /// <summary>
-    /// Manages Logging in an application. This class cannot be inherited.
+    /// Manages logging in an application. This class cannot be inherited.
     /// </summary>
     /// <example>
     /// This example demonstrates how to specify values declaratively for several attributes of the 
@@ -87,7 +87,7 @@ namespace CuttingEdge.Logging
     /// </example>
     public static class Logger
     {
-        private const string SectionName = "logging";
+        internal const string SectionName = "logging";
 
         private static readonly LoggingProviderCollection providers;
         private static readonly LoggingProviderBase provider;
@@ -102,13 +102,15 @@ namespace CuttingEdge.Logging
             {
                 LoggingSection section = GetConfigurationSection();
 
-                LoggingProviderCollection providerCollection = LoadProviderCollection(section);
+                LoggingProviderCollection providerCollection = LoadAndInitializeProviderCollection(section);
 
                 LoggingProviderBase defaultProvider = GetDefaultProvider(section, providerCollection);
 
-                InitializeFallbackProviders(providerCollection);
+                InitializeFallbackProviders(providerCollection);              
 
-                ValidateProviders(providerCollection);
+                CompleteInitialization(providerCollection, defaultProvider);
+
+                CircularReferenceFinder.Validate(providerCollection);
 
                 Logger.providers = providerCollection;
                 Logger.provider = defaultProvider;
@@ -408,7 +410,7 @@ namespace CuttingEdge.Logging
         }
 
         // Throws a ConfigurationException (or a descendant) on failure.
-        private static LoggingProviderCollection LoadProviderCollection(LoggingSection section)
+        private static LoggingProviderCollection LoadAndInitializeProviderCollection(LoggingSection section)
         {
             LoggingProviderCollection providerCollection = new LoggingProviderCollection();
 
@@ -471,52 +473,6 @@ namespace CuttingEdge.Logging
                 // Initialize the provider's fallback provider with the found provider.
                 provider.FallbackProvider = fallbackProvider;
             }
-        }
-
-        // Throws a ConfigurationErrorsException (descendant of ConfigurationException) on failure.
-        private static void ValidateProviders(LoggingProviderCollection providers)
-        {
-            foreach (LoggingProviderBase provider in providers)
-            {
-                bool circularReferenceFound = ProviderContainsACircularReference(provider);
-
-                if (circularReferenceFound)
-                {
-                    throw new ConfigurationErrorsException(
-                        SR.CircularReferenceInLoggingSection(Logger.SectionName, provider.Name));
-                }
-            }
-        }
-
-        private static bool ProviderContainsACircularReference(LoggingProviderBase provider)
-        {
-            if (provider.FallbackProvider == null)
-            {
-                return false;
-            }
-
-            // A HashSet<LoggingProviderBase> would be nicer (and faster), but we are targeting .NET 2.0 and 
-            // we're not in a critical performance path here.
-            var providersInChain = new Dictionary<LoggingProviderBase, object>();
-
-            do
-            {
-                if (providersInChain.ContainsKey(provider))
-                {
-                    // Circular reference found in the chain of providers that are directly or indirectly
-                    // linked by the given provider.
-                    return true;
-                }
-
-                providersInChain.Add(provider, null);
-
-                // Move to the next provider
-                provider = provider.FallbackProvider;
-            }
-            while (provider != null);
-
-            // post: No circular reference found.
-            return false;
         }
 
         // Throws a ConfigurationException (or a descendant) on failure.
@@ -631,6 +587,15 @@ namespace CuttingEdge.Logging
             }
 
             return providerConfiguration;
+        }
+
+        private static void CompleteInitialization(LoggingProviderCollection providers,
+            LoggingProviderBase defaultProvider)
+        {
+            foreach (LoggingProviderBase provider in providers)
+            {
+                provider.CompleteInitialization(providers, defaultProvider);
+            }
         }
     }
 }

@@ -55,6 +55,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CircularReferenceFinder.cs" />
+    <Compile Include="CompositeException.cs" />
+    <Compile Include="CompositeLoggingProvider.cs" />
     <Compile Include="DebugLoggingProvider.cs" />
     <Compile Include="LoggerExtensions.cs" />
     <Compile Include="MailLoggingProvider.cs" />
