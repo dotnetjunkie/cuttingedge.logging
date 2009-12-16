@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompositeLoggingProviderTests.cs" />
     <Compile Include="ConsoleLoggingProviderTests.cs" />
     <Compile Include="DebugLoggingProviderTests.cs" />
     <Compile Include="Helpers\AssertHelper.cs" />

@@ -82,6 +82,20 @@ namespace CuttingEdge.Logging
                 expectedBaseType.FullName);
         }
 
+        internal static string TypeNameCouldNotBeResolvedForProvider(string providerName, string typeName,
+            string exceptionMessage)
+        {
+            return GetString("TypeNameCouldNotBeResolvedForProvider", providerName, typeName,
+                exceptionMessage);
+        }
+
+        internal static string TypeCouldNotBeCreatedForProvider(string providerName, Type providerType,
+            string exceptionMessage)
+        {
+            return GetString("TypeCouldNotBeCreatedForProvider", providerName, providerType.FullName,
+                exceptionMessage);
+        }
+
         // Exception messages for LoggingProviderBase class
         internal static string InvalidFallbackProviderPropertyInConfig(string sectionName, 
             LoggingProviderBase provider)
@@ -244,18 +258,60 @@ namespace CuttingEdge.Logging
             return GetString("MissingUserNameRetrievalTypeAttributeInConfig", providerName, values);
         }
 
-        internal static string TypeNameCouldNotBeResolvedForProvider(string providerName, string typeName,
-            string exceptionMessage)
+        // Exception messages for CompositeLoggingProvider class
+        internal static string LoggingFailed(string extraInformation)
         {
-            return GetString("TypeNameCouldNotBeResolvedForProvider", providerName, typeName, 
-                exceptionMessage);
+            return GetString("LoggingFailed", extraInformation);
         }
 
-        internal static string TypeCouldNotBeCreatedForProvider(string providerName, Type providerType,
-            string exceptionMessage)
+        internal static string ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst(Type providerType)
         {
-            return GetString("TypeCouldNotBeCreatedForProvider", providerName, providerType.FullName,
-                exceptionMessage);
+            return GetString("ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst", 
+                providerType.FullName);
+        }
+      
+        internal static string ReferencedProviderDoesNotExist(CompositeLoggingProvider provider, 
+            string missingProviderName)
+        {
+            string providerTypeName = GetShortTypeNameForOwnTypes(provider.GetType());
+                        
+            return GetString("ReferencedProviderDoesNotExist", providerTypeName, provider.Name, 
+                missingProviderName);
+        }
+
+        internal static string ProviderReferencedMultipleTimes(CompositeLoggingProvider provider, 
+            string doubleReferencedProviderName)
+        {
+            string providerTypeName = GetShortTypeNameForOwnTypes(provider.GetType());
+          
+            return GetString("ProviderReferencedMultipleTimes", providerTypeName, provider.Name, 
+                doubleReferencedProviderName);
+        }
+
+        internal static string CompositeLoggingProviderDoesNotReferenceAnyProviders(
+            CompositeLoggingProvider provider)
+        {
+            string providerTypeName = GetShortTypeNameForOwnTypes(provider.GetType());
+
+            return GetString("CompositeLoggingProviderDoesNotReferenceAnyProviders", providerTypeName, 
+                provider.Name);
+        }
+
+        private static string GetShortTypeNameForOwnTypes(Type type)
+        {
+            Assembly currentAssembly = MethodBase.GetCurrentMethod().DeclaringType.Assembly;
+
+            if (type.Assembly == currentAssembly)
+            {
+                // The type is defined in this assembly, so let's return the short name
+                return type.Name;
+            }
+            else
+            {
+                // The type is defined outside of this assembly (probably by the user), so let's return the
+                // full name.
+                return type.FullName;
+            }
         }
 
         private static string GetString(string name, params object[] args)

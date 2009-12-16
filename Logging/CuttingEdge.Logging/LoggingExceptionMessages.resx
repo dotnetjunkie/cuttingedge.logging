@@ -124,7 +124,10 @@
     <value>Argument must not be null or an empty string.</value>
   </data>
   <data name="CircularReferenceInLoggingSection" xml:space="preserve">
-    <value>There was an error in the &lt;{0}&gt; section of the configuration file. The given provider '{1}' is directly or indirectly circular referencing itself through the fallbackProvider attributes.</value>
+    <value>There was an error in the &lt;{0}&gt; section of the configuration file. The given provider '{1}' is directly or indirectly circular referencing itself. Circular references can cause stack overflows when the logging system is used and are therefore not allowed. Please check the 'fallbackProvider' attributes of all providers to resolve this problem. When one or more CompositeLoggingProviders are configured, circular references can also be caused by the 'provider[n]' attributes (where [n] is an arbitrary number) of such a provider.</value>
+  </data>
+  <data name="CompositeLoggingProviderDoesNotReferenceAnyProviders" xml:space="preserve">
+    <value>{0} with name '{1}' should contain reference at least one other provider by it's name. Please add the following code to the configuration of the '{1}' provider: 'provider1="[NameOfOtherProvider]"'.</value>
   </data>
   <data name="EmptyOrMissingApplicationNameAttributeInConfig" xml:space="preserve">
     <value>Empty or missing applicationName attribute in provider '{0}' in configuration file.</value>
@@ -140,8 +143,8 @@
 &lt;configuration&gt;
     &lt;system.net&gt;
         &lt;mailSettings&gt;
-            &lt;smtp from="test@foo.com"&gt;
-                &lt;network host="smtpserver1" /&gt;
+            &lt;smtp from="test@company.com"&gt;
+                &lt;network host="SmtpServerName" /&gt;
             &lt;/smtp&gt;
         &lt;/mailSettings&gt;
     &lt;/system.net&gt;
@@ -167,6 +170,9 @@
   </data>
   <data name="InvalidUseNameRetrievalTypeAttributeInConfig" xml:space="preserve">
     <value>Invalid userNameRetrievalType attribute in provider '{0}' in the configuration file. Please supply one of the following values: {1}.</value>
+  </data>
+  <data name="LoggingFailed" xml:space="preserve">
+    <value>Logging failed. {0}</value>
   </data>
   <data name="LoggingSectionMissingFromConfigSettings" xml:space="preserve">
     <value>The Logger has not been configured properly. Please register the logger as &lt;section&gt; element in the &lt;configSections&gt; of your configurations file as follows: &lt;configSections&gt;&lt;section name="{0}" type="{1}, {2}" allowDefinition="MachineToApplication" /&gt;&lt;/configSections&gt;.</value>
@@ -195,11 +201,20 @@
   <data name="PossibleInvalidMailConfigurationInConfigFile" xml:space="preserve">
     <value>There is a possible miss configuration in the 'configuration/system.net/mailSettings' section in the application configuration file. The {0} class could not be created.</value>
   </data>
+  <data name="ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst" xml:space="preserve">
+    <value>The {0} has not been initialized. Make sure Initialize(String, NameValueCollection) is called.</value>
+  </data>
   <data name="ProviderMustInheritFromType" xml:space="preserve">
     <value>Provider '{0}' is configured with type {1} that does not inherit from type {2}.</value>
   </data>
   <data name="ProviderParameterMustBeOfTypeX" xml:space="preserve">
     <value>The provider parameter must be of type {0}.</value>
+  </data>
+  <data name="ProviderReferencedMultipleTimes" xml:space="preserve">
+    <value>{0} with name '{1}' references provider with name '{2}' multiple times. A provider should only be referenced once.</value>
+  </data>
+  <data name="ReferencedProviderDoesNotExist" xml:space="preserve">
+    <value>{0} with name '{1}' references a provider with name '{2}' that does not exist. Make sure the name is spelled correctly.</value>
   </data>
   <data name="SectionIsNotOfCorrectType" xml:space="preserve">
     <value>The section '{0}' in the configuration's &lt;configSections&gt; is not of type {1} but of type {2}.</value>
