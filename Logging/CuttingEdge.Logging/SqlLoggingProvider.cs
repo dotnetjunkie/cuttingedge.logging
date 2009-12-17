@@ -64,20 +64,31 @@ namespace CuttingEdge.Logging
     ///     <description>Description</description>
     /// </listheader>
     /// <item>
+    ///     <attribute>name</attribute>
+    ///     <description>
+    ///         The name of the provider. This attribute is mandatory.
+    ///     </description>
+    /// </item>
+    /// <item>
+    ///     <attribute>description</attribute>
+    ///     <description>
+    ///         A description of the provider. This attribute is optional.
+    ///     </description>
+    /// </item>
+    /// <item>
     ///     <attribute>fallbackProvider</attribute>
     ///     <description>
-    ///         A fallback provider that the Logger class will use when logging failed on this logging 
-    ///         provider. The value must contain the name of an existing logging provider. This attribute is
-    ///         optional.
+    ///         A fallback provider that this provider will use when logging failed. The value must contain 
+    ///         the name of an existing logging provider. This attribute is optional.
     ///     </description>
     /// </item>  
     /// <item>
     ///     <attribute>threshold</attribute>
     ///     <description>
-    ///         The logging threshold. The threshold limits the number of event logged. The threshold can be
-    ///         defined as follows: Debug &lt; Information &lt; Warning &lt; Error &lt; Fatal. i.e., When the 
-    ///         threshold is set to Information, Debug events will not be logged. When no value is specified
-    ///         all events are logged. This attribute is optional.
+    ///         The logging threshold. The threshold limits the number of events logged. The threshold can be
+    ///         defined as follows: Debug &lt; Information &lt; Warning &lt; Error &lt; Critical. i.e., When
+    ///         the threshold is set to Information, events with a severity of Debug  will not be logged. When
+    ///         no value is specified, all events are logged. This attribute is optional.
     ///      </description>
     /// </item>  
     /// <item>
@@ -205,6 +216,8 @@ namespace CuttingEdge.Logging
         /// <summary>Implements the functionality to log the event.</summary>
         /// <param name="entry">The entry to log.</param>
         /// <returns>An <see cref="Int32"/> with the id of the logged event.</returns>
+        /// <exception cref="SqlException">Thrown when the <paramref name="entry"/> could not be logged to the
+        /// database.</exception>
         protected override object LogInternal(LogEntry entry)
         {
             using (SqlConnection connection = new SqlConnection(this.ConnectionString))

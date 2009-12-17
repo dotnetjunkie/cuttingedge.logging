@@ -74,7 +74,7 @@ namespace CuttingEdge.Logging
         /// <summary>
         /// Gets the <see cref="LoggingEventType"/> logging threshold. The threshold can be set through
         /// configuration and limits the number of event logged. The threshold can be defined as follows: 
-        /// Debug &lt; Information &lt; Warning &lt; Error &lt; Fatal.
+        /// Debug &lt; Information &lt; Warning &lt; Error &lt; Critical.
         /// i.e., When the threshold is set to 
         /// <see cref="LoggingEventType.Information">Information</see>, 
         /// <see cref="LoggingEventType.Debug">Debug</see> events will not be logged.
@@ -137,6 +137,9 @@ namespace CuttingEdge.Logging
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/> is
         /// a null reference (Nothing in VB).</exception>
+        /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
+        /// exact type of exception thrown depends on the actual provider implementation. See documentation
+        /// of the <see cref="LogInternal"/> method for more information.</exception>
         public object Log(Exception exception)
         {
             return LoggerExtensions.Log(this, exception);
@@ -154,6 +157,9 @@ namespace CuttingEdge.Logging
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/> is
         /// a null reference (Nothing in VB) or the supplied <paramref name="message"/> is a null reference.</exception>
+        /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
+        /// exact type of exception thrown depends on the actual provider implementation. See documentation
+        /// of the <see cref="LogInternal"/> method for more information.</exception>
         public object Log(string message, Exception exception)
         {
             return LoggerExtensions.Log(this, message, exception);
@@ -169,6 +175,9 @@ namespace CuttingEdge.Logging
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/> or
         /// the <paramref name="source"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
+        /// exact type of exception thrown depends on the actual provider implementation. See documentation
+        /// of the <see cref="LogInternal"/> method for more information.</exception>
         public object Log(Exception exception, MethodBase source)
         {
             return LoggerExtensions.Log(this, exception, source);
@@ -187,6 +196,9 @@ namespace CuttingEdge.Logging
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/>,
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
+        /// exact type of exception thrown depends on the actual provider implementation. See documentation
+        /// of the <see cref="LogInternal"/> method for more information.</exception>
         public object Log(string message, Exception exception, MethodBase source)
         {
             return LoggerExtensions.Log(this, message, exception, source);
@@ -205,6 +217,9 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are empty strings.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/>,
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
+        /// exact type of exception thrown depends on the actual provider implementation. See documentation
+        /// of the <see cref="LogInternal"/> method for more information.</exception>
         public object Log(string message, Exception exception, string source)
         {
             return LoggerExtensions.Log(this, message, exception, source);
@@ -226,6 +241,9 @@ namespace CuttingEdge.Logging
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
+        /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
+        /// exact type of exception thrown depends on the actual provider implementation. See documentation
+        /// of the <see cref="LogInternal"/> method for more information.</exception>
         public object Log(LoggingEventType severity, string message, Exception exception, MethodBase source)
         {
             return LoggerExtensions.Log(this, severity, message, exception, source);
@@ -247,6 +265,9 @@ namespace CuttingEdge.Logging
         /// <paramref name="exception"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
+        /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
+        /// exact type of exception thrown depends on the actual provider implementation. See documentation
+        /// of the <see cref="LogInternal"/> method for more information.</exception>
         public object Log(LoggingEventType severity, string message, Exception exception, string source)
         {
             return LoggerExtensions.Log(this, severity, message, exception, source);
@@ -263,6 +284,9 @@ namespace CuttingEdge.Logging
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/> is a 
         /// null reference.</exception>
+        /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
+        /// exact type of exception thrown depends on the actual provider implementation. See documentation
+        /// of the <see cref="LogInternal"/> method for more information.</exception>
         public object Log(string message)
         {
             return LoggerExtensions.Log(this, message);
@@ -281,6 +305,9 @@ namespace CuttingEdge.Logging
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/> is a null reference.</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
+        /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
+        /// exact type of exception thrown depends on the actual provider implementation. See documentation
+        /// of the <see cref="LogInternal"/> method for more information.</exception>
         public object Log(LoggingEventType severity, string message)
         {
             return LoggerExtensions.Log(this, severity, message);
@@ -298,6 +325,9 @@ namespace CuttingEdge.Logging
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/> or
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
+        /// exact type of exception thrown depends on the actual provider implementation. See documentation
+        /// of the <see cref="LogInternal"/> method for more information.</exception>
         public object Log(string message, MethodBase source)
         {
             return LoggerExtensions.Log(this, message, source);
@@ -318,6 +348,9 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
+        /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
+        /// exact type of exception thrown depends on the actual provider implementation. See documentation
+        /// of the <see cref="LogInternal"/> method for more information.</exception>
         public object Log(LoggingEventType severity, string message, MethodBase source)
         {
             return LoggerExtensions.Log(this, severity, message, source);
@@ -338,6 +371,9 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
+        /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
+        /// exact type of exception thrown depends on the actual provider implementation. See documentation
+        /// of the <see cref="LogInternal"/> method for more information.</exception>
         public object Log(LoggingEventType severity, string message, string source)
         {
             return LoggerExtensions.Log(this, severity, message, source);
@@ -352,6 +388,9 @@ namespace CuttingEdge.Logging
         /// The event has been logged to a fallback provider, because of an error in the current implementation.
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown when the given <paramref name="entry"/> is a null reference.</exception>
+        /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
+        /// exact type of exception thrown depends on the actual provider implementation. See documentation
+        /// of the <see cref="LogInternal"/> method for more information.</exception>
         object ILogger.Log(LogEntry entry)
         {
             if (entry == null)
