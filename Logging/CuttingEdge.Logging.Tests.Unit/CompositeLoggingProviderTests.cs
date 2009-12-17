@@ -101,10 +101,15 @@ namespace CuttingEdge.Logging.Tests.Unit
             var actualReferencedProvider = providerUnderTest.Providers[0];
 
             // Assert
-            Assert.AreEqual(1, providerUnderTest.Providers.Count, "The provider is expected to reference a single provider.");
-            Assert.IsNotNull(actualReferencedProvider, "The referenced provider should not be a null reference.");
+            Assert.AreEqual(1, providerUnderTest.Providers.Count, 
+                "The provider is expected to reference a single provider.");
+
+            Assert.IsNotNull(actualReferencedProvider, 
+                "The referenced provider should not be a null reference.");
+
             Assert.AreEqual(expectedReferencedProvider, actualReferencedProvider,
-                "The referenced provider is not the expected provider. Actual referenced provider: " + actualReferencedProvider.Name);
+                "The referenced provider is not the expected provider. Actual referenced provider: " + 
+                actualReferencedProvider.Name);
         }
 
         [TestMethod]
@@ -144,9 +149,11 @@ namespace CuttingEdge.Logging.Tests.Unit
             Assert.IsTrue(firstExpectedReferencedProvider == actualFirstReferencedProvider,
                 "The first provider in the list is not the expected provider. Expected: {0}, Actual: {1}",
                 firstExpectedReferencedProvider.Name, actualFirstReferencedProvider.Name);
+
             Assert.AreEqual(secondExpectedReferencedProvider, actualSecondReferencedProvider,
                 "The second provider in the list is not the expected provider. Expected: {0}, Actual: {1}",
                 firstExpectedReferencedProvider.Name, actualFirstReferencedProvider.Name);
+
             Assert.AreEqual(thirdExpectedReferencedProvider, actualThirdReferencedFirstProvider,
                 "The third provider in the list is not the expected provider. Expected: {0}, Actual: {1}",
                 firstExpectedReferencedProvider.Name, actualFirstReferencedProvider.Name);
@@ -190,16 +197,17 @@ namespace CuttingEdge.Logging.Tests.Unit
             Assert.IsTrue(firstExpectedReferencedProvider == actualFirstReferencedProvider,
                 "The first provider in the list is not the expected provider. Expected: {0}, Actual: {1}",
                 firstExpectedReferencedProvider.Name, actualFirstReferencedProvider.Name);
+
             Assert.AreEqual(secondExpectedReferencedProvider, actualSecondReferencedProvider,
                 "The second provider in the list is not the expected provider. Expected: {0}, Actual: {1}",
                 firstExpectedReferencedProvider.Name, actualFirstReferencedProvider.Name);
+
             Assert.AreEqual(thirdExpectedReferencedProvider, actualThirdReferencedFirstProvider,
                 "The third provider in the list is not the expected provider. Expected: {0}, Actual: {1}",
                 firstExpectedReferencedProvider.Name, actualFirstReferencedProvider.Name);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void CompleteInitialization_OnUninitializedProvider_ThrowsException()
         {
             // Arrange
@@ -212,19 +220,41 @@ namespace CuttingEdge.Logging.Tests.Unit
                 defaultProvider
             };
 
-            // Act
-            providerUnderTest.CompleteInitialization(configuredProviders, defaultProvider);
+            try
+            {
+                // Act
+                providerUnderTest.CompleteInitialization(configuredProviders, defaultProvider);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                string actualMessage = ex.Message ?? string.Empty;
+
+                Assert.IsTrue(actualMessage.Contains("has not been initialized"),
+                    "Exception message should describe the problem. Actual: " + actualMessage);
+
+                Assert.IsTrue(actualMessage.Contains("CompositeLoggingProvider"),
+                    "Exception message should describe the provider type. Actual: " + actualMessage);
+
+                // Note that the name of the provider is set during initialization, therefore it's impossible
+                // for the exception message to contain the name of the provider.
+                Assert.IsTrue(actualMessage.Contains("Initialize"),
+                    "Exception message should describe how to solve the problem. Actual: " + actualMessage);
+            }
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ProviderException))]
         public void CompleteInitialization_NonExistingProviderName_ThrowsException()
         {
             // Arrange
+            string providerName = "Valid provider name";
+            string nonExistingProviderName = "Non existing provider name";
             var providerUnderTest = new CompositeLoggingProvider();
             var validConfiguration = new NameValueCollection();
-            validConfiguration["provider1"] = "Non existing provider name";
-            providerUnderTest.Initialize("Valid provider name", validConfiguration);
+            validConfiguration["provider1"] = nonExistingProviderName;
+            providerUnderTest.Initialize(providerName, validConfiguration);
 
             // List of configured providers in order 
             var configuredProviders = new LoggingProviderCollection()
@@ -232,31 +262,74 @@ namespace CuttingEdge.Logging.Tests.Unit
                 providerUnderTest
             };
 
-            // Act
-            providerUnderTest.CompleteInitialization(configuredProviders, providerUnderTest);
+            try
+            {
+                // Act
+                providerUnderTest.CompleteInitialization(configuredProviders, providerUnderTest);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ProviderException ex)
+            {
+                string msg = ex.Message ?? string.Empty;
+
+                Assert.IsTrue(msg.Contains("references a provider") && msg.Contains("that does not exist"),
+                    "Exception message should describe the problem. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains("CompositeLoggingProvider"),
+                    "Exception message should describe the provider type. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains(providerName),
+                    "Exception message should describe the provider name. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains(nonExistingProviderName),
+                    "Exception message should describe the name of the referenced provider. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains("Make sure the name is spelled correctly."),
+                    "Exception message should describe how to solve the problem. Actual: " + msg);
+            }
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ProviderException))]
         public void CompleteInitialization_SameProviderNameSpelledTwice_ThrowsExceptoin()
         {
             // Arrange
-            var defaultProvider = CreateInitializedProvider("MemoryProvider");
+            const string ProviderName = "Valid provider name";
+            const string ReferencedProviderName = "MemoryProvider";
+            var defaultProvider = CreateInitializedProvider(ReferencedProviderName);
             var providerUnderTest = new CompositeLoggingProvider();
             var validConfiguration = new NameValueCollection();
-            validConfiguration["provider1"] = "MemoryProvider";
-            validConfiguration["provider2"] = "MemoryProvider";
-            providerUnderTest.Initialize("Valid provider name", validConfiguration);
+            validConfiguration["provider1"] = ReferencedProviderName;
+            validConfiguration["provider2"] = ReferencedProviderName;
 
-            // List of configured providers in order 
-            var configuredProviders = new LoggingProviderCollection()
+            try
             {
-                providerUnderTest,
-                defaultProvider
-            };
+                // Act
+                providerUnderTest.Initialize(ProviderName, validConfiguration);
 
-            // Act
-            providerUnderTest.CompleteInitialization(configuredProviders, defaultProvider);
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ProviderException ex)
+            {
+                string msg = ex.Message ?? string.Empty;
+
+                Assert.IsTrue(msg.Contains("references provider") && msg.Contains("multiple times"),
+                    "Exception message should describe the problem. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains("CompositeLoggingProvider"),
+                    "Exception message should describe the provider type. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains(ProviderName),
+                    "Exception message should describe the provider name. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains(ReferencedProviderName),
+                    "Exception message should describe the name of the referenced provider. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains("A provider should only be referenced once"),
+                    "Exception message should describe how to solve the problem. Actual: " + msg);
+            }
         }
 
         [TestMethod]
