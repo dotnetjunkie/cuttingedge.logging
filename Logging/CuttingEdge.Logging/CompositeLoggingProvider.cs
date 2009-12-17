@@ -325,7 +325,7 @@ namespace CuttingEdge.Logging
         {
             List<Exception> thrownExceptions = this.LogToMultipleProvidersGetThrownExceptions(entry);
 
-            this.ThrowCompositeExceptionWhenExceptionsAreThrown(thrownExceptions);
+            ThrowCompositeExceptionWhenExceptionsAreThrown(thrownExceptions);
         }
 
         private List<Exception> LogToMultipleProvidersGetThrownExceptions(LogEntry entry)
@@ -354,7 +354,7 @@ namespace CuttingEdge.Logging
             return thrownExceptions;
         }
 
-        private void ThrowCompositeExceptionWhenExceptionsAreThrown(List<Exception> thrownExceptions)
+        private static void ThrowCompositeExceptionWhenExceptionsAreThrown(List<Exception> thrownExceptions)
         {
             if (thrownExceptions != null && thrownExceptions.Count > 0)
             {
