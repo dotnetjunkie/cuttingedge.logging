@@ -170,6 +170,9 @@ namespace CuttingEdge.Logging
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/> is
         /// a null reference (Nothing in VB).</exception>
+        /// <exception cref="Exception">Thrown when the <b>Logger</b> failed to log to the underlying logging
+        /// provider. The exact type of exception thrown depends on the actual provider implementation.
+        /// </exception>
         public static object Log(Exception exception)
         {
             return Logger.Provider.Log(exception);
@@ -188,6 +191,9 @@ namespace CuttingEdge.Logging
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/> is
         /// a null reference (Nothing in VB) or the supplied <paramref name="message"/> is a null reference.</exception>
+        /// <exception cref="Exception">Thrown when the <b>Logger</b> failed to log to the underlying logging
+        /// provider. The exact type of exception thrown depends on the actual provider implementation.
+        /// </exception>
         public static object Log(string message, Exception exception)
         {
             return Logger.Provider.Log(message, exception);
@@ -204,6 +210,9 @@ namespace CuttingEdge.Logging
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/> or
         /// the <paramref name="source"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="Exception">Thrown when the <b>Logger</b> failed to log to the underlying logging
+        /// provider. The exact type of exception thrown depends on the actual provider implementation.
+        /// </exception>
         public static object Log(Exception exception, MethodBase source)
         {
             return Logger.Provider.Log(exception, source);
@@ -223,6 +232,9 @@ namespace CuttingEdge.Logging
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/>,
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="Exception">Thrown when the <b>Logger</b> failed to log to the underlying logging
+        /// provider. The exact type of exception thrown depends on the actual provider implementation.
+        /// </exception>
         public static object Log(string message, Exception exception, MethodBase source)
         {
             return Logger.Provider.Log(message, exception, source);
@@ -242,6 +254,9 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are empty strings.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="exception"/>,
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="Exception">Thrown when the <b>Logger</b> failed to log to the underlying logging
+        /// provider. The exact type of exception thrown depends on the actual provider implementation.
+        /// </exception>
         public static object Log(string message, Exception exception, string source)
         {
             return Logger.Provider.Log(message, exception, source);
@@ -264,6 +279,9 @@ namespace CuttingEdge.Logging
         /// <paramref name="message"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
+        /// <exception cref="Exception">Thrown when the <b>Logger</b> failed to log to the underlying logging
+        /// provider. The exact type of exception thrown depends on the actual provider implementation.
+        /// </exception>
         public static object Log(LoggingEventType severity, string message, Exception exception, MethodBase source)
         {
             return Logger.Provider.Log(severity, message, exception, source);
@@ -286,6 +304,9 @@ namespace CuttingEdge.Logging
         /// <paramref name="exception"/> or <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
+        /// <exception cref="Exception">Thrown when the <b>Logger</b> failed to log to the underlying logging
+        /// provider. The exact type of exception thrown depends on the actual provider implementation.
+        /// </exception>
         public static object Log(LoggingEventType severity, string message, Exception exception, string source)
         {
             return Logger.Provider.Log(severity, message, exception, source);
@@ -303,6 +324,9 @@ namespace CuttingEdge.Logging
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/> is a 
         /// null reference.</exception>
+        /// <exception cref="Exception">Thrown when the <b>Logger</b> failed to log to the underlying logging
+        /// provider. The exact type of exception thrown depends on the actual provider implementation.
+        /// </exception>
         public static object Log(string message)
         {
             return Logger.Provider.Log(message);
@@ -322,6 +346,9 @@ namespace CuttingEdge.Logging
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/> is a null reference.</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
+        /// <exception cref="Exception">Thrown when the <b>Logger</b> failed to log to the underlying logging
+        /// provider. The exact type of exception thrown depends on the actual provider implementation.
+        /// </exception>
         public static object Log(LoggingEventType severity, string message)
         {
             return Logger.Provider.Log(severity, message);
@@ -340,6 +367,9 @@ namespace CuttingEdge.Logging
         /// an empty string.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="message"/> or
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="Exception">Thrown when the <b>Logger</b> failed to log to the underlying logging
+        /// provider. The exact type of exception thrown depends on the actual provider implementation.
+        /// </exception>
         public static object Log(string message, MethodBase source)
         {
             return Logger.Provider.Log(message, source);
@@ -361,6 +391,9 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
+        /// <exception cref="Exception">Thrown when the <b>Logger</b> failed to log to the underlying logging
+        /// provider. The exact type of exception thrown depends on the actual provider implementation.
+        /// </exception>
         public static object Log(LoggingEventType severity, string message, MethodBase source)
         {
             return Logger.Provider.Log(severity, message, source);
@@ -382,6 +415,9 @@ namespace CuttingEdge.Logging
         /// <paramref name="source"/> are null references (Nothing in VB).</exception>
         /// <exception cref="InvalidEnumArgumentException">Thrown when the supplied <paramref name="type"/>
         /// has an unexpected value.</exception>
+        /// <exception cref="Exception">Thrown when the <b>Logger</b> failed to log to the underlying logging
+        /// provider. The exact type of exception thrown depends on the actual provider implementation.
+        /// </exception>
         public static object Log(LoggingEventType severity, string message, string source)
         {
             return Logger.Provider.Log(severity, message, source);
