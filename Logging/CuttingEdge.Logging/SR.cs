@@ -264,10 +264,14 @@ namespace CuttingEdge.Logging
             return GetString("LoggingFailed", extraInformation);
         }
 
-        internal static string ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst(Type providerType)
+        internal static string ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst(
+            CompositeLoggingProvider provider)
         {
-            return GetString("ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst", 
-                providerType.FullName);
+            string providerTypeName = GetShortTypeNameForOwnTypes(provider.GetType());
+
+            // Note that this message is returned in the case that initialize hasn't been called. Therefore
+            // the provider's Name property will be null and supplying it to the message is useles.
+            return GetString("ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst", providerTypeName);
         }
       
         internal static string ReferencedProviderDoesNotExist(CompositeLoggingProvider provider, 

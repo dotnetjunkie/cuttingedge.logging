@@ -431,7 +431,7 @@ namespace CuttingEdge.Logging
             if (this.providerNames == null)
             {
                 string exceptionMessage =
-                    SR.ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst(this.GetType());
+                    SR.ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst(this);
 
                 throw new InvalidOperationException(exceptionMessage);
             }
