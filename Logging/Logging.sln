@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SharedAssemblies", "SharedA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{6E450885-8EE4-4F0D-9670-A4916171A091}"
 	ProjectSection(SolutionItems) = preProject
+		changes.txt = changes.txt
+		licence.txt = licence.txt
 		Logging.FxCop = Logging.FxCop
 		Settings.StyleCop = Settings.StyleCop
 	EndProjectSection
