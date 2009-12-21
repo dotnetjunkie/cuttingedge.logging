@@ -90,8 +90,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ExampleConfiguration.xml" />
-    <Content Include="licence.txt" />
-    <Content Include="changes.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Web\AspNetSqlLoggingProviderScripts.sql">

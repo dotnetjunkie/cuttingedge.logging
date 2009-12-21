@@ -28,6 +28,8 @@ Version vNext
 		 able to throw an AggregateException while not introducing a breaking change in the library :-).
 
 	Changes to project and solutions:
+		-changes.txt and licence.txt moved up from the CuttingEdge.Logging library directory to the solution 
+		 directory and added to the SolutionItems folder.
 		-Settings.StyleCop file was missing from from Tests.Unit project directory in source control. 
 		 StyleCop would report false errors because of this.
 		-Global Settings.StyleCop and Logging.FxCop files are now added to a new solution folder called
