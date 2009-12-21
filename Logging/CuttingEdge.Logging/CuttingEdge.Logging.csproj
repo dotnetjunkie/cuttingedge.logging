@@ -62,6 +62,7 @@
     <Compile Include="LoggerExtensions.cs" />
     <Compile Include="MailLoggingProvider.cs" />
     <Compile Include="SqlLoggingHelper.cs" />
+    <Compile Include="TerminatorLoggingProvider.cs" />
     <Compile Include="Web\AspNetExceptionLoggingModule.cs" />
     <Compile Include="Web\AspNetSqlLoggingProvider.cs" />
     <Compile Include="Web\AspNetTraceLoggingProvider.cs" />

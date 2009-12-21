@@ -6,6 +6,7 @@ Version vNext
 	Bug fixes:
 	
 	Code changes:
+		-A new TerminatorLoggingProvider added for work item 4845.
 		-A new CompositeLoggingProvider added for work item 4844.
 		 Some internal changes had to be made to the Logger and LoggingProviderBase to make this possible.
 		 The static Logger facade checked the configured providers for circular references during 
