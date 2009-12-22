@@ -40,9 +40,9 @@ namespace CuttingEdge.Logging
     /// Defines the contract that is implemented to provide Logging services using custom Logging providers. 
     /// </summary>
     /// <remarks>
-    /// <para>Logging is designed to enable you to easily use a number of different Logging providers for your 
-    /// applications. You can use the supplied Logging providers that are included with this assembly, or you 
-    /// can implement your own provider.</para>
+    /// <para><b>CuttingEdge.Logging</b> is designed to enable you to easily use a number of different Logging
+    /// providers for your applications. You can use the supplied Logging providers that are included with 
+    /// this assembly, or you can implement your own provider.</para>
     /// <para>
     /// When implementing a custom Logging provider, you are required to inherit this abstract
     /// <b>LoggingProviderBase</b> class.</para>
@@ -68,6 +68,18 @@ namespace CuttingEdge.Logging
         /// failed on this logging provider. When no fallback provider is defined in the configuration file,
         /// <b>null</b> (Nothing in VB) is returned.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// When a provider has a fallback provider, it will log an event to that fallback provider when the
+        /// provider itself fails to log the event. An provider is considered to have failed, when its
+        /// <see cref="LogInternal">LogInternal</see> method threw an exception. After the provider forwarded
+        /// the event to its fallback provider, it will also send the exception thrown from 
+        /// <see cref="LogInternal">LogInternal</see> to the fallback provider.</para>
+        /// <para>
+        /// <b>Important:</b> When a provider fails while no fallback provider is configured, the thrown 
+        /// exception will simply bubble up the call stack.
+        /// </para>
+        /// </remarks>
         /// <value>The fallback provider.</value>
         public LoggingProviderBase FallbackProvider { get; internal set; }
 
