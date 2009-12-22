@@ -292,6 +292,39 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        public void CompleteInitialization_NonExistingProviderNameOnCustomProvider_ThrowsException()
+        {
+            // Arrange
+            string providerName = "Valid provider name";
+            string nonExistingProviderName = "Non existing provider name";
+            var providerUnderTest = new CustomProvider();
+            var validConfiguration = new NameValueCollection();
+            validConfiguration["provider1"] = nonExistingProviderName;
+            providerUnderTest.Initialize(providerName, validConfiguration);
+
+            // List of configured providers in order 
+            var configuredProviders = new LoggingProviderCollection()
+            {
+                providerUnderTest
+            };
+
+            try
+            {
+                // Act
+                providerUnderTest.CompleteInitialization(configuredProviders, providerUnderTest);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ProviderException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(typeof(CustomProvider).FullName),
+                    "Exception message should state the provider's full name, because the type is not a " +
+                    "type defined by the library itself. Actual: " + ex.Message);
+            }
+        }
+
+        [TestMethod]
         public void CompleteInitialization_SameProviderNameSpelledTwice_ThrowsExceptoin()
         {
             // Arrange
@@ -400,8 +433,8 @@ namespace CuttingEdge.Logging.Tests.Unit
         public void Log_WithFailingProviders_ThrowsExceptionWithExpectedTypeAndMessage()
         {
             // Arrange
-            var logger1 = new FailingLoggingProvider("Failer1") { ExceptionToThrow = new Exception("foo") };
-            var logger2 = new FailingLoggingProvider("Failer2") { ExceptionToThrow = new Exception("bar") };
+            var logger1 = new FailingLoggingProvider("Faile1") { ExceptionToThrow = new Exception("foo") };
+            var logger2 = new FailingLoggingProvider("Faile2") { ExceptionToThrow = new Exception("bar") };
             var logger3 = CreateInitializedProvider("MemoryLogger");
             var configuredProviders = new LoggingProviderCollection() { logger1, logger2, logger3 };
             var providerUnderTest = CreateInitializedCompositeLoggingProvider(configuredProviders);
@@ -418,8 +451,8 @@ namespace CuttingEdge.Logging.Tests.Unit
             catch (Exception ex)
             {
                 // When logging to multiple providers, the provider should wrap the thrown exceptions in a
-                // CompositeException, even if there is only one Exception (retrowing the same exception would
-                // make us loose the stack trace).
+                // CompositeException, even if there is only one Exception (re throwing the same exception
+                // would make us loose the stack trace).
                 Assert.IsInstanceOfType(ex, typeof(CompositeException));
                 Assert.IsTrue(ex.Message.Contains("foo"), 
                     "Exception message should contain all inner exception messages. (foo missing)");
@@ -632,7 +665,7 @@ namespace CuttingEdge.Logging.Tests.Unit
                 configuration["provider" + p.Index] = p.Provider.Name;
             }
 
-            provider.Initialize("Vald provider name", configuration);
+            provider.Initialize("Valid provider name", configuration);
 
             provider.CompleteInitialization(providers, provider);
 
@@ -655,6 +688,10 @@ namespace CuttingEdge.Logging.Tests.Unit
 
                 throw this.ExceptionToThrow;
             }
+        }
+
+        private class CustomProvider : CompositeLoggingProvider
+        {
         }
     }
 }

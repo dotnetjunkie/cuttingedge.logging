@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Configuration;
 using System.Configuration.Provider;
 using System.Net.Mail;
+using System.Security;
 
 using CuttingEdge.Logging.Tests.Common;
 using CuttingEdge.Logging.Tests.Unit.Helpers;
@@ -75,7 +76,7 @@ namespace CuttingEdge.Logging.Tests.Unit
             // Act
             provider.Initialize("Valid name", validConfiguration);
 
-            // Assetr
+            // Assert
             Assert.AreEqual(validSubjectFormatString, provider.SubjectFormatString);
         }
 
@@ -186,6 +187,78 @@ namespace CuttingEdge.Logging.Tests.Unit
 
             // Act
             provider.Initialize("Valid name", configurationWithUnrecognizedAttribute);
+        }
+
+        [TestMethod]
+        public void Initialize_WithInsufficientRightsToSendMail_ThrowsExpectedException()
+        {
+            // Arrange
+            var provider = new FakeMailLoggingProvider();
+            var providerName = "Valid name";
+            var securityErrorMessage = "Security message.";
+            provider.ExceptionThrownBySmtpClientConstructor = new SecurityException(securityErrorMessage);
+            var validConfiguration = new NameValueCollection();
+            validConfiguration.Add("to", "john@do.com");
+
+            try
+            {
+                // Act
+                provider.Initialize(providerName, validConfiguration);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ProviderException ex)
+            {
+                var msg = ex.Message ?? string.Empty;
+
+                Assert.IsTrue(msg.Contains("error while initializing the provider") &&
+                    msg.Contains("application does not have permission"),
+                    "Exception message should contain the problem. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains(providerName),
+                    "Exception message should contain the provider causing the exception. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains(securityErrorMessage),
+                    "Exception message should contain the message from the inner exception. Actual: " + msg);
+            }
+        }
+
+        [TestMethod]
+        public void Initialize_ExceptionThrownByMailMessageConstructor_ThrowsExpectedException()
+        {
+            // Arrange
+            var provider = new FakeMailLoggingProvider();
+            var providerName = "Valid name";
+            var formatErrorMessage = "Format error message.";
+            provider.ExceptionThrownByMailMessageConstructor = new FormatException(formatErrorMessage);
+            var validConfiguration = new NameValueCollection();
+            validConfiguration.Add("to", "john@do.com");
+
+            try
+            {
+                // Act
+                provider.Initialize(providerName, validConfiguration);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ProviderException ex)
+            {
+                var msg = ex.Message ?? string.Empty;
+
+                Assert.IsTrue(msg.Contains("possible miss configuration") &&
+                    msg.Contains("configuration/system.net/mailSetting") &&
+                    msg.Contains("MailMessage class could not be created"),
+                    "Exception message should contain the problem. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains("<configuration>") && msg.Contains("<system.net>") &&
+                    msg.Contains("<mailSettings>"),
+                    "Exception message should contain a example configuration. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains(formatErrorMessage),
+                    "Exception message should contain the message from the inner exception. Actual: " + msg);
+            }
         }
 
         [TestMethod]
@@ -652,6 +725,10 @@ namespace CuttingEdge.Logging.Tests.Unit
 
         private sealed class FakeMailLoggingProvider : MailLoggingProvider
         {
+            public Exception ExceptionThrownBySmtpClientConstructor { get; set; }
+
+            public Exception ExceptionThrownByMailMessageConstructor { get; set; }
+
             public new string BuildMailBody(LogEntry entry)
             {
                 // base implementation is protected.
@@ -662,6 +739,26 @@ namespace CuttingEdge.Logging.Tests.Unit
             {
                 // base implementation is protected.
                 return base.BuildMailMessage(entry);
+            }
+            
+            internal override SmtpClient CreateSmtpClient()
+            {
+                if (this.ExceptionThrownBySmtpClientConstructor != null)
+                {
+                    throw this.ExceptionThrownBySmtpClientConstructor;
+                }
+
+                return base.CreateSmtpClient();
+            }
+
+            internal override MailMessage CreateMailMessage()
+            {
+                if (this.ExceptionThrownByMailMessageConstructor != null)
+                {
+                    throw this.ExceptionThrownByMailMessageConstructor;
+                }
+
+                return base.CreateMailMessage();
             }
 
             protected override object LogInternal(LogEntry entry)

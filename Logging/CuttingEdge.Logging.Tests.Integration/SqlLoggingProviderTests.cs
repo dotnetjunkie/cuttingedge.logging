@@ -13,13 +13,13 @@ namespace CuttingEdge.Logging.Tests.Integration
     public class SqlLoggingProviderTests
     {
         [TestMethod]
-        public void Initialize_WithInitializeSchemaTrue_CreatesSchemaSuccesfully()
+        public void Configuration_WithInitializeSchemaTrue_CreatesSchemaSuccesfully()
         {
             // Arrange
-            bool initializeSchema = true;
+            const bool InitializeSchema = true;
             string validConnectionString = TestConfiguration.ConnectionString;
             IConfigurationWriter configuration = 
-                BuildValidConfiguration(initializeSchema, validConnectionString);
+                BuildValidConfiguration(InitializeSchema, validConnectionString);
 
             using (var manager = new IntegrationTestLoggingAppDomainManager(configuration))
             {
@@ -29,13 +29,13 @@ namespace CuttingEdge.Logging.Tests.Integration
         }
 
         [TestMethod]
-        public void Log_WithValidLogEntry_Succeeds()
+        public void Configuration_LoggingAValidLogEntry_Succeeds()
         {
             // Arrange
-            bool initializeSchema = true;
+            const bool InitializeSchema = true;
             string validConnectionString = TestConfiguration.ConnectionString;
             IConfigurationWriter configuration =
-                BuildValidConfiguration(initializeSchema, validConnectionString);
+                BuildValidConfiguration(InitializeSchema, validConnectionString);
             Exception exceptionWithStackTrace = GetExceptionWithStackTrace();
             LogEntry entry =
                 new LogEntry(LoggingEventType.Critical, "my message", "my source", exceptionWithStackTrace);
@@ -50,14 +50,14 @@ namespace CuttingEdge.Logging.Tests.Integration
         }
 
         [TestMethod]
-        public void Initialize_WithInitializeSchemaTrueButInvalidConnectionString_ThrowsException()
+        public void Configuration_WithInitializeSchemaTrueButInvalidConnectionString_ThrowsException()
         {
             // Arrange
-            bool initializeSchema = true;
+            const bool InitializeSchema = true;
             string badConnectionString =
                 "server=.;Initial Catalog=" + TestConfiguration.DatabaseName + ";User Id=bad;Password=bad;";
             IConfigurationWriter configuration = 
-                BuildValidConfiguration(initializeSchema, badConnectionString);
+                BuildValidConfiguration(InitializeSchema, badConnectionString);
 
             using (var manager = new IntegrationTestLoggingAppDomainManager(configuration))
             {
@@ -74,6 +74,76 @@ namespace CuttingEdge.Logging.Tests.Integration
 
                     Assert.IsTrue(messageIsValid, "Exception message should describe the failure. " +
                         "Actual message: " + ex.Message);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void Configuration_TwoProvidersWithInitializeSchemaTrue_ThrowsException()
+        {
+            // Arrange
+            const bool InitializeSchema = true;
+            const string NameOfFailingProvider = "Failing provider";
+            string validConnectionString = TestConfiguration.ConnectionString;
+
+            var configBuilder = new ConfigurationBuilder()
+            {
+                Logging = new LoggingConfigurationBuilder()
+                {
+                    DefaultProvider = "Default",
+                    Providers =
+                    {
+                        // <provider name="Default" type="SqlLoggingProvider" connectionStringName="..." />
+                        new ProviderConfigLine()
+                        {
+                            Name = "Default", 
+                            Type = typeof(SqlLoggingProvider), 
+                            CustomAttributes = @"
+                                connectionStringName=""validConnection""
+                                initializeSchema=""" + InitializeSchema + @""" "
+                        },
+
+                        // <provider name="Second" type="SqlLoggingProvider" connectionStringName="..." />
+                        new ProviderConfigLine()
+                        {
+                            Name = NameOfFailingProvider, 
+                            Type = typeof(SqlLoggingProvider), 
+                            CustomAttributes = @"
+                                connectionStringName=""validConnection""
+                                initializeSchema=""" + InitializeSchema + @""" "
+                        }
+                    }
+                },
+                Xml = @"
+                    <connectionStrings>
+                        <add name=""validConnection"" connectionString=""" + validConnectionString + @""" />
+                    </connectionStrings>
+                "
+            };
+
+            using (var manager = new IntegrationTestLoggingAppDomainManager(configBuilder.Build()))
+            {
+                try
+                {
+                    // Act
+                    manager.DomainUnderTest.InitializeLoggingSystem();
+
+                    // Assert
+                    Assert.Fail("Exception expected.");
+                }
+                catch (ConfigurationErrorsException ex)
+                {
+                    var msg = ex.Message ?? string.Empty;
+
+                    Assert.IsTrue(msg.Contains("already") && msg.Contains("initialized"),
+                        "Exception message should contain the problem. Actual: " + msg);
+
+                    Assert.IsTrue(msg.Contains(NameOfFailingProvider),
+                        "Exception message should contain the name of the failing provider. Actual: " + msg);
+
+                    Assert.IsTrue(msg.Contains(
+                        "remove the 'initializeSchema' attribute from the provider configuration."),
+                        "Exception message should contain the solution. Actual: " + msg);
                 }
             }
         }
