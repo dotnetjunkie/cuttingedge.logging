@@ -128,8 +128,7 @@ namespace CuttingEdge.Logging.Web
 
             if (string.IsNullOrEmpty(config["description"]))
             {
-                config.Remove("description");
-                config.Add("description", "Logging Web Event Provider");
+                config["description"] = "Logging Web Event Provider";
             }
 
             base.Initialize(name, config);

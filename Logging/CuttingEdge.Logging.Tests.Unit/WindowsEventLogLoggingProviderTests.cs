@@ -65,7 +65,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var expectedDescription = "Windows event log logging provider";
-            var provider = new FakeWindowsEventLogLoggingProvider();
+            var provider = new WindowsEventLogLoggingProvider();
             var validConfiguration = CreateValidConfiguration();
 
             // Act
@@ -80,7 +80,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var expectedDescription = "My Windows event logger";
-            var provider = new FakeWindowsEventLogLoggingProvider();
+            var provider = new WindowsEventLogLoggingProvider();
             var validConfiguration = CreateValidConfiguration();
             validConfiguration["description"] = expectedDescription;
 

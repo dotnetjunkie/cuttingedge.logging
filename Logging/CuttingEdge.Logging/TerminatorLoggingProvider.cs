@@ -109,12 +109,6 @@ namespace CuttingEdge.Logging
                 throw new ArgumentNullException("config");
             }
 
-            if (string.IsNullOrEmpty(config["description"]))
-            {
-                config.Remove("description");
-                config.Add("description", "Terminator logging provider");
-            }
-
             // Check for unsupported attributes fallbackProvider and threshold before calling base.Initialize.
             this.ThrowWhenConfigContainsFallbackProvider(name, config);
             this.ThrowWhenConfigContainsThreshold(name, config);
