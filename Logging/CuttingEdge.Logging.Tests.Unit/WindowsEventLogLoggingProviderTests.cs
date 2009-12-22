@@ -22,9 +22,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var provider = new FakeWindowsEventLogLoggingProvider();
-            var validConfiguration = new NameValueCollection();
-            validConfiguration.Add("source", "a valid source name");
-            validConfiguration.Add("logName", "a valid log name");
+            var validConfiguration = CreateValidConfiguration();
 
             // Act
             provider.Initialize("Valid provider name", validConfiguration);
@@ -36,9 +34,8 @@ namespace CuttingEdge.Logging.Tests.Unit
             // Arrange
             var expectedSource = "The expected source";
             var provider = new FakeWindowsEventLogLoggingProvider();
-            var validConfiguration = new NameValueCollection();
-            validConfiguration.Add("source", expectedSource);
-            validConfiguration.Add("logName", "a valid log name");
+            var validConfiguration = CreateValidConfiguration();
+            validConfiguration["source"] = expectedSource;
 
             // Act
             provider.Initialize("Valid provider name", validConfiguration);
@@ -53,15 +50,45 @@ namespace CuttingEdge.Logging.Tests.Unit
             // Arrange
             var expectedLogName = "The expected log name";
             var provider = new FakeWindowsEventLogLoggingProvider();
-            var validConfiguration = new NameValueCollection();
-            validConfiguration.Add("source", "a valid log name");
-            validConfiguration.Add("logName", expectedLogName);
+            var validConfiguration = CreateValidConfiguration();
+            validConfiguration["logName"] = expectedLogName;
 
             // Act
             provider.Initialize("Valid provider name", validConfiguration);
 
             // Assert
             Assert.AreEqual(expectedLogName, provider.LogName);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithoutDescription_SetsDefaultDescription()
+        {
+            // Arrange
+            var expectedDescription = "Windows event log logging provider";
+            var provider = new FakeWindowsEventLogLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithCustomDescription_SetsSpecifiedDescription()
+        {
+            // Arrange
+            var expectedDescription = "My Windows event logger";
+            var provider = new FakeWindowsEventLogLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+            validConfiguration["description"] = expectedDescription;
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
         }
 
         [TestMethod]
@@ -82,13 +109,13 @@ namespace CuttingEdge.Logging.Tests.Unit
             // Arrange
             var validProviderName = "Valid provider name";
             var provider = new FakeWindowsEventLogLoggingProvider();
-            var missingSourceConfiguration = new NameValueCollection();
-            missingSourceConfiguration.Add("logName", "a valid log name");
+            var invalidConfiguration = CreateValidConfiguration();
+            invalidConfiguration.Remove("source");
 
             try
             {
                 // Act
-                provider.Initialize(validProviderName, missingSourceConfiguration);
+                provider.Initialize(validProviderName, invalidConfiguration);
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -108,13 +135,13 @@ namespace CuttingEdge.Logging.Tests.Unit
             // Arrange
             var validProviderName = "Valid provider name";
             var provider = new FakeWindowsEventLogLoggingProvider();
-            var missingLogNameConfiguration = new NameValueCollection();
-            missingLogNameConfiguration.Add("source", "a valid source name");
+            var invalidConfiguration = CreateValidConfiguration();
+            invalidConfiguration.Remove("logName");
 
             try
             {
                 // Act
-                provider.Initialize(validProviderName, missingLogNameConfiguration);
+                provider.Initialize(validProviderName, invalidConfiguration);
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -133,15 +160,13 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var provider = new FakeWindowsEventLogLoggingProvider();
-            var validConfiguration = new NameValueCollection();
-            validConfiguration.Add("source", "a valid source name");
-            validConfiguration.Add("logName", "a valid log name");
-            validConfiguration.Add("bad attribute", "a bad value");
+            var invalidConfiguration = CreateValidConfiguration();
+            invalidConfiguration.Add("bad attribute", "a bad value");
 
             try
             {
                 // Act
-                provider.Initialize("Valid provider name", validConfiguration);
+                provider.Initialize("Valid provider name", invalidConfiguration);
 
                 // Assert
                 Assert.Fail("Initialize was expected to throw an Exception.");
@@ -338,6 +363,16 @@ namespace CuttingEdge.Logging.Tests.Unit
             }
 
             return thrownException;
+        }
+
+        private static NameValueCollection CreateValidConfiguration()
+        {
+            var configuration = new NameValueCollection();
+
+            configuration.Add("source", "a valid source name");
+            configuration.Add("logName", "a valid log name");
+
+            return configuration;
         }
 
         /// <summary>

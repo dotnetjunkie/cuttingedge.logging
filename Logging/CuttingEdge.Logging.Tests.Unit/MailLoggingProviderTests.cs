@@ -31,8 +31,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var provider = new FakeMailLoggingProvider();
-            var validConfiguration = new NameValueCollection();
-            validConfiguration.Add("to", "john@do.com");
+            var validConfiguration = CreateValidConfiguration();
 
             // Act
             provider.Initialize("Valid name", validConfiguration);
@@ -43,8 +42,8 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var provider = new FakeMailLoggingProvider();
-            var validConfiguration = new NameValueCollection();
-            validConfiguration.Add("to", "developer1@cuttingedge.it;developer2@cuttingedge.it");
+            var validConfiguration = CreateValidConfiguration();
+            validConfiguration["to"] = "developer1@cuttingedge.it;developer2@cuttingedge.it";
             
             // Act
             provider.Initialize("Valid name", validConfiguration);
@@ -69,15 +68,143 @@ namespace CuttingEdge.Logging.Tests.Unit
             var validSubjectFormatString = 
                 "severity {0} message {1} source {2} type {3} time {4}";
             var provider = new FakeMailLoggingProvider();
-            var validConfiguration = new NameValueCollection();
-            validConfiguration.Add("to", "john@do.com");
-            validConfiguration.Add("subjectFormatString", validSubjectFormatString);
+            var validConfiguration = CreateValidConfiguration();
+            validConfiguration["subjectFormatString"] = validSubjectFormatString;
 
             // Act
             provider.Initialize("Valid name", validConfiguration);
 
             // Assert
             Assert.AreEqual(validSubjectFormatString, provider.SubjectFormatString);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithoutDescription_SetsDefaultDescription()
+        {
+            // Arrange
+            var expectedDescription = "Mail logging provider";
+            var provider = new FakeMailLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithCustomDescription_SetsSpecifiedDescription()
+        {
+            // Arrange
+            var expectedDescription = "My mail logger";
+            var provider = new FakeMailLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+            validConfiguration["description"] = expectedDescription;
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ProviderException))]
+        public void Initialize_WithInvalidSubjectFormatString_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeMailLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+
+            // The format item {5} is invalid, because only {0} to {4} are (currently) supported.
+            validConfiguration["subjectFormatString"] = "{5}";
+
+            // Act
+            provider.Initialize("Valid name", validConfiguration);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ProviderException))]
+        public void Initialize_ConfigurationWithUnrecognizedAttributes_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeMailLoggingProvider();
+            var configurationWithUnrecognizedAttribute = CreateValidConfiguration();
+            configurationWithUnrecognizedAttribute.Add("unknown attribute", "some value");
+
+            // Act
+            provider.Initialize("Valid name", configurationWithUnrecognizedAttribute);
+        }
+
+        [TestMethod]
+        public void Initialize_WithInsufficientRightsToSendMail_ThrowsExpectedException()
+        {
+            // Arrange
+            var provider = new FakeMailLoggingProvider();
+            var providerName = "Valid name";
+            var securityErrorMessage = "Security message.";
+            provider.ExceptionThrownBySmtpClientConstructor = new SecurityException(securityErrorMessage);
+            var validConfiguration = CreateValidConfiguration();
+
+            try
+            {
+                // Act
+                provider.Initialize(providerName, validConfiguration);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ProviderException ex)
+            {
+                var msg = ex.Message ?? string.Empty;
+
+                Assert.IsTrue(msg.Contains("error while initializing the provider") &&
+                    msg.Contains("application does not have permission"),
+                    "Exception message should contain the problem. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains(providerName),
+                    "Exception message should contain the provider causing the exception. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains(securityErrorMessage),
+                    "Exception message should contain the message from the inner exception. Actual: " + msg);
+            }
+        }
+
+        [TestMethod]
+        public void Initialize_ExceptionThrownByMailMessageConstructor_ThrowsExpectedException()
+        {
+            // Arrange
+            var provider = new FakeMailLoggingProvider();
+            var providerName = "Valid name";
+            var formatErrorMessage = "Format error message.";
+            provider.ExceptionThrownByMailMessageConstructor = new FormatException(formatErrorMessage);
+            var validConfiguration = CreateValidConfiguration();
+
+            try
+            {
+                // Act
+                provider.Initialize(providerName, validConfiguration);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ProviderException ex)
+            {
+                var msg = ex.Message ?? string.Empty;
+
+                Assert.IsTrue(msg.Contains("possible miss configuration") &&
+                    msg.Contains("configuration/system.net/mailSetting") &&
+                    msg.Contains("MailMessage class could not be created"),
+                    "Exception message should contain the problem. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains("<configuration>") && msg.Contains("<system.net>") &&
+                    msg.Contains("<mailSettings>"),
+                    "Exception message should contain a example configuration. Actual: " + msg);
+
+                Assert.IsTrue(msg.Contains(formatErrorMessage),
+                    "Exception message should contain the message from the inner exception. Actual: " + msg);
+            }
         }
 
 #if DEBUG // This test code only runs in debug mode
@@ -159,107 +286,6 @@ namespace CuttingEdge.Logging.Tests.Unit
             Assert.AreEqual("11/30/2009 18:27:12", subject);
         }
 #endif
-
-        [TestMethod]
-        [ExpectedException(typeof(ProviderException))]
-        public void Initialize_WithInvalidSubjectFormatString_ThrowsException()
-        {
-            // Arrange
-            var provider = new FakeMailLoggingProvider();
-            var validConfiguration = new NameValueCollection();
-            validConfiguration.Add("to", "john@do.com");
-            
-            // The format item {5} is invalid, because only {0} to {4} are (currently) supported.
-            validConfiguration.Add("subjectFormatString", "{5}");
-
-            // Act
-            provider.Initialize("Valid name", validConfiguration);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ProviderException))]
-        public void Initialize_ConfigurationWithUnrecognizedAttributes_ThrowsException()
-        {
-            // Arrange
-            var provider = new FakeMailLoggingProvider();
-            var configurationWithUnrecognizedAttribute = new NameValueCollection();
-            configurationWithUnrecognizedAttribute.Add("unknown attribute", "some value");
-
-            // Act
-            provider.Initialize("Valid name", configurationWithUnrecognizedAttribute);
-        }
-
-        [TestMethod]
-        public void Initialize_WithInsufficientRightsToSendMail_ThrowsExpectedException()
-        {
-            // Arrange
-            var provider = new FakeMailLoggingProvider();
-            var providerName = "Valid name";
-            var securityErrorMessage = "Security message.";
-            provider.ExceptionThrownBySmtpClientConstructor = new SecurityException(securityErrorMessage);
-            var validConfiguration = new NameValueCollection();
-            validConfiguration.Add("to", "john@do.com");
-
-            try
-            {
-                // Act
-                provider.Initialize(providerName, validConfiguration);
-
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ProviderException ex)
-            {
-                var msg = ex.Message ?? string.Empty;
-
-                Assert.IsTrue(msg.Contains("error while initializing the provider") &&
-                    msg.Contains("application does not have permission"),
-                    "Exception message should contain the problem. Actual: " + msg);
-
-                Assert.IsTrue(msg.Contains(providerName),
-                    "Exception message should contain the provider causing the exception. Actual: " + msg);
-
-                Assert.IsTrue(msg.Contains(securityErrorMessage),
-                    "Exception message should contain the message from the inner exception. Actual: " + msg);
-            }
-        }
-
-        [TestMethod]
-        public void Initialize_ExceptionThrownByMailMessageConstructor_ThrowsExpectedException()
-        {
-            // Arrange
-            var provider = new FakeMailLoggingProvider();
-            var providerName = "Valid name";
-            var formatErrorMessage = "Format error message.";
-            provider.ExceptionThrownByMailMessageConstructor = new FormatException(formatErrorMessage);
-            var validConfiguration = new NameValueCollection();
-            validConfiguration.Add("to", "john@do.com");
-
-            try
-            {
-                // Act
-                provider.Initialize(providerName, validConfiguration);
-
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ProviderException ex)
-            {
-                var msg = ex.Message ?? string.Empty;
-
-                Assert.IsTrue(msg.Contains("possible miss configuration") &&
-                    msg.Contains("configuration/system.net/mailSetting") &&
-                    msg.Contains("MailMessage class could not be created"),
-                    "Exception message should contain the problem. Actual: " + msg);
-
-                Assert.IsTrue(msg.Contains("<configuration>") && msg.Contains("<system.net>") &&
-                    msg.Contains("<mailSettings>"),
-                    "Exception message should contain a example configuration. Actual: " + msg);
-
-                Assert.IsTrue(msg.Contains(formatErrorMessage),
-                    "Exception message should contain the message from the inner exception. Actual: " + msg);
-            }
-        }
 
         [TestMethod]
         public void BuildMailBody_WithValidEntry_ReturnsExpectedMailBody()
@@ -721,6 +747,15 @@ namespace CuttingEdge.Logging.Tests.Unit
                         "The exception message should contain the string 'subjectFormatString'.");
                 }
             }
+        }
+
+        private static NameValueCollection CreateValidConfiguration()
+        {
+            var configuration = new NameValueCollection();
+
+            configuration.Add("to", "john@do.com");
+
+            return configuration;
         }
 
         private sealed class FakeMailLoggingProvider : MailLoggingProvider
