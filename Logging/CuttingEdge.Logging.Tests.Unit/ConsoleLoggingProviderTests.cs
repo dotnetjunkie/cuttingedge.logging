@@ -2,17 +2,20 @@
 using System.Collections.Specialized;
 using System.Configuration.Provider;
 
+using CuttingEdge.Logging.Tests.Common;
+using CuttingEdge.Logging.Tests.Unit.Helpers;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.Logging.Tests.Unit
 {
-#if DEBUG // This test code only runs in debug mode
     /// <summary>
     /// Tests the <see cref="ConsoleLoggingProvider"/> class.
     /// </summary>
     [TestClass]
     public class ConsoleLoggingProviderTests
     {
+#if DEBUG // This test code only runs in debug mode
         [TestMethod]
         public void Initialize_WithValidArguments_Succeeds()
         {
@@ -68,7 +71,37 @@ namespace CuttingEdge.Logging.Tests.Unit
             string actualText = provider.TextWrittenToConsole;
             Assert.AreEqual(expectedText, actualText);
         }
+#endif
 
+        [TestMethod]
+        public void Configuration_WithValidConfiguration_Succeeds()
+        {
+            // Arrange
+            var configBuilder = new ConfigurationBuilder()
+            {
+                Logging = new LoggingConfigurationBuilder()
+                {
+                    DefaultProvider = "Console",
+                    Providers =
+                    {
+                        // <provider name="Console" type="CuttingEdge.Logging.ConsoleLoggingProvider, ..." />
+                        new ProviderConfigLine()
+                        {
+                            Name = "Console", 
+                            Type = typeof(ConsoleLoggingProvider),
+                        },
+                    }
+                }
+            };
+
+            using (var manager = new UnitTestAppDomainManager(configBuilder.Build()))
+            {
+                // Act
+                manager.DomainUnderTest.InitializeLoggingSystem();
+            }
+        }
+
+#if DEBUG // This test code only runs in debug mode
         private sealed class FakeConsoleLoggingProvider : ConsoleLoggingProvider
         {
             public FakeConsoleLoggingProvider()
@@ -79,6 +112,6 @@ namespace CuttingEdge.Logging.Tests.Unit
 
             public string TextWrittenToConsole { get; private set; }
         }
-    }
 #endif
+    }
 }

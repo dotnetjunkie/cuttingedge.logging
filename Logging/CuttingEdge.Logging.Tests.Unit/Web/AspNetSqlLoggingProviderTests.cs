@@ -50,7 +50,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
         }
 
         [TestMethod]
-        public void Initialize_WithValidConfiguration_Succeeds()
+        public void Configuration_WithValidConfiguration_Succeeds()
         {
             // Arrange
             var configBuilder = new ConfigurationBuilder()
@@ -88,7 +88,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
         }
 
         [TestMethod]
-        public void Initialize_ApplicationNameAttributeValueWithMaximumLength_Succeeds()
+        public void Configuration_ApplicationNameAttributeValueWithMaximumLength_Succeeds()
         {
             // Arrange
             const int MaximumApplicationNameLength = 255;
@@ -129,7 +129,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
         }
 
         [TestMethod]
-        public void Initialize_TooLongApplicationNameAttribute_ThrowsException()
+        public void Configuration_TooLongApplicationNameAttribute_ThrowsException()
         {
             // Arrange
             const int MaximumApplicationNameLength = 255;
@@ -182,7 +182,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
         }
 
         [TestMethod]
-        public void Initialize_MissingApplicationName_ThrowsException()
+        public void Configuration_MissingApplicationName_ThrowsException()
         {
             // Arrange
             var configBuilder = new ConfigurationBuilder()
@@ -229,7 +229,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
         }
 
         [TestMethod]
-        public void Initialize_InvalidUseNameRetrievalTypeAttribute_ThrowsException()
+        public void Configuration_InvalidUseNameRetrievalTypeAttribute_ThrowsException()
         {
             // Arrange
             var configBuilder = new ConfigurationBuilder()
@@ -278,7 +278,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
         }
 
         [TestMethod]
-        public void Initialize_MissingUseNameRetrievalTypeAttribute_ThrowsException()
+        public void Configuration_MissingUseNameRetrievalTypeAttribute_ThrowsException()
         {
             // Arrange
             var configBuilder = new ConfigurationBuilder()

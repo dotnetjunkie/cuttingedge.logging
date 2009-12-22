@@ -123,7 +123,7 @@ namespace CuttingEdge.Logging.Tests.Unit
                     DefaultProvider = "Terminator",
                     Providers =
                     {
-                        // <provider name="Terminator" type="CE.Logging.TerminatorLoggingProvider, CE.Logging" />
+                        // <provider name="Terminator" type="CE.Logging.TerminatorLoggingProvider, ..." />
                         new ProviderConfigLine()
                         {
                             Name = "Terminator",

@@ -430,6 +430,42 @@ namespace CuttingEdge.Logging.Tests.Unit
 #endif // DEBUG
 
         [TestMethod]
+        public void Configuration_WithValidConfiguration_Succeeds()
+        {
+            // Arrange
+            var configBuilder = new ConfigurationBuilder()
+            {
+                Logging = new LoggingConfigurationBuilder()
+                {
+                    DefaultProvider = "Forwarder",
+                    Providers =
+                    {
+                        // <provider name="Forwarder" type="CompositeLoggingProvider" provider1="MemLogger" />
+                        new ProviderConfigLine()
+                        {
+                            Name = "Forwarder",
+                            Type = typeof(CompositeLoggingProvider),
+                            CustomAttributes = "provider1=\"MemLogger\" "
+                        },
+
+                        // <provider name="MemLogger" type="MemoryLoggingProvider" />
+                        new ProviderConfigLine()
+                        {
+                            Name = "MemLogger",
+                            Type = typeof(MemoryLoggingProvider),
+                        },
+                    }
+                }
+            };
+
+            using (var manager = new UnitTestAppDomainManager(configBuilder.Build()))
+            {
+                // Act
+                manager.DomainUnderTest.InitializeLoggingSystem();
+            }
+        }
+
+        [TestMethod]
         public void Configuration_CircularReferencingSelf_ThrowsException()
         {
             // Arrange
