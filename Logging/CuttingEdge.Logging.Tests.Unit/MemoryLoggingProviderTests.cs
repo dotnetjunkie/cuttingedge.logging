@@ -3,6 +3,9 @@ using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Linq;
 
+using CuttingEdge.Logging.Tests.Common;
+using CuttingEdge.Logging.Tests.Unit.Helpers;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.Logging.Tests.Unit
@@ -97,6 +100,34 @@ namespace CuttingEdge.Logging.Tests.Unit
             Assert.AreEqual(2, id2);
             Assert.AreEqual(3, id3);
             Assert.AreEqual(4, id4);
+        }
+
+        [TestMethod]
+        public void Configuration_WithSimplestPossibleConfiguration_Succeeds()
+        {
+            // Arrange
+            var configBuilder = new ConfigurationBuilder()
+            {
+                Logging = new LoggingConfigurationBuilder()
+                {
+                    DefaultProvider = "MemLogger",
+                    Providers =
+                    {
+                        // <provider name="MemLogger" type="CuttingEdge.Logging.MemoryLoggingProvider, ..." />
+                        new ProviderConfigLine()
+                        {
+                            Name = "MemLogger", 
+                            Type = typeof(MemoryLoggingProvider),
+                        },
+                    }
+                }
+            };
+
+            using (var manager = new UnitTestAppDomainManager(configBuilder.Build()))
+            {
+                // Act
+                manager.DomainUnderTest.InitializeLoggingSystem();
+            }
         }
 
         private static MemoryLoggingProvider CreateInitializedMemoryLoggingProvider()

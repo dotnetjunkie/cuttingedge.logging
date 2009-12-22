@@ -3,6 +3,9 @@ using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Diagnostics;
 
+using CuttingEdge.Logging.Tests.Common;
+using CuttingEdge.Logging.Tests.Unit.Helpers;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.Logging.Tests.Unit
@@ -276,6 +279,36 @@ namespace CuttingEdge.Logging.Tests.Unit
 
             // Assert
             Assert.AreEqual(null, provider.LoggedType);
+        }
+
+        [TestMethod]
+        public void Configuration_WithValidConfiguration_Succeeds()
+        {
+            // Arrange
+            var configBuilder = new ConfigurationBuilder()
+            {
+                Logging = new LoggingConfigurationBuilder()
+                {
+                    DefaultProvider = "EventLog",
+                    Providers =
+                    {
+                        // <provider name="EventLog" type="WindowsEventLogLoggingProvider,..." source=... />
+                        new ProviderConfigLine()
+                        {
+                            Name = "EventLog", 
+                            Type = typeof(WindowsEventLogLoggingProvider),
+                            CustomAttributes = 
+                                "source=\"CuttingEdge.Logging.Tests\" logName=\"CuttingEdge.Logging.Tests\" "
+                        },
+                    }
+                }
+            };
+
+            using (var manager = new UnitTestAppDomainManager(configBuilder.Build()))
+            {
+                // Act
+                manager.DomainUnderTest.InitializeLoggingSystem();
+            }
         }
 
         private static FakeWindowsEventLogLoggingProvider BuildInitializedProvider()
