@@ -26,27 +26,58 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
         }
 
         [TestMethod]
-        public void Initiailze_WithValidConfiguration_SetsExpectedProperties()
+        public void Initialize_ConfigurationWithoutDescription_SetsDefaultDescription()
+        {
+            // Arrange
+            var expectedDescription = "ASP.NET SQL logging provider";
+            var provider = new FakeAspNetSqlLoggingProvider();
+            var settings = CreateValidAspNetSqlLoggingSettings();
+            settings.Description = null;
+            var validConfiguration = settings.BuildConfiguration();
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithCustomDescription_SetsSpecifiedDescription()
+        {
+            // Arrange
+            var expectedDescription = "My web app logging provider";
+            var provider = new FakeAspNetSqlLoggingProvider();
+            var settings = CreateValidAspNetSqlLoggingSettings();
+            settings.Description = expectedDescription;
+            var validConfiguration = settings.BuildConfiguration();
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
+        }
+
+        [TestMethod]
+        public void Initialize_WithValidConfiguration_SetsExpectedProperties()
         {
             // Arrange
             var provider = new FakeAspNetSqlLoggingProvider();
-            var validConfiguration = new NameValueCollection();
-            validConfiguration.Add("logFormData", "false");
-            validConfiguration.Add("logQueryString", "false");
-            validConfiguration.Add("userNameRetrievalType", "WindowsIdentity");
-            validConfiguration.Add("applicationName", "MyApplication");
-            validConfiguration.Add("connectionStringName", "myConnection");
+            var settings = CreateValidAspNetSqlLoggingSettings();
+            var validConfiguration = settings.BuildConfiguration();
+            var expectedConnectionString =
+                ConfigurationManager.ConnectionStrings[settings.ConnectionStringName].ConnectionString;
 
             // Act
             provider.Initialize("Valid name", validConfiguration);
 
             // Assert
-            Assert.AreEqual(false, provider.LogFormData, "LogFormData");
-            Assert.AreEqual(false, provider.LogQueryString, "LogQueryString");
-            Assert.AreEqual(UserIdentityRetrievalType.WindowsIdentity, provider.RetrievalType, "RetrievalType");
-            Assert.AreEqual("MyApplication", provider.ApplicationName, "ApplicationName");
-            Assert.AreEqual(ConfigurationManager.ConnectionStrings["myConnection"].ConnectionString, 
-                provider.ConnectionString, "ConnectionString");
+            Assert.AreEqual(settings.LogFormData, provider.LogFormData, "LogFormData");
+            Assert.AreEqual(settings.LogQueryString, provider.LogQueryString, "LogQueryString");
+            Assert.AreEqual(settings.RetrievalType, provider.RetrievalType, "RetrievalType");
+            Assert.AreEqual(settings.ApplicationName, provider.ApplicationName, "ApplicationName");
+            Assert.AreEqual(expectedConnectionString, provider.ConnectionString, "ConnectionString");
         }
 
         [TestMethod]
@@ -322,6 +353,58 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
                     Assert.IsTrue(ex.Message.StartsWith("Empty or missing userNameRetrievalType attribute"),
                         "Exception message should state about the missing userNameRetrievalType attribute");
                 }
+            }
+        }
+
+        private static AspNetSqlLoggingSettings CreateValidAspNetSqlLoggingSettings()
+        {
+            return new AspNetSqlLoggingSettings
+            {
+                Description = null,
+                LogFormData = false,
+                LogQueryString = false,
+                RetrievalType = UserIdentityRetrievalType.WindowsIdentity,
+                ApplicationName = "MyApplication",
+                ConnectionStringName = ConfigurationManager.ConnectionStrings[0].Name,
+            };
+        }
+
+        internal class AspNetSqlLoggingSettings
+        {
+            public AspNetSqlLoggingSettings()
+            {
+                this.LogFormData = true;
+                this.LogQueryString = true;
+            }
+
+            public bool LogFormData { get; set; }
+
+            public bool LogQueryString { get; set; }
+
+            public UserIdentityRetrievalType RetrievalType { get; set; }
+
+            public string ApplicationName { get; set; }
+
+            public string ConnectionStringName { get; set; }
+
+            public string Description { get; set; }
+
+            public NameValueCollection BuildConfiguration()
+            {
+                var configuration = new NameValueCollection();
+
+                configuration.Add("logFormData", this.LogFormData.ToString());
+                configuration.Add("logQueryString", this.LogQueryString.ToString());
+                configuration.Add("userNameRetrievalType", this.RetrievalType.ToString());
+                configuration.Add("applicationName", this.ApplicationName);
+                configuration.Add("connectionStringName", this.ConnectionStringName);
+
+                if (this.Description != null)
+                {
+                    configuration.Add("description", this.Description);
+                }
+
+                return configuration;
             }
         }
 

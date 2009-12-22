@@ -20,7 +20,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
             // Arrange
             var provider = new LoggingWebEventProvider();
             var validProviderName = "Valid name";
-            var validConfiguration = new NameValueCollection();
+            var validConfiguration = CreateValidConfiguration();
 
             // Act
             provider.Initialize(validProviderName, validConfiguration);
@@ -44,7 +44,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
             var expectedProviderName = "LoggingWebEventProvider";
             var provider = new LoggingWebEventProvider();
             var validEmptyProviderName = string.Empty;
-            var validConfiguration = new NameValueCollection();
+            var validConfiguration = CreateValidConfiguration();
 
             // Act
             provider.Initialize(validEmptyProviderName, validConfiguration);
@@ -60,7 +60,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
             // Arrange
             var provider = new LoggingWebEventProvider();
             var validProviderName = "Valid name";
-            var invalidConfiguration = new NameValueCollection();
+            var invalidConfiguration = CreateValidConfiguration();
             invalidConfiguration.Add("bad attribute", "bad value");
 
             // Act
@@ -75,12 +75,43 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
             {
                 // Arrange
                 var provider = new LoggingWebEventProvider();
-                var invalidConfiguration = new NameValueCollection();
+                var invalidConfiguration = CreateValidConfiguration();
                 invalidConfiguration.Add("loggingProvider", "NON EXISTING PROVIDER");
 
                 // Act
                 provider.Initialize("Valid name", invalidConfiguration);
             }
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithoutDescription_SetsDefaultDescription()
+        {
+            // Arrange
+            var expectedDescription = "Logging Web Event Provider";
+            var provider = new LoggingWebEventProvider();
+            var validConfiguration = CreateValidConfiguration();
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithCustomDescription_SetsSpecifiedDescription()
+        {
+            // Arrange
+            var expectedDescription = "My web app trace logging provider";
+            var provider = new LoggingWebEventProvider();
+            var validConfiguration = CreateValidConfiguration();
+            validConfiguration["description"] = expectedDescription;
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
         }
 
         [TestMethod]
@@ -233,6 +264,11 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
             provider.Initialize("Valid name", new NameValueCollection());
 
             return provider;
+        }
+
+        private static NameValueCollection CreateValidConfiguration()
+        {
+            return new NameValueCollection();
         }
 
         private sealed class DerivedWebErrorEvent : WebErrorEvent

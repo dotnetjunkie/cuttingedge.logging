@@ -17,24 +17,10 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var provider = new TerminatorLoggingProvider();
-            var validConfiguration = new NameValueCollection();
+            var validConfiguration = CreateValidConfiguration();
 
             // Act
             provider.Initialize("Valid provider name", validConfiguration);
-        }
-
-        [TestMethod]
-        public void Log_WithValidLogEntry_ReturnsNull()
-        {
-            // Arrange
-            ILogger provider = new TerminatorLoggingProvider();
-            var entry = new LogEntry(LoggingEventType.Error, "error", null, null);
-
-            // Act
-            object id = provider.Log(entry);
-
-            // Assert
-            Assert.IsNull(id, "Provider should always return null.");
         }
 
         [TestMethod]
@@ -55,7 +41,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var provider = new TerminatorLoggingProvider();
-            var configurationWithUnrecognizedAttribute = new NameValueCollection();
+            var configurationWithUnrecognizedAttribute = CreateValidConfiguration();
             configurationWithUnrecognizedAttribute.Add("unknown attribute", "some value");
 
             // Act
@@ -67,15 +53,15 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var provider = new TerminatorLoggingProvider();
-            var configurationWithFallbackProviderAttribute = new NameValueCollection();
-            configurationWithFallbackProviderAttribute.Add("fallbackProvider", "some value");
+            var invalidConfiguration = CreateValidConfiguration();
+            invalidConfiguration.Add("fallbackProvider", "some value");
 
             try
             {
                 // Act
                 // The 'fallbackProvider' attribute is not supported by the TerminatorLoggingProvider, because
                 // it is of no use.
-                provider.Initialize("Valid provider name", configurationWithFallbackProviderAttribute);
+                provider.Initialize("Valid provider name", invalidConfiguration);
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -92,15 +78,15 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var provider = new TerminatorLoggingProvider();
-            var configurationWithThresholdAttribute = new NameValueCollection();
-            configurationWithThresholdAttribute.Add("threshold", "some value");
+            var invalidConfiguration = CreateValidConfiguration();
+            invalidConfiguration.Add("threshold", "some value");
 
             try
             {
                 // Act
                 // The 'threshold' attribute is not supported by the TerminatorLoggingProvider, because it is
                 // of no use.
-                provider.Initialize("Valid provider name", configurationWithThresholdAttribute);
+                provider.Initialize("Valid provider name", invalidConfiguration);
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -110,6 +96,51 @@ namespace CuttingEdge.Logging.Tests.Unit
                 Assert.IsTrue(ex.Message.Contains("threshold"),
                     "The exception message should contain the name of the invalid attribute.");
             }
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithoutDescription_SetsDefaultDescription()
+        {
+            // Arrange
+            var expectedDescription = "Terminator logging provider";
+            var provider = new TerminatorLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithCustomDescription_SetsSpecifiedDescription()
+        {
+            // Arrange
+            var expectedDescription = "My terminator, I'll be back :-)";
+            var provider = new TerminatorLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+            validConfiguration["description"] = expectedDescription;
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
+        }
+
+        [TestMethod]
+        public void Log_WithValidLogEntry_ReturnsNull()
+        {
+            // Arrange
+            ILogger provider = new TerminatorLoggingProvider();
+            var entry = new LogEntry(LoggingEventType.Error, "error", null, null);
+
+            // Act
+            object id = provider.Log(entry);
+
+            // Assert
+            Assert.IsNull(id, "Provider should always return null.");
         }
 
         [TestMethod]
@@ -138,6 +169,11 @@ namespace CuttingEdge.Logging.Tests.Unit
                 // Act
                 manager.DomainUnderTest.InitializeLoggingSystem();
             }
+        }
+
+        private static NameValueCollection CreateValidConfiguration()
+        {
+            return new NameValueCollection();
         }
     }
 }

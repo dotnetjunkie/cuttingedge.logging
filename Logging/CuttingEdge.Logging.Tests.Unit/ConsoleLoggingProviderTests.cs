@@ -21,7 +21,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var provider = new FakeConsoleLoggingProvider();
-            var validConfiguration = new NameValueCollection();
+            var validConfiguration = CreateValidConfiguration();
 
             // Act
             provider.Initialize("Valid provider name", validConfiguration);
@@ -45,11 +45,42 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var provider = new FakeConsoleLoggingProvider();
-            var configurationWithUnrecognizedAttribute = new NameValueCollection();
+            var configurationWithUnrecognizedAttribute = CreateValidConfiguration();
             configurationWithUnrecognizedAttribute.Add("unknown attribute", "some value");
 
             // Act
             provider.Initialize("Valid provider name", configurationWithUnrecognizedAttribute);
+        }
+        
+        [TestMethod]
+        public void Initialize_ConfigurationWithoutDescription_SetsDefaultDescription()
+        {
+            // Arrange
+            var expectedDescription = "Console logging provider";
+            var provider = new ConsoleLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithCustomDescription_SetsSpecifiedDescription()
+        {
+            // Arrange
+            var expectedDescription = "My console logger";
+            var provider = new ConsoleLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+            validConfiguration["description"] = expectedDescription;
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
         }
 
         [TestMethod]
@@ -99,6 +130,11 @@ namespace CuttingEdge.Logging.Tests.Unit
                 // Act
                 manager.DomainUnderTest.InitializeLoggingSystem();
             }
+        }
+
+        private static NameValueCollection CreateValidConfiguration()
+        {
+            return new NameValueCollection();
         }
 
 #if DEBUG // This test code only runs in debug mode

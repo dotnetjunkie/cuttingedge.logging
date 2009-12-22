@@ -14,6 +14,17 @@ namespace CuttingEdge.Logging.Tests.Unit
     public class SqlLoggingProviderTests
     {
         [TestMethod]
+        public void Initialize_WithValidConfiguration_Succeeds()
+        {
+            // Arrange
+            var provider = new FakeSqlLoggingProvider();
+            NameValueCollection validConfiguration = CreateValidConfiguration();
+
+            // Act
+            provider.Initialize("Valid name", validConfiguration);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Initialize_WithNullConfiguration_ThrowsException()
         {
@@ -23,6 +34,37 @@ namespace CuttingEdge.Logging.Tests.Unit
 
             // Act
             provider.Initialize("Valid name", invalidConfiguration);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithoutDescription_SetsDefaultDescription()
+        {
+            // Arrange
+            var expectedDescription = "SQL logging provider";
+            var provider = new FakeSqlLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithCustomDescription_SetsSpecifiedDescription()
+        {
+            // Arrange
+            var expectedDescription = "My SQL logger";
+            var provider = new FakeSqlLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+            validConfiguration["description"] = expectedDescription;
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
         }
 
         [TestMethod]
@@ -203,6 +245,15 @@ namespace CuttingEdge.Logging.Tests.Unit
                         "The exception message should note the invalid attribute: " + ex.Message);
                 }
             }
+        }
+
+        private static NameValueCollection CreateValidConfiguration()
+        {
+            var configuration = new NameValueCollection();
+
+            configuration.Add("connectionStringName", ConfigurationManager.ConnectionStrings[0].Name);
+
+            return configuration;
         }
 
         private sealed class FakeSqlLoggingProvider : SqlLoggingProvider

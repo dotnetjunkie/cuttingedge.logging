@@ -22,8 +22,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var provider = new CompositeLoggingProvider();
-            var validConfiguration = new NameValueCollection();
-            validConfiguration["provider1"] = "OtherProvider";
+            var validConfiguration = CreateValidConfiguration("OtherProvider");
 
             // Act
             provider.Initialize("Valid provider name", validConfiguration);
@@ -47,10 +46,10 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var providerUnderTest = new CompositeLoggingProvider();
-            var validConfiguration = new NameValueCollection();
+            var invalidConfiguration = new NameValueCollection();
 
             // Act
-            providerUnderTest.Initialize("Valid provider name", validConfiguration);
+            providerUnderTest.Initialize("Valid provider name", invalidConfiguration);
         }
 
         [TestMethod]
@@ -59,11 +58,42 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var providerUnderTest = new CompositeLoggingProvider();
-            var validConfiguration = new NameValueCollection();
-            validConfiguration["_provider1"] = "MemoryProvider";
+            var invalidConfiguration = new NameValueCollection();
+            invalidConfiguration["_provider1"] = "MemoryProvider";
 
             // Act
-            providerUnderTest.Initialize("Valid provider name", validConfiguration);
+            providerUnderTest.Initialize("Valid provider name", invalidConfiguration);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithoutDescription_SetsDefaultDescription()
+        {
+            // Arrange
+            var expectedDescription = "Composite logging provider";
+            var provider = new CompositeLoggingProvider();
+            var validConfiguration = CreateValidConfiguration("Referenced Provider");
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithCustomDescription_SetsSpecifiedDescription()
+        {
+            // Arrange
+            var expectedDescription = "My forwarder";
+            var provider = new CompositeLoggingProvider();
+            var validConfiguration = CreateValidConfiguration("Referenced Provider");
+            validConfiguration["description"] = expectedDescription;
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
         }
 
         [TestMethod]
@@ -82,11 +112,10 @@ namespace CuttingEdge.Logging.Tests.Unit
         public void CompleteInitialization_WithValidConfiguration_Succeeds()
         {
             // Arrange
-            var expectedReferencedProvider = CreateInitializedProvider("Other Provider");
-            var defaultProvider = CreateInitializedProvider("Default Provider");
+            var expectedReferencedProvider = CreateInitializedMemoryLogger("Other Provider");
+            var defaultProvider = CreateInitializedMemoryLogger("Default Provider");
             var providerUnderTest = new CompositeLoggingProvider();
-            var validConfiguration = new NameValueCollection();
-            validConfiguration["provider1"] = expectedReferencedProvider.Name;
+            var validConfiguration = CreateValidConfiguration(expectedReferencedProvider.Name);
             providerUnderTest.Initialize("Valid provider name", validConfiguration);         
             
             var configuredProviders = new LoggingProviderCollection()
@@ -117,16 +146,15 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             // List of referenced providers which names would sort them in opposite order.
-            var firstExpectedReferencedProvider = CreateInitializedProvider("Z first provider");
-            var secondExpectedReferencedProvider = CreateInitializedProvider("Y second provider");
-            var thirdExpectedReferencedProvider = CreateInitializedProvider("X third provider");
-            var defaultProvider = CreateInitializedProvider("Default Provider");
+            var firstExpectedReferencedProvider = CreateInitializedMemoryLogger("Z first provider");
+            var secondExpectedReferencedProvider = CreateInitializedMemoryLogger("Y second provider");
+            var thirdExpectedReferencedProvider = CreateInitializedMemoryLogger("X third provider");
+            var defaultProvider = CreateInitializedMemoryLogger("Default Provider");
             var providerUnderTest = new CompositeLoggingProvider();
-            var validConfiguration = new NameValueCollection();
-
-            validConfiguration["provider1"] = firstExpectedReferencedProvider.Name;
-            validConfiguration["provider2"] = secondExpectedReferencedProvider.Name;
-            validConfiguration["provider3"] = thirdExpectedReferencedProvider.Name;
+            var validConfiguration = CreateValidConfiguration(
+                firstExpectedReferencedProvider.Name,
+                secondExpectedReferencedProvider.Name,
+                thirdExpectedReferencedProvider.Name);
             providerUnderTest.Initialize("Valid provider name", validConfiguration);
 
             // List of configured providers in order 
@@ -164,10 +192,10 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             // List of referenced providers which names would sort them in opposite order.
-            var firstExpectedReferencedProvider = CreateInitializedProvider("First provider");
-            var secondExpectedReferencedProvider = CreateInitializedProvider("Second provider");
-            var thirdExpectedReferencedProvider = CreateInitializedProvider("Third provider");
-            var defaultProvider = CreateInitializedProvider("Default Provider");
+            var firstExpectedReferencedProvider = CreateInitializedMemoryLogger("First provider");
+            var secondExpectedReferencedProvider = CreateInitializedMemoryLogger("Second provider");
+            var thirdExpectedReferencedProvider = CreateInitializedMemoryLogger("Third provider");
+            var defaultProvider = CreateInitializedMemoryLogger("Default Provider");
             var providerUnderTest = new CompositeLoggingProvider();
             var validConfiguration = new NameValueCollection();
 
@@ -212,7 +240,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var providerUnderTest = new CompositeLoggingProvider();
-            var defaultProvider = CreateInitializedProvider("Default Provider");
+            var defaultProvider = CreateInitializedMemoryLogger("Default Provider");
 
             // List of configured providers in order 
             var configuredProviders = new LoggingProviderCollection()
@@ -330,7 +358,7 @@ namespace CuttingEdge.Logging.Tests.Unit
             // Arrange
             const string ProviderName = "Valid provider name";
             const string ReferencedProviderName = "MemoryProvider";
-            var defaultProvider = CreateInitializedProvider(ReferencedProviderName);
+            var defaultProvider = CreateInitializedMemoryLogger(ReferencedProviderName);
             var providerUnderTest = new CompositeLoggingProvider();
             var validConfiguration = new NameValueCollection();
             validConfiguration["provider1"] = ReferencedProviderName;
@@ -369,7 +397,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         public void Log_WithSingleReferencedProvider_LogsToReferencedProvider()
         {
             // Arrange
-            var memoryLogger = CreateInitializedProvider("MemoryLogger");
+            var memoryLogger = CreateInitializedMemoryLogger("MemoryLogger");
             var configuredProviders = new LoggingProviderCollection() { memoryLogger };
             var providerUnderTest = CreateInitializedCompositeLoggingProvider(configuredProviders);
             var expectedMessage = "Some message";
@@ -386,8 +414,8 @@ namespace CuttingEdge.Logging.Tests.Unit
         public void Log_WithMultipleReferencedProviders_LogsToAllReferencedProviders()
         {
             // Arrange
-            var logger1 = CreateInitializedProvider("MemoryLogger1");
-            var logger2 = CreateInitializedProvider("MemoryLogger2");
+            var logger1 = CreateInitializedMemoryLogger("MemoryLogger1");
+            var logger2 = CreateInitializedMemoryLogger("MemoryLogger2");
             var configuredProviders = new LoggingProviderCollection() { logger1, logger2 };
             var providerUnderTest = CreateInitializedCompositeLoggingProvider(configuredProviders);
             var expectedMessage = "Some message";
@@ -406,8 +434,8 @@ namespace CuttingEdge.Logging.Tests.Unit
         public void Log_WithFailingProvider_LogsToRemainingLoggers()
         {
             // Arrange
-            var logger1 = new FailingLoggingProvider("Failer") { ExceptionToThrow = new Exception() };
-            var logger2 = CreateInitializedProvider("MemoryLogger");
+            var logger1 = new FailingLoggingProvider("Failure") { ExceptionToThrow = new Exception() };
+            var logger2 = CreateInitializedMemoryLogger("MemoryLogger");
             var configuredProviders = new LoggingProviderCollection() { logger1, logger2 };
             var providerUnderTest = CreateInitializedCompositeLoggingProvider(configuredProviders);
             var expectedMessage = "Some message";
@@ -435,7 +463,7 @@ namespace CuttingEdge.Logging.Tests.Unit
             // Arrange
             var logger1 = new FailingLoggingProvider("Faile1") { ExceptionToThrow = new Exception("foo") };
             var logger2 = new FailingLoggingProvider("Faile2") { ExceptionToThrow = new Exception("bar") };
-            var logger3 = CreateInitializedProvider("MemoryLogger");
+            var logger3 = CreateInitializedMemoryLogger("MemoryLogger");
             var configuredProviders = new LoggingProviderCollection() { logger1, logger2, logger3 };
             var providerUnderTest = CreateInitializedCompositeLoggingProvider(configuredProviders);
             var expectedMessage = "Some message";
@@ -644,11 +672,11 @@ namespace CuttingEdge.Logging.Tests.Unit
             }
         }
 
-        private static MemoryLoggingProvider CreateInitializedProvider(string name)
+        private static MemoryLoggingProvider CreateInitializedMemoryLogger(string name)
         {
             var provider = new MemoryLoggingProvider();
-            var configuration = new NameValueCollection();
-            provider.Initialize(name, configuration);
+
+            provider.Initialize(name, new NameValueCollection());
 
             return provider;
         }
@@ -672,6 +700,20 @@ namespace CuttingEdge.Logging.Tests.Unit
             return provider;
         }
 #endif // DEBUG
+
+        private static NameValueCollection CreateValidConfiguration(params string[] providerNames)
+        {
+            Assert.IsNotNull(providerNames);
+
+            var configuration = new NameValueCollection();
+
+            for (int index = 0; index < providerNames.Length; index++)
+            {
+                configuration["provider" + (index + 1)] = providerNames[index];
+            }
+
+            return configuration;
+        }
 
         private sealed class FailingLoggingProvider : LoggingProviderBase
         {

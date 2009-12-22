@@ -21,7 +21,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var provider = new MemoryLoggingProvider();
-            var validConfiguration = new NameValueCollection();
+            var validConfiguration = CreateValidConfiguration();
 
             // Act
             provider.Initialize("Valid name", validConfiguration);
@@ -45,11 +45,42 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var provider = new MemoryLoggingProvider();
-            var configurationWithUnrecognizedAttribute = new NameValueCollection();
+            var configurationWithUnrecognizedAttribute = CreateValidConfiguration();
             configurationWithUnrecognizedAttribute.Add("unknown attribute", "some value");
 
             // Act
             provider.Initialize("Valid name", configurationWithUnrecognizedAttribute);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithoutDescription_SetsDefaultDescription()
+        {
+            // Arrange
+            var expectedDescription = "Memory logging provider";
+            var provider = new MemoryLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
+        }
+
+        [TestMethod]
+        public void Initialize_ConfigurationWithCustomDescription_SetsSpecifiedDescription()
+        {
+            // Arrange
+            var expectedDescription = "My memory logger";
+            var provider = new MemoryLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+            validConfiguration["description"] = expectedDescription;
+
+            // Act
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Assert
+            Assert.AreEqual(expectedDescription, provider.Description);
         }
 
         [TestMethod]
@@ -133,10 +164,15 @@ namespace CuttingEdge.Logging.Tests.Unit
         private static MemoryLoggingProvider CreateInitializedMemoryLoggingProvider()
         {
             var provider = new MemoryLoggingProvider();
-            var validConfiguration = new NameValueCollection();
+            var validConfiguration = CreateValidConfiguration();
             provider.Initialize("MemoryLoggingProvider", validConfiguration);
 
             return provider;
+        }
+
+        private static NameValueCollection CreateValidConfiguration()
+        {
+            return new NameValueCollection();
         }
     }
 }
