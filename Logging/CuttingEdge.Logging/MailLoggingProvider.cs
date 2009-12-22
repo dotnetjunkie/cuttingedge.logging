@@ -248,14 +248,24 @@ namespace CuttingEdge.Logging
                 currentTime);   // {4}
         }
 
+        internal virtual SmtpClient CreateSmtpClient()
+        {
+            return new SmtpClient();
+        }
+
+        internal virtual MailMessage CreateMailMessage()
+        {
+            return new MailMessage();
+        }
+
         /// <summary>Sends the given <paramref name="entry"/> as mail message.</summary>
         /// <param name="entry">The entry to log.</param>
         /// <returns>Returns null.</returns>
         /// <exception cref="SmtpException">Thrown when the provider was unable to send the mail message.</exception>
         protected override object LogInternal(LogEntry entry)
         {
-            // Create and configure the smtp client
-            var smtpClient = new SmtpClient();
+            // Create and configure the SMTP client
+            var smtpClient = this.CreateSmtpClient();
 
             MailMessage mailMessage = this.BuildMailMessage(entry);
 
@@ -270,7 +280,7 @@ namespace CuttingEdge.Logging
         /// <returns>A new <see cref="MailMessage"/>.</returns>
         protected virtual MailMessage BuildMailMessage(LogEntry entry)
         {
-            MailMessage message = new MailMessage();
+            MailMessage message = this.CreateMailMessage();
 
             var currentTime = DateTime.Now;
 
@@ -389,7 +399,7 @@ namespace CuttingEdge.Logging
 
             try
             {
-                client = new SmtpClient();
+                client = this.CreateSmtpClient();
             }
             catch (SecurityException ex)
             {
@@ -414,7 +424,7 @@ namespace CuttingEdge.Logging
             {
                 try
                 {
-                    message = new MailMessage();
+                    message = this.CreateMailMessage();
                 }
                 catch (Exception ex)
                 {

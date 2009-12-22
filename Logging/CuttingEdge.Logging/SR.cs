@@ -270,7 +270,7 @@ namespace CuttingEdge.Logging
             string providerTypeName = GetShortTypeNameForOwnTypes(provider.GetType());
 
             // Note that this message is returned in the case that initialize hasn't been called. Therefore
-            // the provider's Name property will be null and supplying it to the message is useles.
+            // the provider's Name property will be null and supplying it to the message is useless.
             return GetString("ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst", providerTypeName);
         }
       
