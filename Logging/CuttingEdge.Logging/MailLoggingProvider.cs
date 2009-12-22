@@ -212,12 +212,6 @@ namespace CuttingEdge.Logging
                 throw new ArgumentNullException("config");
             }
 
-            if (string.IsNullOrEmpty(config["description"]))
-            {
-                config.Remove("description");
-                config.Add("description", "Mail logging provider");
-            }
-
             // Call base initialize first. This method prevents initialize from being called more than once.
             base.Initialize(name, config);
 

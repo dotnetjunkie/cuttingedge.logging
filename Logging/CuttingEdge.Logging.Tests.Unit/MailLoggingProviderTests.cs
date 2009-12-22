@@ -83,7 +83,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             // Arrange
             var expectedDescription = "Mail logging provider";
-            var provider = new FakeMailLoggingProvider();
+            var provider = new MailLoggingProvider();
             var validConfiguration = CreateValidConfiguration();
 
             // Act
@@ -137,6 +137,7 @@ namespace CuttingEdge.Logging.Tests.Unit
             provider.Initialize("Valid name", configurationWithUnrecognizedAttribute);
         }
 
+#if DEBUG // This test code only runs in debug mode
         [TestMethod]
         public void Initialize_WithInsufficientRightsToSendMail_ThrowsExpectedException()
         {
@@ -207,7 +208,6 @@ namespace CuttingEdge.Logging.Tests.Unit
             }
         }
 
-#if DEBUG // This test code only runs in debug mode
         [TestMethod]
         public void BuildSubjectWithSubjectFormatString_SubjectFormatStringWithSeverityFormatItem_ReturnsSeverity()
         {
@@ -760,9 +760,11 @@ namespace CuttingEdge.Logging.Tests.Unit
 
         private sealed class FakeMailLoggingProvider : MailLoggingProvider
         {
+#if DEBUG // This test code only runs in debug mode
             public Exception ExceptionThrownBySmtpClientConstructor { get; set; }
 
             public Exception ExceptionThrownByMailMessageConstructor { get; set; }
+#endif
 
             public new string BuildMailBody(LogEntry entry)
             {
@@ -775,7 +777,8 @@ namespace CuttingEdge.Logging.Tests.Unit
                 // base implementation is protected.
                 return base.BuildMailMessage(entry);
             }
-            
+
+#if DEBUG // This code only runs in debug mode
             internal override SmtpClient CreateSmtpClient()
             {
                 if (this.ExceptionThrownBySmtpClientConstructor != null)
@@ -795,6 +798,7 @@ namespace CuttingEdge.Logging.Tests.Unit
 
                 return base.CreateMailMessage();
             }
+#endif
 
             protected override object LogInternal(LogEntry entry)
             {

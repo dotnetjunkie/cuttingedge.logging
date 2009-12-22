@@ -242,8 +242,7 @@ namespace CuttingEdge.Logging.Web
 
             if (string.IsNullOrEmpty(config["description"]))
             {
-                config.Remove("description");
-                config.Add("description", "ASP.NET SQL logging provider");
+                config["description"] = "ASP.NET SQL logging provider";
             }
 
             // Retrieve and remove values from config. We do this before calling base.Initialize(), 

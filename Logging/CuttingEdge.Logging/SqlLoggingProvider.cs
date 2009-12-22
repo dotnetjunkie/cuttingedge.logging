@@ -170,8 +170,7 @@ namespace CuttingEdge.Logging
 
             if (string.IsNullOrEmpty(config["description"]))
             {
-                config.Remove("description");
-                config.Add("description", "SQL logging provider");
+                config["description"] = "SQL logging provider";
             }
 
             // Call initialize first.

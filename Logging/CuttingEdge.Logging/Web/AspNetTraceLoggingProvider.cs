@@ -135,8 +135,7 @@ namespace CuttingEdge.Logging.Web
 
             if (string.IsNullOrEmpty(config["description"]))
             {
-                config.Remove("description");
-                config.Add("description", "ASP.NET trace logging provider");
+                config["description"] = "ASP.NET trace logging provider";
             }
 
             // Call initialize first.
