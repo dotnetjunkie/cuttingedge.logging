@@ -69,7 +69,6 @@
     <Compile Include="ConsoleLoggingProvider.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="LoggerWrapper.cs" />
     <Compile Include="LogEntry.cs" />
     <Compile Include="LoggingProviderBase.cs" />
     <Compile Include="LoggingProviderCollection.cs" />
