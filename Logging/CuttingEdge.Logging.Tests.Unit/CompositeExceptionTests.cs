@@ -129,16 +129,20 @@ namespace CuttingEdge.Logging.Tests.Unit
             // Arrange
             Exception innerException = new InvalidOperationException("bad, bad things have happened.");
             var exceptionUnderTest = new CompositeException("Errors have occurred.", innerException);
-            var expectedText = @"CuttingEdge.Logging.CompositeException: Errors have occurred. ---> System.InvalidOperationException: bad, bad things have happened.
-   --- End of inner exception stack trace ---
----> (Inner Exception #0) System.InvalidOperationException: bad, bad things have happened.<---
-";
+            var expectedBeginningOfText = 
+                "CuttingEdge.Logging.CompositeException: Errors have occurred. ---> " + 
+                "System.InvalidOperationException: bad, bad things have happened.";
+
+            var expectedEndingOfText = 
+                @"---> (Inner Exception #0) " + 
+                "System.InvalidOperationException: bad, bad things have happened.<---" + Environment.NewLine;
 
             // Act
             var actualText = exceptionUnderTest.ToString();
 
             // Arrange
-            Assert.AreEqual(expectedText, actualText);
+            Assert.IsTrue(actualText.StartsWith(expectedBeginningOfText));
+            Assert.IsTrue(actualText.EndsWith(expectedEndingOfText));
         }
 
         [TestMethod]
