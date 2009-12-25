@@ -9,6 +9,9 @@ namespace CuttingEdge.Logging.Tests.Unit.Helpers
 {
     internal enum ScopeOption
     {
+        /// <summary>Default option. Does not do any checking.</summary>
+        None = 0,
+
         /// <summary>Tells the LoggingProviderScope that it should fail when a second LogEntry is logged.</summary>
         AllowOnlyASingleEntryToBeLogged = 1,
     }
@@ -30,10 +33,8 @@ namespace CuttingEdge.Logging.Tests.Unit.Helpers
             this.option = option;
         }
 
-        /// <summary>
-        /// Prevents a default instance of the <see cref="LoggingProviderScope"/> class from being created.
-        /// </summary>
-        private LoggingProviderScope()
+        /// <summary>Initializes a new instance of the <see cref="LoggingProviderScope"/> class.</summary>
+        public LoggingProviderScope()
         {
             var entries = new List<LogEntry>();
             this.loggedEntries = new ReadOnlyCollection<LogEntry>(entries);
