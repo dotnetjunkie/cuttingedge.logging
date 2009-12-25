@@ -102,10 +102,10 @@ namespace CuttingEdge.Logging.Web
                 throw new ArgumentNullException("context");
             }
 
-            context.Error += Log;
+            context.Error += this.Log;
         }
 
-        private static void Log(object sender, EventArgs e)
+        internal virtual void Log(object sender, EventArgs e)
         {
             HttpApplication context = (HttpApplication)sender;
 
