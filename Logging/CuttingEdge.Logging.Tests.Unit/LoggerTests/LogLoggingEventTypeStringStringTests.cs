@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 
+using CuttingEdge.Logging.Tests.Common;
 using CuttingEdge.Logging.Tests.Unit.Helpers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;

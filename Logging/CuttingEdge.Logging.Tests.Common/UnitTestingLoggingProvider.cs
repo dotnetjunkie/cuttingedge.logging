@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace CuttingEdge.Logging.Tests.Unit.Helpers
+namespace CuttingEdge.Logging.Tests.Common
 {
     /// <summary>
     /// Logging provider for unit tests.
@@ -12,12 +13,12 @@ namespace CuttingEdge.Logging.Tests.Unit.Helpers
         [ThreadStatic]
         private static ILogger internalThreadStaticLogger;
 
-        internal static void RegisterThreadStaticLogger(ILogger logger)
+        public static void RegisterThreadStaticLogger(ILogger logger)
         {
             internalThreadStaticLogger = logger;
         }
 
-        internal static void UnregisterThreadStaticLogger()
+        public static void UnregisterThreadStaticLogger()
         {
             internalThreadStaticLogger = null;
         }

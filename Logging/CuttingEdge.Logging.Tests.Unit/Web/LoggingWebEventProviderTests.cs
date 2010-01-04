@@ -4,7 +4,7 @@ using System.Configuration.Provider;
 using System.Linq;
 using System.Web.Management;
 
-using CuttingEdge.Logging.Tests.Unit.Helpers;
+using CuttingEdge.Logging.Tests.Common;
 using CuttingEdge.Logging.Web;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;

@@ -6,6 +6,7 @@ Version vNext
 	Bug fixes:
 	
 	Code changes:
+		-The Obsolete attribute of the LoggerWrapper class was removed from the library.
 		-A new TerminatorLoggingProvider added for work item 4845.
 		-A new CompositeLoggingProvider added for work item 4844.
 		 Some internal changes had to be made to the Logger and LoggingProviderBase to make this possible.
@@ -28,6 +29,9 @@ Version vNext
 		 able to throw an AggregateException while not introducing a breaking change in the library :-).
 
 	Changes to project and solutions:
+		-New Common.Logging.CuttingEdge and Common.Logging.CuttingEdge.Tests.Unit projects added. The
+		 Common.Logging.CuttingEdge project provides an adapter for the Common.Logging infrastructure (CLI). 
+		 The CLI is a facade around logging frameworks with an API close to that of log4net.
 		-changes.txt and licence.txt moved up from the CuttingEdge.Logging library directory to the solution 
 		 directory and added to the SolutionItems folder.
 		-Settings.StyleCop file was missing from from Tests.Unit project directory in source control. 

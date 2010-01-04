@@ -17,11 +17,11 @@ namespace CuttingEdge.Logging.Tests.Common
         private static int id;
         private SandboxManager sandboxManager;
 
-        protected LoggingAppDomainManager(IConfigurationWriter configuration, string testAssemblyFileName)
+        protected LoggingAppDomainManager(IConfigurationWriter configuration)
         {
             string name = "sandbox" + GetNextId();
 
-            this.sandbox = CreateLocalSandbox(name, configuration, testAssemblyFileName);
+            this.sandbox = this.CreateLocalSandbox(name, configuration);
 
             this.sandboxManager = new SandboxManager();
 
@@ -53,8 +53,8 @@ namespace CuttingEdge.Logging.Tests.Common
             }
         }
 
-        private static LocalSandbox<TRemoteSandbox> CreateLocalSandbox(string name,
-            IConfigurationWriter configuration, string testAssemblyFileName)
+        protected virtual LocalSandbox<TRemoteSandbox> CreateLocalSandbox(string name,
+            IConfigurationWriter configuration)
         {
             LocalSandbox<TRemoteSandbox> localSandbox =
                 new LocalSandbox<TRemoteSandbox>(name, configuration);
@@ -63,7 +63,6 @@ namespace CuttingEdge.Logging.Tests.Common
 
             localSandbox.DependentFiles.Add("CuttingEdge.Logging.dll");
             localSandbox.DependentFiles.Add(currentAssemblyName + ".dll");
-            localSandbox.DependentFiles.Add(testAssemblyFileName);
             localSandbox.DependentFiles.Add("NSandbox.dll");
 
             return localSandbox;

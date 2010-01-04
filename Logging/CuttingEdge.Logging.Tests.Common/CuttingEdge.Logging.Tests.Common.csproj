@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,8 +34,10 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="NSandbox, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\SharedAssemblies\NSandbox.dll</HintPath>
@@ -44,21 +47,28 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigurationBuilder.cs" />
     <Compile Include="LoggingAppDomainManager.cs" />
     <Compile Include="LoggingConfigurationBuilder.cs" />
+    <Compile Include="LoggingProviderScope.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProviderConfigLine.cs" />
     <Compile Include="SandboxHelpers.cs" />
     <Compile Include="TemplatedConfigurationWriter.cs" />
+    <Compile Include="UnitTestingLoggingProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CuttingEdge.Logging\CuttingEdge.Logging.csproj">
       <Project>{740C36FE-5353-4862-907A-693511194CC1}</Project>
       <Name>CuttingEdge.Logging</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Settings.StyleCop" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

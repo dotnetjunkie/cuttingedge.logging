@@ -1,0 +1,1 @@
+Common.Logging project aims to provide lightweight 'infrastructure' libraries that can be used across multiple projects. Common.Logging supports logging frameworks such as log4net, NLog and Enterprise Library. CuttingEdge.Logging defines an adapter for Common.Logging.

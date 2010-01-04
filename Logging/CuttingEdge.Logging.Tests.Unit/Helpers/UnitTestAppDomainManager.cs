@@ -8,20 +8,20 @@ namespace CuttingEdge.Logging.Tests.Unit.Helpers
 {
     public sealed class UnitTestAppDomainManager : LoggingAppDomainManager<UnitTestRemoteSandbox>
     {
-        public UnitTestAppDomainManager(IConfigurationWriter configuration)
-            : base(configuration, ThisTestAssemblyFileName)
+        public UnitTestAppDomainManager(IConfigurationWriter configuration) : base(configuration)
         {
         }
 
-        private static string ThisTestAssemblyFileName
+        protected override LocalSandbox<UnitTestRemoteSandbox> CreateLocalSandbox(string name, 
+            IConfigurationWriter configuration)
         {
-            get
-            {
-                string currentAssemblyName =
-                    MethodBase.GetCurrentMethod().DeclaringType.Assembly.GetName().Name;
+            var localSandbox = base.CreateLocalSandbox(name, configuration);
 
-                return currentAssemblyName + ".dll";
-            }
+            string currentAssemblyName = MethodBase.GetCurrentMethod().DeclaringType.Assembly.GetName().Name;
+
+            localSandbox.DependentFiles.Add(currentAssemblyName + ".dll");
+
+            return localSandbox;
         }
     }
 }

@@ -12,21 +12,21 @@ namespace CuttingEdge.Logging.Tests.Integration
     public sealed class IntegrationTestLoggingAppDomainManager 
         : LoggingAppDomainManager<IntegrationTestingRemoteSandbox>
     {
-        public IntegrationTestLoggingAppDomainManager(IConfigurationWriter configuration)
-            : base(configuration, ThisTestAssemblyFileName)
+        public IntegrationTestLoggingAppDomainManager(IConfigurationWriter configuration) : base(configuration)
         {
             this.DomainUnderTest.BeginTransactionScope();
         }
 
-        private static string ThisTestAssemblyFileName
+        protected override LocalSandbox<IntegrationTestingRemoteSandbox> CreateLocalSandbox(string name, 
+            IConfigurationWriter configuration)
         {
-            get
-            {
-                string currentAssemblyName =
-                    MethodBase.GetCurrentMethod().DeclaringType.Assembly.GetName().Name;
+            var localSandbox = base.CreateLocalSandbox(name, configuration);
 
-                return currentAssemblyName + ".dll";
-            }
+            string currentAssemblyName = MethodBase.GetCurrentMethod().DeclaringType.Assembly.GetName().Name;
+
+            localSandbox.DependentFiles.Add(currentAssemblyName + ".dll");
+
+            return localSandbox;
         }
 
         protected override void Dispose(bool disposing)

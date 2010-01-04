@@ -5,9 +5,9 @@ using System.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CuttingEdge.Logging.Tests.Unit.Helpers
+namespace CuttingEdge.Logging.Tests.Common
 {
-    internal enum ScopeOption
+    public enum ScopeOption
     {
         /// <summary>Default option. Does not do any checking.</summary>
         None = 0,
@@ -21,14 +21,15 @@ namespace CuttingEdge.Logging.Tests.Unit.Helpers
     /// supplied <typeparamref name="TLogger"/> in the context of the current thread.
     /// </summary>
     /// <typeparam name="TLogger">The type of logger that will be created and registered.</typeparam>
-    internal sealed class LoggingProviderScope : IDisposable
+    public sealed class LoggingProviderScope : IDisposable
     {
         private readonly ReadOnlyCollection<LogEntry> loggedEntries;
         private readonly ScopeOption option;
 
         /// <summary>Initializes a new instance of the <see cref="LoggingProviderScope"/> class.</summary>
         /// <param name="option">The scope option.</param>
-        public LoggingProviderScope(ScopeOption option) : this()
+        public LoggingProviderScope(ScopeOption option)
+            : this()
         {
             this.option = option;
         }
@@ -55,6 +56,23 @@ namespace CuttingEdge.Logging.Tests.Unit.Helpers
         }
 
         /// <summary>
+        /// Gets the provider that is set up in the configuration file that can be used to log to.
+        /// </summary>
+        /// <returns>The <see cref="LoggingProviderBase"/> that can be used to log to in the context of the
+        /// LoggingProviderScope.</returns>
+        public static LoggingProviderBase GetProviderFromConfiguration()
+        {
+            var provider = Logger.Providers.OfType<UnitTestingLoggingProvider>().FirstOrDefault();
+
+            if (provider == null)
+            {
+                Assert.Fail("There is no UnitTestingLoggingProvider configured.");
+            }
+
+            return provider;
+        }
+
+        /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged 
         /// resources.
         /// </summary>
@@ -69,7 +87,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Helpers
             {
                 if (entries.Count >= 2)
                 {
-                    Assert.Fail("A second LogEntry was logged, while only one entry was expected. " + 
+                    Assert.Fail("A second LogEntry was logged, while only one entry was expected. " +
                         "LogEntry: " + entries.Last().ToString());
                 }
             }
