@@ -28,6 +28,7 @@ using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text;
+using System.Collections.Specialized;
 
 namespace CuttingEdge.Logging
 {
@@ -153,6 +154,14 @@ namespace CuttingEdge.Logging
             }
 
             return builder.ToString();
+        }
+
+        internal static void SetDescriptionWhenMissing(NameValueCollection config, string description)
+        {
+            if (string.IsNullOrEmpty(config["description"]))
+            {
+                config["description"] = description;
+            }
         }
 
         private static int EstimateInitialCapacity(MethodBase method, ParameterInfo[] parameters)

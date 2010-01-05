@@ -240,10 +240,7 @@ namespace CuttingEdge.Logging.Web
                 throw new ArgumentNullException("config");
             }
 
-            if (string.IsNullOrEmpty(config["description"]))
-            {
-                config["description"] = "ASP.NET SQL logging provider";
-            }
+            LoggingHelper.SetDescriptionWhenMissing(config, "ASP.NET SQL logging provider");
 
             // Retrieve and remove values from config. We do this before calling base.Initialize(), 
             // because the base class checks for unrecognized attributes.
