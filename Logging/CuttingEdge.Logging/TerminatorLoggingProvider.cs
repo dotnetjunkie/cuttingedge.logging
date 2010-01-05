@@ -109,6 +109,8 @@ namespace CuttingEdge.Logging
                 throw new ArgumentNullException("config");
             }
 
+            LoggingHelper.SetDescriptionWhenMissing(config, "Terminator logging provider");
+
             // Check for unsupported attributes fallbackProvider and threshold before calling base.Initialize.
             this.ThrowWhenConfigContainsFallbackProvider(name, config);
             this.ThrowWhenConfigContainsThreshold(name, config);

@@ -133,10 +133,7 @@ namespace CuttingEdge.Logging.Web
                 throw new ArgumentNullException("config");
             }
 
-            if (string.IsNullOrEmpty(config["description"]))
-            {
-                config["description"] = "ASP.NET trace logging provider";
-            }
+            LoggingHelper.SetDescriptionWhenMissing(config, "ASP.NET trace logging provider");
 
             // Call initialize first.
             base.Initialize(name, config);

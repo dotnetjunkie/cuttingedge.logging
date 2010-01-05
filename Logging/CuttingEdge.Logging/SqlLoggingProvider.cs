@@ -168,10 +168,7 @@ namespace CuttingEdge.Logging
                 throw new ArgumentNullException("config");
             }
 
-            if (string.IsNullOrEmpty(config["description"]))
-            {
-                config["description"] = "SQL logging provider";
-            }
+            LoggingHelper.SetDescriptionWhenMissing(config, "SQL logging provider");
 
             // Call initialize first.
             base.Initialize(name, config);

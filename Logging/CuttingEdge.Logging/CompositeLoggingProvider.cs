@@ -203,6 +203,8 @@ namespace CuttingEdge.Logging
                 throw new ArgumentNullException("config");
             }
 
+            LoggingHelper.SetDescriptionWhenMissing(config, "Composite logging provider");
+
             // Call base initialize first. This method prevents initialize from being called more than once.
             base.Initialize(name, config);
 

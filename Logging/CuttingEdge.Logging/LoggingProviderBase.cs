@@ -131,11 +131,6 @@ namespace CuttingEdge.Logging
                 name = this.GetType().Name;
             }
 
-            if (string.IsNullOrEmpty(config["description"]))
-            {
-                config["description"] = this.GenerateDescriptionBasedOnTypeName();
-            }
-
             // Perform the basic initialization.
             base.Initialize(name, config);
 
@@ -495,29 +490,6 @@ namespace CuttingEdge.Logging
 
                 throw new ProviderException(SR.UnrecognizedAttributeInProviderConfiguration(name, attribute));
             }
-        }
-
-        private string GenerateDescriptionBasedOnTypeName()
-        {
-            const char WhiteSpace = ' ';
-
-            List<char> characters = new List<char>();
-
-            bool first = true;
-
-            foreach (char character in this.GetType().Name)
-            {
-                if (!first && Char.IsUpper(character))
-                {
-                    characters.Add(WhiteSpace);
-                }
-
-                characters.Add(first ? character : Char.ToLowerInvariant(character));
-
-                first = false;
-            }
-
-            return new string(characters.ToArray());
         }
 
         private void InitializeThreshold(NameValueCollection config)

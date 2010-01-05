@@ -186,6 +186,8 @@ namespace CuttingEdge.Logging
                 throw new ArgumentNullException("config");
             }
 
+            LoggingHelper.SetDescriptionWhenMissing(config, "Memory logging provider");
+
             // Call initialize first.
             base.Initialize(name, config);
 

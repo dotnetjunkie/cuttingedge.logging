@@ -166,6 +166,8 @@ namespace CuttingEdge.Logging
                 throw new ArgumentNullException("config");
             }
 
+            LoggingHelper.SetDescriptionWhenMissing(config, "Windows event log logging provider");
+
             // Call base initialize first. This method prevents initialize from being called more than once.
             base.Initialize(name, config);
 

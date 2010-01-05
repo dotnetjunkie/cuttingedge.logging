@@ -143,6 +143,8 @@ namespace CuttingEdge.Logging
                 throw new ArgumentNullException("config");
             }
 
+            LoggingHelper.SetDescriptionWhenMissing(config, "Debug logging provider");
+
             // Call initialize first.
             base.Initialize(name, config);
 
