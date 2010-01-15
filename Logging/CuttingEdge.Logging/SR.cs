@@ -53,16 +53,9 @@ namespace CuttingEdge.Logging
                 type.Assembly.GetName().Name);
         }
 
-        internal static string SectionIsNotOfCorrectType(string sectionName, Type expectedType,
-            Type actualType)
+        internal static string NoDefaultLoggingProviderFound(string sectionName)
         {
-            return GetString("SectionIsNotOfCorrectType", sectionName, expectedType.FullName, 
-                actualType.FullName);
-        }
-
-        internal static string NoDefaultLoggingProviderFound(string sourceName)
-        {
-            return GetString("NoDefaultLoggingProviderFound", sourceName);
+            return GetString("NoDefaultLoggingProviderFound", sectionName);
         }
 
         internal static string CircularReferenceInLoggingSection(string sectionName, string providerName)
@@ -189,9 +182,9 @@ namespace CuttingEdge.Logging
 
         // Exception messages for LoggingWebEventProvider
         internal static string MissingLoggingProviderInConfig(string loggingProviderName, 
-            string loggingWebEventProviderName)
+            string loggingWebEventProviderName, string sectionName)
         {
-            return GetString("MissingLoggingProviderInConfig", loggingProviderName, 
+            return GetString("MissingLoggingProviderInConfig", loggingProviderName, sectionName,
                 loggingWebEventProviderName);
         }
 

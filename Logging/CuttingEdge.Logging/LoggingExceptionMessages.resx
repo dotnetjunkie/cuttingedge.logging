@@ -187,13 +187,13 @@
     <value>Missing connection string '{0}' in &lt;connectionStrings&gt; section of the configuration file.</value>
   </data>
   <data name="MissingLoggingProviderInConfig" xml:space="preserve">
-    <value>Missing logging provider '{0}' in &lt;logging&gt; section of the configuration file. The logging provider that was configured in the '{1}' web event provider could not be found.</value>
+    <value>Missing logging provider '{0}' in &lt;{1}&gt; section of the configuration file. The logging provider that was configured in the '{2}' web event provider could not be found.</value>
   </data>
   <data name="MissingUserNameRetrievalTypeAttributeInConfig" xml:space="preserve">
     <value>Empty or missing userNameRetrievalType attribute in provider '{0}' in configuration file. Please supply one of the following values: {1}.</value>
   </data>
   <data name="NoDefaultLoggingProviderFound" xml:space="preserve">
-    <value>No default Logging provider was found in the &lt;{0}&gt; section of the configuration file or the &lt;{0}&gt; section was missing. Please provide a default provider as follows: &lt;{0} defaultProvider="[NameOfYourDefaultProvider]"&gt;&lt;add name="[NameOfYourDefaultProvider]" type="[ProviderType]" /&gt;&lt;/{0}&gt;.</value>
+    <value>No default Logging provider was found in the &lt;{0}&gt; section of the configuration file or the &lt;{0}&gt; section was missing. Please provide a default provider as follows: &lt;{0} defaultProvider="[NameOfYourDefaultProvider]"&gt;&lt;providers&gt;&lt;add name="[NameOfYourDefaultProvider]" type="[ProviderType]" /&gt;&lt;/providers&gt;&lt;/{0}&gt;.</value>
   </data>
   <data name="NoPermissionsToAccessSmtpServers" xml:space="preserve">
     <value>There was an error while initializing the provider '{0}'. The application does not have permissions to access Simple Mail Transport Protocol (SMTP) servers. {1}</value>
@@ -215,9 +215,6 @@
   </data>
   <data name="ReferencedProviderDoesNotExist" xml:space="preserve">
     <value>The {0} with name '{1}' references a provider with name '{2}' that does not exist. Make sure the name is spelled correctly.</value>
-  </data>
-  <data name="SectionIsNotOfCorrectType" xml:space="preserve">
-    <value>The section '{0}' in the configuration's &lt;configSections&gt; is not of type {1} but of type {2}.</value>
   </data>
   <data name="SqlProviderAlreadyInitialized" xml:space="preserve">
     <value>The provider '{0}' has already been initialized. Please remove the 'initializeSchema' attribute from the provider configuration.</value>

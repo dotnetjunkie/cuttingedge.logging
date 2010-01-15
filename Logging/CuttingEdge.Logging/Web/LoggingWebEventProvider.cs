@@ -228,7 +228,7 @@ namespace CuttingEdge.Logging.Web
                 if (this.loggingProvider == null)
                 {
                     throw new ProviderException(SR.MissingLoggingProviderInConfig(loggingProviderName,
-                        this.Name));
+                        this.Name, Logger.SectionName));
                 }
             }
 

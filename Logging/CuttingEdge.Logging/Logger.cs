@@ -87,7 +87,7 @@ namespace CuttingEdge.Logging
     /// </example>
     public static class Logger
     {
-        internal const string SectionName = "logging";
+        private const string DefaultSectionName = "logging";
 
         private static readonly LoggingProviderCollection providers;
         private static readonly LoggingProviderBase provider;
@@ -423,26 +423,51 @@ namespace CuttingEdge.Logging
             return Logger.Provider.Log(severity, message, source);
         }
 
+        /// <summary>Gets the name of the logging section as it is currently configured by the user.</summary>
+        /// <value>The name of the logging section.</value>
+        internal static string SectionName
+        {
+            get { return GetConfigurationSection().SectionInformation.Name; }
+        }
+
         // Throws a ProviderException on failure.
         private static LoggingSection GetConfigurationSection()
         {
-            object section = ConfigurationManager.GetSection(SectionName);
+            var configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-            if (section == null)
+            var section = FindLoggingSection(configuration.Sections, configuration.SectionGroups);
+
+            if (section != null)
             {
-                throw new ProviderException(
-                    SR.LoggingSectionMissingFromConfigSettings(SectionName, typeof(LoggingSection)));
+                return section;
             }
 
-            LoggingSection loggingSection = section as LoggingSection;
+            throw new ProviderException(
+                SR.LoggingSectionMissingFromConfigSettings(DefaultSectionName, typeof(LoggingSection)));
+        }
 
-            if (loggingSection == null)
+        private static LoggingSection FindLoggingSection(ConfigurationSectionCollection sections,
+            ConfigurationSectionGroupCollection sectionGroups)
+        {
+            foreach (var section in sections)
             {
-                throw new ProviderException(
-                    SR.SectionIsNotOfCorrectType(SectionName, typeof(LoggingSection), section.GetType()));
+                if (section is LoggingSection)
+                {
+                    return (LoggingSection)section;
+                }
             }
 
-            return loggingSection;
+            foreach (ConfigurationSectionGroup sectionGroup in sectionGroups)
+            {
+                var section = FindLoggingSection(sectionGroup.Sections, sectionGroup.SectionGroups);
+
+                if (section != null)
+                {
+                    return section;
+                }
+            }
+
+            return null;
         }
 
         // Throws a ConfigurationException (or a descendant) on failure.
