@@ -105,23 +105,59 @@ namespace CuttingEdge.Logging.Tests.Unit.LoggerTests
         }
 
         [TestMethod]
-        public void Configuration_WithInvalidSection_ThrowsException()
+        public void Configuration_WithAlternativeSectionName_Succeeds()
         {
-            string incorrectSectionTypeName = typeof(IncorrectSection).FullName + ", " +
-                typeof(IncorrectSection).Assembly.GetName().Name;
-
             // Arrange
-            string xml =
+            var config = new TemplatedConfigurationWriter(
                 @"<?xml version=""1.0"" encoding=""utf-8"" ?>
                 <configuration>
                     <configSections>
-	                    <section name=""logging"" 
-                            type=""" + incorrectSectionTypeName + @""" 
+	                    <section name=""cuttingEdge_logging"" 
+                            type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"" 
                             allowDefinition=""MachineToApplication"" />
                     </configSections>
-                </configuration>";
+                    <cuttingEdge_logging defaultProvider=""MemoryLoggingProvider"">
+                       <providers>
+                            <add 
+                                name=""MemoryLoggingProvider""
+                                type=""CuttingEdge.Logging.MemoryLoggingProvider, CuttingEdge.Logging""
+                            />
+                       </providers>
+                    </cuttingEdge_logging>
+                </configuration>
+            ");
 
-            var config = new TemplatedConfigurationWriter(xml);
+            using (var manager = new UnitTestAppDomainManager(config))
+            {
+                // Act
+                manager.DomainUnderTest.InitializeLoggingSystem();
+            }
+        }
+
+
+        [TestMethod]
+        public void Configuration_WithAlternativeSectionNameWithoutExpectedName_ThrowsExceptionWithExpectedSectionName()
+        {
+            // Arrange
+            const string AlternativeSectionName = "cuttingEdge_logging";
+
+            var config = new TemplatedConfigurationWriter(
+                @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+                <configuration>
+                    <configSections>
+	                    <section name=""" + AlternativeSectionName + @""" 
+                            type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"" />
+                    </configSections>
+                    <logging defaultProvider=""MemoryLoggingProvider"">
+                       <providers>
+                            <add 
+                                name=""MemoryLoggingProvider""
+                                type=""CuttingEdge.Logging.MemoryLoggingProvider, CuttingEdge.Logging""
+                            />
+                       </providers>
+                    </logging>
+                </configuration>
+            ");
 
             using (var manager = new UnitTestAppDomainManager(config))
             {
@@ -133,11 +169,83 @@ namespace CuttingEdge.Logging.Tests.Unit.LoggerTests
                     // Assert
                     Assert.Fail("Exception expected.");
                 }
-                catch (ProviderException ex)
+                catch (ConfigurationErrorsException ex)
                 {
-                    Assert.IsTrue(ex.Message.Contains(typeof(LoggingSection).FullName), "Actual message: " + ex.Message);
-                    Assert.IsTrue(ex.Message.Contains(typeof(IncorrectSection).FullName), "Actual message: " + ex.Message);
+                    Assert.IsTrue(ex.Message.Contains("<cuttingEdge_logging>"), "Actual message: " + ex.Message);
+                    Assert.IsTrue(!ex.Message.Contains("<logging"), "Actual message: " + ex.Message);
+                    Assert.IsTrue(!ex.Message.Contains("</logging"), "Actual message: " + ex.Message);
                 }
+            }
+        }
+
+        [TestMethod]
+        public void Configuration_WithSectionGroup_Succeeds()
+        {
+            // Arrange
+            var config = new TemplatedConfigurationWriter(
+                @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+                <configuration>
+                    <configSections>
+                        <sectionGroup name=""cuttingEdge"">
+                            <section name=""logging"" 
+                                type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"" 
+                                allowDefinition=""MachineToApplication"" />
+                        </sectionGroup>
+                    </configSections>
+                    <cuttingEdge>
+                        <logging defaultProvider=""MemoryLoggingProvider"">
+                           <providers>
+                                <add 
+                                    name=""MemoryLoggingProvider""
+                                    type=""CuttingEdge.Logging.MemoryLoggingProvider, CuttingEdge.Logging""
+                                />
+                           </providers>
+                        </logging>
+                    </cuttingEdge>
+                </configuration>
+            ");
+
+            using (var manager = new UnitTestAppDomainManager(config))
+            {
+                // Act
+                manager.DomainUnderTest.InitializeLoggingSystem();
+            }
+        }
+
+        [TestMethod]
+        public void Configuration_WithNestedSectionGroup_Succeeds()
+        {
+            // Arrange
+            var config = new TemplatedConfigurationWriter(
+                @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+                <configuration>
+                    <configSections>
+                        <sectionGroup name=""cutting"">
+                            <sectionGroup name=""edge"">
+                                <section name=""logging"" 
+                                    type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"" />
+                            </sectionGroup>
+                        </sectionGroup>
+                    </configSections>
+                    <cutting>
+                        <edge>
+                            <logging defaultProvider=""MemoryLoggingProvider"">
+                               <providers>
+                                    <add 
+                                        name=""MemoryLoggingProvider""
+                                        type=""CuttingEdge.Logging.MemoryLoggingProvider, CuttingEdge.Logging""
+                                    />
+                               </providers>
+                            </logging>
+                        </edge>
+                    </cutting>
+                </configuration>
+            ");
+
+            using (var manager = new UnitTestAppDomainManager(config))
+            {
+                // Act
+                manager.DomainUnderTest.InitializeLoggingSystem();
             }
         }
 

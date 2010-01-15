@@ -17,11 +17,11 @@ namespace CuttingEdge.Logging.Tests.Unit
     [TestClass]
     public class LoggingProviderBaseTests
     {
-        private const string MissingDefaultProviderExceptionMessage =
-            "No default Logging provider was found in the <logging> section of the configuration file " +
-            "or the <logging> section was missing. Please provide a default provider as follows: " +
-            "<logging defaultProvider=\"[NameOfYourDefaultProvider]\">" +
-            "<add name=\"[NameOfYourDefaultProvider]\" type=\"[ProviderType]\" /></logging>.";
+        //private const string MissingDefaultProviderExceptionMessage =
+        //    "No default Logging provider was found in the <logging> section of the configuration file " +
+        //    "or the <logging> section was missing. Please provide a default provider as follows: " +
+        //    "<logging defaultProvider=\"[NameOfYourDefaultProvider]\">" +
+        //    "<add name=\"[NameOfYourDefaultProvider]\" type=\"[ProviderType]\" /></logging>.";
 
         private const string MissingConfigSectionsElementExceptionMessage =
             "The Logger has not been configured properly. Please register the logger as <section> element " +
@@ -334,8 +334,8 @@ namespace CuttingEdge.Logging.Tests.Unit
                 }
                 catch (ConfigurationErrorsException ex)
                 {
-                    Assert.IsTrue(ex.Message.StartsWith(MissingDefaultProviderExceptionMessage),
-                        "Exception message does not start with expected string: {0}", ex.Message);
+                    Assert.IsTrue(ex.Message.Contains("No default Logging provider was found"),
+                        "Exception message does contain expected string. Actual: {0}", ex.Message);
                 }
             }
         }
@@ -373,8 +373,8 @@ namespace CuttingEdge.Logging.Tests.Unit
                 }
                 catch (ConfigurationErrorsException ex)
                 {
-                    Assert.IsTrue(ex.Message.StartsWith(MissingDefaultProviderExceptionMessage),
-                        "Exception message does not start with expected string: {0}", ex.Message);
+                    Assert.IsTrue(ex.Message.StartsWith("No default Logging provider was found"),
+                        "Exception message does not contain expected string. Actual: {0}", ex.Message);
                 }
             }
         }
