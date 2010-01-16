@@ -4,8 +4,13 @@ Version vNext
 	General description:
 	
 	Bug fixes:
+		-Exception message contained invalid example configuration.
+		 The exception thrown in the situation where the <logging> section was missing or didn't contain a
+		 'defaultProvider' attribute, contained an example configuration that was invalid. The <providers>
+		 tag was missing.
 	
 	Code changes:
+		-Configuration can now use an alternatively named configuration section name for work item 5109.
 		-The Obsolete attribute of the LoggerWrapper class was removed from the library.
 		-A new TerminatorLoggingProvider added for work item 4845.
 		-A new CompositeLoggingProvider added for work item 4844.
@@ -34,7 +39,7 @@ Version vNext
 		 The CLI is a facade around logging frameworks with an API close to that of log4net.
 		-changes.txt and licence.txt moved up from the CuttingEdge.Logging library directory to the solution 
 		 directory and added to the SolutionItems folder.
-		-Settings.StyleCop file was missing from from Tests.Unit project directory in source control. 
+		-Settings.StyleCop file was missing from Tests.Unit project directory in source control. 
 		 StyleCop would report false errors because of this.
 		-Global Settings.StyleCop and Logging.FxCop files are now added to a new solution folder called
 		 SolutionItems. This makes them more visible to developers. Settings.StyleCop files in sub

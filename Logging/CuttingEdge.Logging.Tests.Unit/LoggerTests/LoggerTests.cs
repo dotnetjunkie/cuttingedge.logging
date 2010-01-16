@@ -134,7 +134,6 @@ namespace CuttingEdge.Logging.Tests.Unit.LoggerTests
             }
         }
 
-
         [TestMethod]
         public void Configuration_WithAlternativeSectionNameWithoutExpectedName_ThrowsExceptionWithExpectedSectionName()
         {
