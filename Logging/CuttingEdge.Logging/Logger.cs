@@ -159,6 +159,13 @@ namespace CuttingEdge.Logging
                 return providers;
             }
         }
+        
+        /// <summary>Gets the name of the logging section as it is currently configured by the user.</summary>
+        /// <value>The name of the logging section.</value>
+        internal static string SectionName
+        {
+            get { return GetConfigurationSection().SectionInformation.Name; }
+        }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
         /// <param name="exception">The exception that has to be logged.</param>
@@ -421,13 +428,6 @@ namespace CuttingEdge.Logging
         public static object Log(LoggingEventType severity, string message, string source)
         {
             return Logger.Provider.Log(severity, message, source);
-        }
-
-        /// <summary>Gets the name of the logging section as it is currently configured by the user.</summary>
-        /// <value>The name of the logging section.</value>
-        internal static string SectionName
-        {
-            get { return GetConfigurationSection().SectionInformation.Name; }
         }
 
         // Throws a ProviderException on failure.

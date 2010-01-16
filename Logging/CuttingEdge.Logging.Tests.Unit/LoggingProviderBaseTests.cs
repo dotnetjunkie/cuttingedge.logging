@@ -17,12 +17,6 @@ namespace CuttingEdge.Logging.Tests.Unit
     [TestClass]
     public class LoggingProviderBaseTests
     {
-        //private const string MissingDefaultProviderExceptionMessage =
-        //    "No default Logging provider was found in the <logging> section of the configuration file " +
-        //    "or the <logging> section was missing. Please provide a default provider as follows: " +
-        //    "<logging defaultProvider=\"[NameOfYourDefaultProvider]\">" +
-        //    "<add name=\"[NameOfYourDefaultProvider]\" type=\"[ProviderType]\" /></logging>.";
-
         private const string MissingConfigSectionsElementExceptionMessage =
             "The Logger has not been configured properly. Please register the logger as <section> element " +
             "in the <configSections> of your configurations file as follows: " +
