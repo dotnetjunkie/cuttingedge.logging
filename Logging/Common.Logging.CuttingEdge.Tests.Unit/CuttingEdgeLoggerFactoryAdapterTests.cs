@@ -91,12 +91,33 @@ namespace Common.Logging.CuttingEdge.Tests.Unit
         public void GetLogger_WithNameWithoutExactMatchConfigurationInDifferentOrder_ReturnsExpectedParentProvider()
         {
             // Arrange
-            const string HierarchicalLoggerName = "System.Configuration.Install";
-            const string ExpectedLoggerName = "System.Configuration";
+            const string HierarchicalLoggerName = "System.Configuration.Install.FooBar";
+            const string ExpectedLoggerName = "System.Configuration.Install";
 
             // This test looks a lot like the previous, but the providers are in a different order now.
-            var validConfiguration =
-                BuildConfigurationWithProviderNames("System.Configuration.FooBar", ExpectedLoggerName, "System");
+            var validConfiguration = BuildConfigurationWithProviderNames(
+                "System.Configuration.FooBar", "System.Configuration", ExpectedLoggerName, "System");
+
+            using (var manager = new CommonLoggingTestLoggingAppDomainManager(validConfiguration))
+            {
+                // Act
+                string actualLoggerName = manager.DomainUnderTest.GetLoggerName(HierarchicalLoggerName);
+
+                // Assert
+                Assert.AreEqual(ExpectedLoggerName, actualLoggerName);
+            }
+        }
+
+        [TestMethod]
+        public void GetLogger_WithNameWithoutExactMatchConfigurationInDifferentOrder2_ReturnsExpectedParentProvider()
+        {
+            // Arrange
+            const string HierarchicalLoggerName = "System.Configuration.Install.FooBar";
+            const string ExpectedLoggerName = "System.Configuration.Install";
+
+            // This test looks a lot like the previous, but the providers are in a different order now.
+            var validConfiguration = BuildConfigurationWithProviderNames(
+                "System.Configuration.FooBar", "System.Configuration", ExpectedLoggerName, "System");
 
             using (var manager = new CommonLoggingTestLoggingAppDomainManager(validConfiguration))
             {
