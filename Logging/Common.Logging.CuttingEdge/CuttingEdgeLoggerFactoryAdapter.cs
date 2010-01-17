@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+
 using Common.Logging.Factory;
+
 using CuttingEdge.Logging;
 
 namespace Common.Logging.CuttingEdge
@@ -11,25 +13,34 @@ namespace Common.Logging.CuttingEdge
     /// </summary>
     /// <remarks>
     /// <para>The adapter has no configuration properties.</para>
+    /// <para>
+    /// This adapter for Common.Logging adds the notion of hierarchical loggers to CuttingEdge.Logging.
+    /// This is a feature CuttingEdge.Logging doesn't support natively. Naming logging providers as
+    /// namespaces (such as 'Company.Product.Layer') allows the <b>CuttingEdgeLoggerFactoryAdapter</b> to
+    /// resolve loggers in an hierarchical manner.
+    /// </para>
     /// </remarks>
     /// <example>
     /// The following snippet shows how to configure CuttingEdge.Logging logging for Common.Logging:
     /// <code><![CDATA[
     /// <configuration>
     ///   <configSections>
-    ///     <section name="logging" type="Common.Logging.ConfigurationSectionHandler, Common.Logging" />
+    ///     <sectionGroup name="common">
+    ///       <section name="logging" type="Common.Logging.ConfigurationSectionHandler, Common.Logging" />  
+    ///     </sectionGroup>
     ///     <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging" />
     ///   </configSections>
     ///   <common>
     ///     <logging>
     ///       <factoryAdapter
-    ///         type="Common.Logging.CuttingEdge.CuttingEdgeLoggerFactoryAdapter, Common.Logging.CuttingEdge">
-    ///       </factoryAdapter>
+    ///         type="Common.Logging.CuttingEdge.CuttingEdgeLoggerFactoryAdapter, Common.Logging.CuttingEdge"
+    ///       />
     ///     </logging>
     ///   </common>
     ///   <logging defaultProvider="...">
-    /// <-- configure CuttingEdge.Logging here -->
-    /// ...
+    ///     <providers>
+    ///       <-- configure CuttingEdge.Logging here -->
+    ///     </providers>
     ///   </logging>
     /// </configuration>
     /// ]]></code>
@@ -40,7 +51,7 @@ namespace Common.Logging.CuttingEdge
 
         // Calling Logger.Provider will initialize logging system. The Logger will throw an exception when
         // initialization failed. It is important to let the logging system fail as soon as possible when the
-        // system is misconfigured.
+        // system is configured incorrectly.
         private readonly LoggingProviderBase DefaultProvider = Logger.Provider;
 
         /// <summary>
@@ -101,18 +112,13 @@ namespace Common.Logging.CuttingEdge
                 }
             }
 
-            Comparison<LoggingProviderBase> longestNameFirstSorter = (x, y) => y.Name.Length - x.Name.Length;
+            // All the names of the parents in the list have a name that is the starting part of the
+            // providerName. Therefore, the parent with the longest name will be the closest parent.
+            parents.Sort((x, y) => y.Name.Length - x.Name.Length);
 
-            parents.Sort(longestNameFirstSorter);
+            var closestParent = parents.Count > 0 ? parents[0] : null;
 
-            if (parents.Count > 0)
-            {
-                return parents[0];
-            }
-            else
-            {
-                return null;
-            }
+            return closestParent;
         }
     }
 }
