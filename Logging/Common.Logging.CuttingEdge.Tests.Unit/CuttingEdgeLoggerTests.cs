@@ -1,8 +1,8 @@
-﻿using System.Linq;
+﻿using System.ComponentModel;
+using System.Linq;
 using CuttingEdge.Logging;
 using CuttingEdge.Logging.Tests.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.ComponentModel;
 
 namespace Common.Logging.CuttingEdge.Tests.Unit
 {
