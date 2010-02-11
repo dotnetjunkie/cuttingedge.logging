@@ -25,10 +25,10 @@
 #endregion
 
 using System;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text;
-using System.Collections.Specialized;
 
 namespace CuttingEdge.Logging
 {
