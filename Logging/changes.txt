@@ -1,7 +1,10 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
-Version vNext
+Version 1.2.0.10042 (1.2) 2010-02-11
 	General description:
+		This release has one small bug fix and several new features. The biggest new features are the ability
+		to use an alternatively named configuration section and the addition of the TerminatorLoggingProvider
+		and CompositeLoggingProvider.
 	
 	Bug fixes:
 		-Exception message contained invalid example configuration.

@@ -32,7 +32,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Common.Logging.CuttingEdge")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("CuttingEdge.Logging adapter for Common Infrastructure Libraries for .NET")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
 [assembly: AssemblyProduct("Common.Logging.CuttingEdge")]
