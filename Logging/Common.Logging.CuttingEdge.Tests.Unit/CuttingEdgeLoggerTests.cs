@@ -2,6 +2,7 @@
 using CuttingEdge.Logging;
 using CuttingEdge.Logging.Tests.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.ComponentModel;
 
 namespace Common.Logging.CuttingEdge.Tests.Unit
 {
@@ -235,7 +236,19 @@ namespace Common.Logging.CuttingEdge.Tests.Unit
 
             Assert.IsTrue(log.IsFatalEnabled, "Fatal");
         }
-        
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidEnumArgumentException))]
+        public void WriteInternal_WithInvalidLogLevel_ThrowsException()
+        {
+            // Arrange
+            var logger = new FakeCuttingEdgeLogger();
+            LogLevel invalidLevel = (LogLevel)100;
+
+            // Act
+            logger.PublicWriteInternal(invalidLevel);
+        }
+       
         private static ILog GetLoggerForUseWithScope()
         {
             var adapter = new CuttingEdgeLoggerFactoryAdapter();
@@ -260,6 +273,18 @@ namespace Common.Logging.CuttingEdge.Tests.Unit
             var adapter = new CuttingEdgeLoggerFactoryAdapter();
 
             return adapter.GetLogger(loggingProvider.Name);
+        }
+
+        private sealed class FakeCuttingEdgeLogger : CuttingEdgeLogger
+        {
+            public FakeCuttingEdgeLogger() : base(null)
+            {
+            }
+
+            public void PublicWriteInternal(LogLevel level)
+            {
+                this.WriteInternal(level, "some message", null);
+            }
         }
     }
 }
