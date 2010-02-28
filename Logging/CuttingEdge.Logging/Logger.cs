@@ -25,11 +25,11 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration;
 using System.Configuration.Provider;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CuttingEdge.Logging
@@ -96,6 +96,8 @@ namespace CuttingEdge.Logging
         private static readonly Exception InitializationException;
 
         /// <summary>Initializes static members of the Logger class.</summary>
+        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline",
+            Justification = "Static constructor is needed to be able to store the thrown exception.")]
         static Logger()
         {
             try
@@ -451,9 +453,11 @@ namespace CuttingEdge.Logging
         {
             foreach (var section in sections)
             {
-                if (section is LoggingSection)
+                var loggingSection = section as LoggingSection;
+
+                if (loggingSection != null)
                 {
-                    return (LoggingSection)section;
+                    return loggingSection;
                 }
             }
 

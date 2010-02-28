@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 
@@ -163,7 +164,7 @@ namespace CuttingEdge.Logging
     {
         private const string ProviderAttributePrefix = "provider";
         private List<string> providerNames;
-        private ReadOnlyCollection<LoggingProviderBase> providers = null;
+        private ReadOnlyCollection<LoggingProviderBase> providers;
 
         /// <summary>
         /// Gets the list of logging provider to which the logging events will be forwarded. This list will
@@ -324,6 +325,9 @@ namespace CuttingEdge.Logging
             ThrowCompositeExceptionWhenExceptionsAreThrown(thrownExceptions);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+            Justification = "Catching the Exception base class is not a problem, " +
+                "because we will wrap and re throw these caught exceptions.")]
         private List<Exception> LogToMultipleProvidersGetThrownExceptions(LogEntry entry)
         {
             List<Exception> thrownExceptions = null;
@@ -336,8 +340,6 @@ namespace CuttingEdge.Logging
                 }
                 catch (Exception ex)
                 {
-                    // Catching the Exception base class is not a problem, because we will wrap and re throw
-                    // these caught exceptions.
                     if (thrownExceptions == null)
                     {
                         thrownExceptions = new List<Exception>();
