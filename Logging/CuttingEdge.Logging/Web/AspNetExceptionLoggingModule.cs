@@ -25,6 +25,7 @@
 #endregion
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Web;
 
@@ -77,6 +78,8 @@ namespace CuttingEdge.Logging.Web
     public class AspNetExceptionLoggingModule : IHttpModule
     {
         /// <summary>Initializes static members of the AspNetExceptionLoggingModule class.</summary>
+        [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "logger",
+            Justification = "Logger.Provider has to be called. Local can not be removed.")]
         static AspNetExceptionLoggingModule()
         {
             // Ensure that the Logger configuration is loaded and correct. An exception will be thrown
