@@ -31,6 +31,7 @@ using System.Configuration;
 using System.Configuration.Provider;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Web.Configuration;
 
 namespace CuttingEdge.Logging
 {
@@ -435,7 +436,18 @@ namespace CuttingEdge.Logging
         // Throws a ProviderException on failure.
         private static LoggingSection GetConfigurationSection()
         {
-            var configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            Configuration configuration;
+
+            try
+            {
+                configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            }
+            catch (ArgumentException)
+            {
+                // ArgumentException is thrown when configuration could not be opened, because application is
+                // not a stand alone exe. Next best guess is that we're dealing with a web application.
+                configuration = WebConfigurationManager.OpenWebConfiguration("~");
+            }
 
             var section = FindLoggingSection(configuration.Sections, configuration.SectionGroups);
 
