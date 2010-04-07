@@ -1,13 +1,19 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
-Version vNext
+Version 1.2.1.10097 (1.2.1) 2010-04-07
 	General description:
+		The 1.2.0.10042 contained a critical bug that caused loading of the library to fail in a web 
+		environment.
 	
+	Bug fixes:
+		-Library could not be used in web environment. ArgumentException with message "exePath must be 
+		specified when not running inside a stand alone exe" was thrown.
+		 
 	Code changes:
 		-Reevaluated the use of FxCop and fixed some by FxCop reported issues in the code or added the 
 		 SuppressMessageAttribute to the code. Originally these excludes were added in the FxCop file, but 
 		 adding the attributes to code is more maintainable and discoverable.
-		 
+
 
 Version 1.2.0.10042 (1.2) 2010-02-11
 	General description:
