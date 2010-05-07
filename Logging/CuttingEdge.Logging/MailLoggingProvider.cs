@@ -32,6 +32,7 @@ using System.Configuration.Provider;
 using System.Globalization;
 using System.Net.Mail;
 using System.Security;
+using System.Text;
 
 namespace CuttingEdge.Logging
 {
@@ -174,6 +175,8 @@ namespace CuttingEdge.Logging
     public class MailLoggingProvider : LoggingProviderBase
     {
         private const string SubjectFormatStringAttribute = "subjectFormatString";
+        private const int MaximumMailSubjectMessageLength = 100;
+        private const int MaximumMailSubjectSourceLength = 40;
 
         private string subjectFormatString;
 
@@ -204,7 +207,7 @@ namespace CuttingEdge.Logging
         /// <exception cref="InvalidOperationException">Thrown when an attempt is made to call Initialize on a
         /// provider after the provider has already been initialized.</exception>
         /// <exception cref="ProviderException">Thrown when the <paramref name="config"/> contains
-        /// unrecognized attributes.</exception>
+        /// unrecognized attributes or when the subjectFormatString is formatted incorrectly.</exception>
         public override void Initialize(string name, NameValueCollection config)
         {
             if (config == null)
@@ -236,12 +239,21 @@ namespace CuttingEdge.Logging
         {
             string exceptionType = entry.Exception != null ? entry.Exception.GetType().Name : null;
 
-            return string.Format(CultureInfo.InvariantCulture, subjectFormatString,
+            string message = Truncate(entry.Message, MaximumMailSubjectMessageLength, "...");
+            string source = Truncate(entry.Source, MaximumMailSubjectSourceLength, "...");
+
+            string messageSubject = string.Format(CultureInfo.InvariantCulture, subjectFormatString,
                 entry.Severity, // {0}
-                entry.Message,  // {1}
-                entry.Source,   // {2}
+                RemoveLineBreaks(message),  // {1}
+                RemoveLineBreaks(source),   // {2}
                 exceptionType,  // {3}
                 currentTime);   // {4}
+
+            var builder = new StringBuilder(messageSubject);
+
+            builder.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
+
+            return builder.ToString();
         }
 
         internal virtual SmtpClient CreateSmtpClient()
@@ -350,6 +362,8 @@ namespace CuttingEdge.Logging
             {
                 this.TestIfSubjectFormatStringIsFormattedCorrectly(subjectFormatString);
 
+                this.CheckWhetherFormatStringContainsIllegalCharacters(subjectFormatString);
+
                 this.subjectFormatString = subjectFormatString;
             }
             else
@@ -379,6 +393,18 @@ namespace CuttingEdge.Logging
                     this.Name, ex.Message);
 
                 throw new ProviderException(exceptionMessage, ex);
+            }
+        }
+
+        private void CheckWhetherFormatStringContainsIllegalCharacters(string subjectFormatString)
+        {
+            if (subjectFormatString.Contains("\n") || subjectFormatString.Contains("\r"))
+            {
+                string exceptionMessage =
+                    SR.IllegalCharactersLineBreaksAreNotAllowed(subjectFormatString,
+                    SubjectFormatStringAttribute, this.Name);
+
+                throw new ProviderException(exceptionMessage);
             }
         }
 
@@ -447,6 +473,26 @@ namespace CuttingEdge.Logging
                     message.Dispose();
                 }
             }
+        }
+
+        private static string RemoveLineBreaks(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            return value.Replace("\r\n", " ").Replace("\n", " ").Replace("\r", " ");
+        }
+
+        private static string Truncate(string value, int maxLength, string trailer)
+        {
+            if (value == null || value.Length <= maxLength)
+            {
+                return value;
+            }
+
+            return value.Substring(0, maxLength) + trailer;
         }
     }
 }

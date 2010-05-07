@@ -150,6 +150,9 @@
     &lt;/system.net&gt;
 &lt;/configuration&gt;</value>
   </data>
+  <data name="IllegalCharactersLineBreaksAreNotAllowed" xml:space="preserve">
+    <value>The value contains one or more illegal characters. Line breaks are not allowed.</value>
+  </data>
   <data name="InitializationOfDatabaseSchemaFailed" xml:space="preserve">
     <value>Initialization of database schema for provider '{0}' failed. {1}</value>
   </data>

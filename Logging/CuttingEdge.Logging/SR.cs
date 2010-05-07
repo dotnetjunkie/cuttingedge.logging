@@ -202,6 +202,15 @@ namespace CuttingEdge.Logging
                 providerName) + " " + exceptionMessage;
         }
 
+        internal static string IllegalCharactersLineBreaksAreNotAllowed(string attributeValue, 
+            string attributeName, string providerName)
+        {
+            string illegalCharactersMessage = GetString("IllegalCharactersLineBreaksAreNotAllowed");
+
+            return InvalidFormatStringAttribute(attributeValue, attributeName, providerName,
+                illegalCharactersMessage);
+        }
+
         internal static string MissingAttributeInMailSettings(string providerName, string attributeName,
             string sectionName)
         {
