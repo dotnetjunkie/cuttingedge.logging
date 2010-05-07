@@ -9,6 +9,7 @@ using CuttingEdge.Logging.Tests.Common;
 using CuttingEdge.Logging.Tests.Unit.Helpers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace CuttingEdge.Logging.Tests.Unit
 {
@@ -209,7 +210,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
-        public void BuildSubjectWithSubjectFormatString_SubjectFormatStringWithSeverityFormatItem_ReturnsSeverity()
+        public void BuildMailMessageSubject_SubjectFormatStringWithSeverityFormatItem_ReturnsSeverity()
         {
             // Arrange
             string subjectFormatString = "{0}";
@@ -225,7 +226,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
-        public void BuildSubjectWithSubjectFormatString_SubjectFormatStringWithMessageFormatItem_ReturnsMessage()
+        public void BuildMailMessageSubject_SubjectFormatStringWithMessageFormatItem_ReturnsMessage()
         {
             // Arrange
             string subjectFormatString = "{1}";
@@ -241,7 +242,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
-        public void BuildSubjectWithSubjectFormatString_SubjectFormatStringWithSourceFormatItem_ReturnsSource()
+        public void BuildMailMessageSubject_SubjectFormatStringWithSourceFormatItem_ReturnsSource()
         {
             // Arrange
             string subjectFormatString = "{2}";
@@ -257,7 +258,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
-        public void BuildSubjectWithSubjectFormatString_SubjectFormatStringWithExeptionTypeFormatItem_ReturnsExceptionType()
+        public void BuildMailMessageSubject_SubjectFormatStringWithExeptionTypeFormatItem_ReturnsExceptionType()
         {
             // Arrange
             string subjectFormatString = "{3}";
@@ -273,7 +274,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
-        public void BuildSubjectWithSubjectFormatString_SubjectFormatStringWithDateFormatItem_ReturnsDate()
+        public void BuildMailMessageSubject_SubjectFormatStringWithDateFormatItem_ReturnsDate()
         {
             string subjectFormatString = "{4}";
             DateTime currentTime = new DateTime(2009, 11, 30, 18, 27, 12);
@@ -284,6 +285,22 @@ namespace CuttingEdge.Logging.Tests.Unit
                 MailLoggingProvider.BuildMailMessageSubject(subjectFormatString, entryToFormat, currentTime);
 
             Assert.AreEqual("11/30/2009 18:27:12", subject);
+        }
+
+        [TestMethod]
+        public void BuildMailMessageSubject_EntryWithLongMessage_TruncatesMessageAccordingly()
+        {
+            string subjectFormatString = "{1}";
+            string message = string.Join(",", Enumerable.Repeat("123456789_", 20).ToArray());
+            DateTime currentTime = new DateTime(2009, 11, 30, 18, 27, 12);
+            var entryToFormat = new LogEntry(LoggingEventType.Debug, message, null, null);
+
+            // Act
+            string subject =
+                MailLoggingProvider.BuildMailMessageSubject(subjectFormatString, entryToFormat, currentTime);
+
+            Assert.IsFalse(subject.Contains(message));
+            Assert.IsTrue(subject.Contains(message.Substring(0, 100)));
         }
 #endif
 
@@ -399,6 +416,22 @@ namespace CuttingEdge.Logging.Tests.Unit
                 "MailAddress does not contain expected address: " + mailAddress2);
             Assert.IsTrue(message.To.Contains(new MailAddress(mailAddress3)),
                 "MailAddress does not contain expected address: " + mailAddress3);
+        }
+
+        [TestMethod]
+        public void BuildMailMessage_EntryContainingLineBreaks_Succeeds()
+        {
+            // Arrange
+            var provider = new FakeMailLoggingProvider();
+            var configuration = new NameValueCollection();
+            configuration.Add("to", "valid@mail.address");
+            provider.Initialize("Valid name", configuration);
+
+            var entry = new LogEntry(LoggingEventType.Error,
+                "Message with \r\n breaks.", "Log source \r\n with breaks", null);
+
+            // Act
+            provider.BuildMailMessage(entry);
         }
 
         [TestMethod]
@@ -539,6 +572,41 @@ namespace CuttingEdge.Logging.Tests.Unit
                     Assert.IsNotNull(ex.InnerException, 
                         "The thrown exception is expected to have an inner exception.");
                 }
+            }
+        }
+        
+        [TestMethod]
+        [ExpectedException(typeof(ConfigurationErrorsException))]
+        public void Configuration_SubjectFormatStringWithNewLineCharacter_ThrowsException()
+        {
+            // Arrange
+            string validToAttributeWithMultipleMailAddresses = 
+                "to=\"dev@cuttingedge.it\" " +
+                "subjectFormatString=\"Message subject\n\" ";
+
+            var configBuilder = new ConfigurationBuilder()
+            {
+                Logging = new LoggingConfigurationBuilder()
+                {
+                    DefaultProvider = "DefaultProvider",
+                    Providers =
+                    {
+                        // <provider name="DefaultProvider" type="CE.Logging.MailLoggingProvider, CE.Logging" />
+                        new ProviderConfigLine()
+                        {
+                            Name = "DefaultProvider",
+                            Type = typeof(MailLoggingProvider),
+                            CustomAttributes = validToAttributeWithMultipleMailAddresses
+                        }
+                    }
+                },
+                Xml = ValidMailConfiguration,
+            };
+
+            using (var manager = new UnitTestAppDomainManager(configBuilder.Build()))
+            {
+                // Act
+                manager.DomainUnderTest.InitializeLoggingSystem();
             }
         }
 
