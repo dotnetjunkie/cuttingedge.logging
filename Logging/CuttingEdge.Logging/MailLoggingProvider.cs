@@ -242,18 +242,12 @@ namespace CuttingEdge.Logging
             string message = Truncate(entry.Message, MaximumMailSubjectMessageLength, "...");
             string source = Truncate(entry.Source, MaximumMailSubjectSourceLength, "...");
 
-            string messageSubject = string.Format(CultureInfo.InvariantCulture, subjectFormatString,
+            return string.Format(CultureInfo.InvariantCulture, subjectFormatString,
                 entry.Severity, // {0}
                 RemoveLineBreaks(message),  // {1}
                 RemoveLineBreaks(source),   // {2}
                 exceptionType,  // {3}
                 currentTime);   // {4}
-
-            var builder = new StringBuilder(messageSubject);
-
-            builder.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
-
-            return builder.ToString();
         }
 
         internal virtual SmtpClient CreateSmtpClient()

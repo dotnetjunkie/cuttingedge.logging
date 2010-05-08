@@ -1,5 +1,11 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+Version vNext
+	General description:
+	Code changes:
+		-MailLoggingProvider.BuildMailMessageSubject refactored. Useless use of StringBuilder removed. This
+		 improves performance.
+
 
 Version 1.2.2.10128 (1.2.2) 2010-05-08
 	General description:
