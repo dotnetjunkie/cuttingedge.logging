@@ -1,5 +1,18 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+
+Version 1.2.2.10128 (1.2.2) 2010-05-08
+	General description:
+		This release fixes a single bug in the MailLoggingProvider. The bug prevented the provider from 
+		logging when either the message or the source of the LogEntry contained a new line character.
+	
+	Bug fixes:
+		-A bug in the MailLoggingProvider prevented the provider from logging (thus sending a mail) when 
+		 either the message or the source of the LogEntry contained a new line character. This is fixed by 
+		 removing new line characters from message and source when bulding the mail subject and by validating 
+		 during initialization whether the subjectFormatString contains a new line character. Work item 6078.
+
+
 Version 1.2.1.10097 (1.2.1) 2010-04-07
 	General description:
 		The 1.2.0.10042 contained a critical bug that caused loading of the library to fail in a web 
