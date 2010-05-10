@@ -29,9 +29,10 @@ using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Data;
 using System.Data.SqlClient;
-using System.Globalization;
 using System.Security.Principal;
+using System.Threading;
 using System.Web;
+using System.Web.Hosting;
 using System.Web.Security;
 
 namespace CuttingEdge.Logging.Web
@@ -109,17 +110,22 @@ namespace CuttingEdge.Logging.Web
     ///     </description>
     /// </item>
     /// <item>
+    /// 
+    /// retrieves the user information from the data source and creates a MembershipUser object populated with 
+    /// the returned data. If you use one of the GetUser overloads that does not take a username parameter, 
+    /// GetUser returns the information for the current logged-on membership user. The current logged-on 
+    /// membership user is identified by the Name of the user in the current HttpContext.
+    /// 
     ///     <attribute>userNameRetrievalType</attribute>
     ///     <description>
     ///         The userNameRetrievalType attribute allows you to configure the source from which the provider
-    ///         tries to retrieve the user name of the current request. The options are 
-    ///         <see cref="UserIdentityRetrievalType.None">None</see>, 
+    ///         tries to retrieve the user name of the current logged-on user (the user making the request).
+    ///         The options are <see cref="UserIdentityRetrievalType.None">None</see>, 
     ///         <see cref="UserIdentityRetrievalType.Membership">Membership</see> and
     ///         <see cref="UserIdentityRetrievalType.WindowsIdentity">WindowsIdentity</see>;
-    ///         Use <b>Membership</b> when a <see cref="MembershipProvider"/> is configured using the
-    ///         <see cref="Membership"/> model. Use <b>WindowsIdentity</b> when you use windows authentication;
-    ///         Use <b>None</b> when you don't want any user information to be logged. This attribute is
-    ///         mandatory.
+    ///         Use <b>Membership</b> to retrieve the user name from the current <see cref="HttpContext"/>.
+    ///         Use <b>WindowsIdentity</b> when you use windows authentication; Use <b>None</b> when you don't 
+    ///         want any user information to be logged. This attribute is mandatory.
     ///     </description>
     /// </item>
     /// <item>
@@ -431,16 +437,38 @@ namespace CuttingEdge.Logging.Web
             switch (this.retrievalType)
             {
                 case UserIdentityRetrievalType.Membership:
-                    MembershipUser user = Membership.GetUser();
-                    return user == null ? null : user.UserName;
+                    return this.GetMembershipUserName();
 
                 case UserIdentityRetrievalType.WindowsIdentity:
-                    WindowsIdentity identity = WindowsIdentity.GetCurrent();
-                    return identity == null ? null : identity.Name;
+                    return this.GetWindowsIdentityUserName();
 
                 default:
                     return null;
             }
+        }
+
+        private string GetMembershipUserName()
+        {
+            if (HostingEnvironment.IsHosted && HttpContext.Current != null)
+            {
+                return HttpContext.Current.User.Identity.Name;
+            }
+
+            IPrincipal currentPrincipal = Thread.CurrentPrincipal;
+
+            if (currentPrincipal != null && currentPrincipal.Identity != null)
+            {
+                return currentPrincipal.Identity.Name;
+            }
+
+            return string.Empty;
+        }
+
+        private string GetWindowsIdentityUserName()
+        {
+            WindowsIdentity identity = WindowsIdentity.GetCurrent();
+
+            return identity == null ? null : identity.Name;
         }
 
         /// <summary>Encapsulates the <see cref="HttpContext"/> to easy access the request data.</summary>
