@@ -156,7 +156,7 @@ namespace CuttingEdge.Logging.Web
                 return null;
             }
 
-            if (LoggingEventType.Warning <= entry.Severity)
+            if (entry.Severity >= LoggingEventType.Warning)
             {
                 currentTrace.Warn(this.Name, entry.Message, entry.Exception);
             }

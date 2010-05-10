@@ -2,7 +2,11 @@
 
 Version vNext
 	General description:
+	
 	Code changes:
+		-AspNetSqlLoggingProvider now uses HttpContext.User.Identity.Name and IPrincipal.Identity.Name for 
+		 retrieving the current logged-on user name, instead of using the System.Web.Security.Membership.
+		 This makes the usage of this logger more flexible and improves performance. Work item 6092.
 		-MailLoggingProvider.BuildMailMessageSubject refactored. Useless use of StringBuilder removed. This
 		 improves performance.
 
