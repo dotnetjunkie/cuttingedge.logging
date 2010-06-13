@@ -328,9 +328,13 @@ namespace CuttingEdge.Logging
             // Create and configure the SMTP client
             var smtpClient = this.CreateSmtpClient();
 
-            MailMessage mailMessage = this.BuildMailMessage(entry);
+            // SmtpClient implements IDisposable in .NET 4.0.
+            using (smtpClient as IDisposable)
+            {
+                MailMessage mailMessage = this.BuildMailMessage(entry);
 
-            smtpClient.Send(mailMessage);
+                smtpClient.Send(mailMessage);
+            }
 
             // Returning an ID is inappropriate for this type of logger.
             return null;
@@ -512,24 +516,36 @@ namespace CuttingEdge.Logging
 
         private void TestCreatingSmtpClient()
         {
-            SmtpClient client;
-
+            SmtpClient client = null;
             try
             {
-                client = this.CreateSmtpClient();
-            }
-            catch (SecurityException ex)
-            {
-                // the SmtpClient constructor will throw a SecurityException when the application doesn't
-                // have the proper rights to send mail.
-                throw new ProviderException(
-                    SR.NoPermissionsToAccessSmtpServers(this.Name, ex.Message));
-            }
+                try
+                {
+                    client = this.CreateSmtpClient();
+                }
+                catch (SecurityException ex)
+                {
+                    // the SmtpClient constructor will throw a SecurityException when the application doesn't
+                    // have the proper rights to send mail.
+                    throw new ProviderException(
+                        SR.NoPermissionsToAccessSmtpServers(this.Name, ex.Message));
+                }
 
-            if (String.IsNullOrEmpty(client.Host))
+                if (String.IsNullOrEmpty(client.Host))
+                {
+                    throw new ProviderException(SR.MissingAttributeInMailSettings(this.Name, "host",
+                        "/smtp/network") + " " + SR.ExampleMailConfigurationSettings());
+                }
+            }
+            finally
             {
-                throw new ProviderException(SR.MissingAttributeInMailSettings(this.Name, "host", 
-                    "/smtp/network") + " " + SR.ExampleMailConfigurationSettings());
+                // SmtpClient implements IDisposable in .NET 4.0.
+                IDisposable disposable = client as IDisposable;
+
+                if (disposable != null)
+                {
+                    disposable.Dispose();
+                }
             }
         }
 
