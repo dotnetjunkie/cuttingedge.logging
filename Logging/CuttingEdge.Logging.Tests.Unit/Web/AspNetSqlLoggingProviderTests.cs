@@ -15,6 +15,149 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
     public class AspNetSqlLoggingProviderTests
     {
         [TestMethod]
+        public void Constructor_WithValidArguments_Succeeds()
+        {
+            // Arrange
+            var validThreshold = LoggingEventType.Critical;
+            var validConfiguration = new AspNetSqlLoggingProviderConfiguration("Valid app name");
+            var validConnectionString = "Valid constr";
+
+            // Act
+            new AspNetSqlLoggingProvider(validThreshold, validConfiguration, validConnectionString, null);
+        }
+
+        [TestMethod]
+        public void Constructor_WithValidConfiguration_SetsLogQueryStringProperty()
+        {
+            var expectedLogQueryString = false;
+            var validConfiguration = new AspNetSqlLoggingProviderConfiguration("Valid app name")
+            {
+                LogQueryString = expectedLogQueryString
+            };
+
+            // Act
+            var provider = new AspNetSqlLoggingProvider(LoggingEventType.Critical, validConfiguration, 
+                "Valid constr", null);
+
+            // Assert
+            Assert.AreEqual(expectedLogQueryString, provider.LogQueryString);
+        }
+
+        [TestMethod]
+        public void Constructor_WithValidConfiguration_SetsLogFormDataProperty()
+        {
+            var expectedLogFormData = true;
+            var validConfiguration = new AspNetSqlLoggingProviderConfiguration("Valid app name")
+            {
+                LogFormData = expectedLogFormData
+            };
+
+            // Act
+            var provider = new AspNetSqlLoggingProvider(LoggingEventType.Critical, validConfiguration,
+                "Valid constr", null);
+
+            // Assert
+            Assert.AreEqual(expectedLogFormData, provider.LogFormData);
+        }
+
+        [TestMethod]
+        public void Constructor_WithValidConfiguration_SetsRetrievalTypeProperty()
+        {
+            var expectedRetrievalType = UserIdentityRetrievalType.WindowsIdentity;
+            var validConfiguration = new AspNetSqlLoggingProviderConfiguration("Valid app name")
+            {
+                RetrievalType = expectedRetrievalType
+            };
+
+            // Act
+            var provider = new AspNetSqlLoggingProvider(LoggingEventType.Critical, validConfiguration,
+                "Valid constr", null);
+
+            // Assert
+            Assert.AreEqual(expectedRetrievalType, provider.RetrievalType);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Constructor_WithNullConfiguration_ThrowsException()
+        {
+            // Act
+            new AspNetSqlLoggingProvider(LoggingEventType.Debug, null, "Valid string", null);
+        }
+
+        [TestMethod]
+        public void Constructor_ChangingLogFormDataInConfigurationAfterConstructorCall_HasNoEffect()
+        {
+            // Arrange
+            var validConfiguration = new AspNetSqlLoggingProviderConfiguration("valid name")
+            {
+                LogFormData = true
+            };
+
+            var provider = new AspNetSqlLoggingProvider(LoggingEventType.Critical, validConfiguration,
+                "Valid constr", null);
+
+            // Act
+            validConfiguration.LogFormData = false;
+
+            // Assert
+            Assert.AreEqual(true, provider.LogFormData);
+        }
+
+        [TestMethod]
+        public void Constructor_ChangingLogQueryStringInConfigurationAfterConstructorCall_HasNoEffect()
+        {
+            // Arrange
+            var validConfiguration = new AspNetSqlLoggingProviderConfiguration("valid name")
+            {
+                LogQueryString = true
+            };
+
+            var provider = new AspNetSqlLoggingProvider(LoggingEventType.Critical, validConfiguration,
+                "Valid constr", null);
+
+            // Act
+            validConfiguration.LogQueryString = false;
+
+            // Assert
+            Assert.AreEqual(true, provider.LogQueryString);
+        }
+
+        [TestMethod]
+        public void Constructor_ChangingRetrievalTypeInConfigurationAfterConstructorCall_HasNoEffect()
+        {
+            // Arrange
+            var validConfiguration = new AspNetSqlLoggingProviderConfiguration("valid name")
+            {
+                RetrievalType = UserIdentityRetrievalType.None
+            };
+
+            var provider = new AspNetSqlLoggingProvider(LoggingEventType.Critical, validConfiguration,
+                "Valid constr", null);
+
+            // Act
+            validConfiguration.RetrievalType = UserIdentityRetrievalType.Membership;
+
+            // Assert
+            Assert.AreEqual(UserIdentityRetrievalType.None, provider.RetrievalType);
+        }
+
+        [TestMethod]
+        public void Log_CodeConfiguredFailingProvider_LogsToFallbackProvider()
+        {
+            // Arrange
+            var fallbackProvider = new MemoryLoggingProvider();
+
+            var provider = new FakeAspNetSqlLoggingProvider(fallbackProvider);
+
+            // Act
+            provider.Log("Message");
+
+            // Assert
+            Assert.AreEqual(2, fallbackProvider.GetLoggedEntries().Length, "Logging failed.");
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Initialize_WithNullConfiguration_ThrowsException()
         {
@@ -410,6 +553,16 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
 
         internal sealed class FakeAspNetSqlLoggingProvider : AspNetSqlLoggingProvider
         {
+            public FakeAspNetSqlLoggingProvider()
+            {
+            }
+
+            public FakeAspNetSqlLoggingProvider(LoggingProviderBase fallbackProvider)
+                : base(LoggingEventType.Debug, new AspNetSqlLoggingProviderConfiguration("Valid app name"),
+                    "some unimportant connection string", fallbackProvider)
+            {
+            }
+
             protected override void InitializeDatabaseSchema()
             {
                 throw new NotSupportedException();

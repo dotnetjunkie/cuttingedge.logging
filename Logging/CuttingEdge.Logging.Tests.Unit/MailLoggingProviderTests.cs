@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Configuration;
 using System.Configuration.Provider;
+using System.Linq;
 using System.Net.Mail;
 using System.Security;
 
@@ -9,7 +11,6 @@ using CuttingEdge.Logging.Tests.Common;
 using CuttingEdge.Logging.Tests.Unit.Helpers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
 
 namespace CuttingEdge.Logging.Tests.Unit
 {
@@ -26,6 +27,123 @@ namespace CuttingEdge.Logging.Tests.Unit
             </mailSettings>
           </system.net>
         ";
+
+        private const LoggingEventType ValidThreshold = LoggingEventType.Debug;
+        private const string ValidSubjectFormatString = "{0}: {1}";
+        private static readonly LoggingProviderBase ValidFallbackProvider = null;
+        private static readonly MailAddress ValidRecipient = new MailAddress("dev1@cuttingedge.it");
+
+        [TestMethod]
+        public void Constructor_WithValidArguments_Succeeds()
+        {
+            // Act
+            new MailLoggingProvider(ValidThreshold, ValidSubjectFormatString, ValidFallbackProvider,
+                ValidRecipient);
+        }
+
+        [TestMethod]
+        public void Constructor_WithoutFallbackProvider_RegistersNoFallbackProvider()
+        {
+            // Act
+            var provider = new MailLoggingProvider(ValidThreshold, ValidRecipient);
+
+            // Assert
+            Assert.IsNull(provider.FallbackProvider);
+        }
+
+        [TestMethod]
+        public void Constructor_WithoutSubjectFormatString_RegistersDefaultSubjectFormatString()
+        {
+            // Act
+            var provider = new MailLoggingProvider(ValidThreshold, ValidRecipient);
+
+            // Assert
+            Assert.AreEqual("{0}: {1}", provider.SubjectFormatString);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidEnumArgumentException))]
+        public void Constructor_WithInvalidThreshold_ThrowsException()
+        {
+            // Arrange
+            var invalidThreshold = (LoggingEventType)(-1);
+
+            // Act
+            new MailLoggingProvider(invalidThreshold, ValidSubjectFormatString, ValidFallbackProvider,
+                ValidRecipient, ValidRecipient, ValidRecipient);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Constructor_WithNullRecipients_ThrowsException()
+        {
+            // Arrange
+            MailAddress[] invalidRecipients = null;
+
+            // Act
+            new MailLoggingProvider(ValidThreshold, ValidSubjectFormatString, ValidFallbackProvider, 
+                invalidRecipients);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Constructor_WithEmptyRecipientsCollection_ThrowsException()
+        {
+            // Arrange
+            MailAddress[] invalidRecipients = new MailAddress[0];
+
+            // Act
+            new MailLoggingProvider(ValidThreshold, ValidSubjectFormatString, ValidFallbackProvider, 
+                invalidRecipients);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Constructor_WithNullElementInRecipientsCollection_ThrowsException()
+        {
+            // Arrange
+            MailAddress[] invalidRecipients = new MailAddress[] { null };
+
+            // Act
+            new MailLoggingProvider(ValidThreshold, ValidSubjectFormatString, ValidFallbackProvider,
+                invalidRecipients);
+        }
+
+        [TestMethod]
+        public void Constructor_SubjectFormatStringWithInvalidCharacters_ThrowsException()
+        {
+            // Arrange
+            var invalidSubjectFormatString = "Test\n";
+
+            try
+            {
+                // Act
+                new MailLoggingProvider(ValidThreshold, invalidSubjectFormatString, ValidFallbackProvider,
+                    ValidRecipient);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.IsInstanceOfType(ex, typeof(ArgumentException));
+
+                Assert.IsTrue(ex.Message.Contains("illegal characters") && ex.Message.Contains("Line breaks"),
+                    "Exception message is not descriptive enough. Actual message: " + ex.Message);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Constructor_WithInvalidSubjectFormatString_ThrowsException()
+        {
+            // Arrange
+            var invalidSubjectFormatString = "{";
+
+            // Act
+            new MailLoggingProvider(ValidThreshold, invalidSubjectFormatString, ValidFallbackProvider,
+                ValidRecipient);
+        }
 
         [TestMethod]
         public void Initialize_WithValidArguments_Succeeds()

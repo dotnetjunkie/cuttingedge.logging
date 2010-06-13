@@ -46,6 +46,21 @@ namespace CuttingEdge.Logging
             return GetString("ArgumentMustNotBeNullOrEmptyString");
         }
 
+        internal static string ValueShouldNotBeAnEmptyString()
+        {
+            return GetString("ValueShouldNotBeAnEmptyString");
+        }
+        
+        internal static string CollectionShouldNotContainNullElements()
+        {
+            return GetString("CollectionShouldNotContainNullElements");
+        }
+
+        internal static string CollectionShouldContainAtleastOneElement()
+        {
+            return GetString("CollectionShouldContainAtleastOneElement");
+        }
+
         // Exception messages for Logger class
         internal static string LoggingSectionMissingFromConfigSettings(string sectionName, Type type)
         {
@@ -180,6 +195,11 @@ namespace CuttingEdge.Logging
             }
         }
 
+        internal static string ValueTooLong(int maxLength)
+        {
+            return GetString("ValueTooLong", maxLength);
+        }
+
         // Exception messages for LoggingWebEventProvider
         internal static string MissingLoggingProviderInConfig(string loggingProviderName, 
             string loggingWebEventProviderName, string sectionName)
@@ -195,11 +215,17 @@ namespace CuttingEdge.Logging
                 providerName);
         }
 
+        // Exception messages for MailLoggingProvider
         internal static string InvalidFormatStringAttribute(string attributeValue, string attributeName,
             string providerName, string exceptionMessage)
         {
             return GetString("InvalidFormatStringAttribute", attributeValue, attributeName,
                 providerName) + " " + exceptionMessage;
+        }
+
+        internal static string IllegalCharactersLineBreaksAreNotAllowed()
+        {
+            return GetString("IllegalCharactersLineBreaksAreNotAllowed");
         }
 
         internal static string IllegalCharactersLineBreaksAreNotAllowed(string attributeValue, 
@@ -235,6 +261,11 @@ namespace CuttingEdge.Logging
                 " " + exceptionMessage;
         }
 
+        internal static string ValueIsNotAValidFormatString(string subjectFormatString, string message)
+        {
+            return GetString("ValueIsNotAValidFormatString", subjectFormatString, message);
+        }
+
         // Exception messages for AspNetSqlLoggingProvider
         internal static string EmptyOrMissingApplicationNameAttributeInConfig(string providerName)
         {
@@ -264,6 +295,18 @@ namespace CuttingEdge.Logging
         internal static string LoggingFailed(string extraInformation)
         {
             return GetString("LoggingFailed", extraInformation);
+        }
+
+        internal static string CollectionMustNotContainNullElements()
+        {
+            // TODO: Put in recourse
+            return "The collection contains one or more null references.";
+        }
+
+        internal static string CollectionMustNotContainDuplicates()
+        {
+            // TODO: Put in recourse
+            return "The collection contains one or more duplicate references.";
         }
 
         internal static string ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst(

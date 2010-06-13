@@ -97,6 +97,7 @@
     <Compile Include="SqlLoggingProviderTests.cs" />
     <Compile Include="TerminatorLoggingProviderTests.cs" />
     <Compile Include="Web\AspNetExceptionLoggingModuleTests.cs" />
+    <Compile Include="Web\AspNetSqlLoggingProviderConfigurationTests.cs" />
     <Compile Include="Web\AspNetSqlLoggingProviderTests.cs" />
     <Compile Include="Web\AspNetTraceLoggingProviderTests.cs" />
     <Compile Include="Web\LoggingWebEventProviderTests.cs" />

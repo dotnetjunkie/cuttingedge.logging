@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Configuration.Provider;
 
 namespace CuttingEdge.Logging
@@ -142,6 +143,22 @@ namespace CuttingEdge.Logging
     {
         private readonly object locker = new object();
         private readonly List<LogEntry> loggingEvents = new List<LogEntry>();
+
+        /// <summary>Initializes a new instance of the <see cref="MemoryLoggingProvider"/> class.</summary>
+        public MemoryLoggingProvider()
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="MemoryLoggingProvider"/> class.</summary>
+        /// <param name="threshold">The <see cref="LoggingEventType"/> logging threshold. The threshold limits
+        /// the number of event logged. <see cref="LoggingProviderBase.Threshold">Threshold</see> for more 
+        /// information.</param>
+        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="threshold"/> has an
+        /// invalid value.</exception>
+        public MemoryLoggingProvider(LoggingEventType threshold)
+            : base(threshold, null)
+        {
+        }
 
         /// <summary>
         /// Gets a copy of the internal cache of <see cref="LogEntry"/> objects.

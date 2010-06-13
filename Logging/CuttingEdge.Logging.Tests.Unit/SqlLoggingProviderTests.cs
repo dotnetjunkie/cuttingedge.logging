@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Configuration;
 using System.Data.SqlClient;
 
@@ -13,6 +14,72 @@ namespace CuttingEdge.Logging.Tests.Unit
     [TestClass]
     public class SqlLoggingProviderTests
     {
+        private const LoggingEventType ValidThreshold = LoggingEventType.Debug;
+        private const string ValidConnectionString = "some connection string";
+        private static readonly LoggingProviderBase ValidFallbackProvider = null;
+
+        [TestMethod]
+        public void Constructor_WithValidArguments_Succeeds()
+        {
+            // Act
+            new SqlLoggingProvider(ValidThreshold, ValidConnectionString);
+        }
+
+        [TestMethod]
+        public void Constructor_WithValidArguments2_Succeeds()
+        {
+            // Act
+            new SqlLoggingProvider(ValidThreshold, ValidConnectionString, ValidFallbackProvider);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidEnumArgumentException))]
+        public void Constructor_WithInvalidThreshold_ThrowsException()
+        {
+            // Arrange
+            var invalidThreshold = (LoggingEventType)(-1);
+
+            // Act
+            new SqlLoggingProvider(invalidThreshold, ValidConnectionString);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Constructor_WithNullConnectionString_ThrowsException()
+        {
+            // Arrange
+            string invalidConnectionString = null;
+
+            // Act
+            new SqlLoggingProvider(ValidThreshold, invalidConnectionString, ValidFallbackProvider);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Constructor_WithEmptyConnectionString_ThrowsException()
+        {
+            // Arrange
+            string invalidConnectionString = string.Empty;
+
+            // Act
+            new SqlLoggingProvider(ValidThreshold, invalidConnectionString, ValidFallbackProvider);
+        }
+
+        [TestMethod]
+        public void Log_CodeConfiguredFailingProvider_LogsToFallbackProvider()
+        {
+            // Arrange
+            var fallbackProvider = new MemoryLoggingProvider(LoggingEventType.Debug);
+
+            var provider = new FailingSqlLoggingProvider(fallbackProvider);
+
+            // Act
+            provider.Log("Test");
+
+            // Assert
+            Assert.AreEqual(2, fallbackProvider.GetLoggedEntries().Length, "To events were expected to be logged.");
+        }
+
         [TestMethod]
         public void Initialize_WithValidConfiguration_Succeeds()
         {
@@ -256,8 +323,30 @@ namespace CuttingEdge.Logging.Tests.Unit
             return configuration;
         }
 
-        private sealed class FakeSqlLoggingProvider : SqlLoggingProvider
+        private sealed class FailingSqlLoggingProvider : FakeSqlLoggingProvider
         {
+            public FailingSqlLoggingProvider(LoggingProviderBase fallbackProvider)
+                : base(fallbackProvider)
+            {
+            }
+
+            protected override object LogInternal(LogEntry entry)
+            {
+                throw new InvalidOperationException("Fail!");
+            }
+        }
+
+        private class FakeSqlLoggingProvider : SqlLoggingProvider
+        {
+            public FakeSqlLoggingProvider()
+            {
+            }
+
+            protected FakeSqlLoggingProvider(LoggingProviderBase fallbackProvider)
+                : base(LoggingEventType.Debug, ValidConnectionString, fallbackProvider)
+            {
+            }
+
             protected override void InitializeDatabaseSchema()
             {
                 Assert.Fail("This method should not be called.");

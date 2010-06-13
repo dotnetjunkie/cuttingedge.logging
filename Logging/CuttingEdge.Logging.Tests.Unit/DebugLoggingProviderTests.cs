@@ -17,6 +17,46 @@ namespace CuttingEdge.Logging.Tests.Unit
     {
 #if DEBUG // This test code only runs in debug mode
         [TestMethod]
+        public void Log_ProviderInitializedWithDebugThresholdThroughConstructor_LogsMessage()
+        {
+            // Arrange
+            var expectedMessage = "Hello";
+            var provider = new FakeDebugLoggingProvider(LoggingEventType.Debug);
+
+            // Act
+            provider.Log(expectedMessage);
+
+            // Assert
+            Assert.IsTrue(provider.TextWrittenToDebugWindow.Contains(expectedMessage), "Message not logged");
+        }
+
+        [TestMethod]
+        public void Log_ProviderInitializedWithDebugThresholdThroughConstructor_Succeeds()
+        {
+            // Arrange
+            var expectedMessage = "Hello";
+            var provider = new DebugLoggingProvider(LoggingEventType.Debug);
+
+            // Act
+            provider.Log(expectedMessage);
+        }
+
+        [TestMethod]
+        public void Log_ProviderInitializedWithCriticalThresholdThroughConstructor_DoesNotLogMessage()
+        {
+            // Arrange
+            var expectedMessage = "Hello";
+            var provider = new FakeDebugLoggingProvider(LoggingEventType.Critical);
+
+            // Act
+            provider.Log(expectedMessage);
+
+            // Assert
+            Assert.AreEqual(string.Empty, provider.TextWrittenToDebugWindow,
+                "Actual text: " + provider.TextWrittenToDebugWindow);
+        }
+
+        [TestMethod]
         public void Initialize_WithValidArguments_Succeeds()
         {
             // Arrange
@@ -140,16 +180,31 @@ namespace CuttingEdge.Logging.Tests.Unit
 #if DEBUG // This test code only runs in debug mode
         private sealed class FakeDebugLoggingProvider : DebugLoggingProvider
         {
+            private string textWrittenToDebugWindow = string.Empty;
+
+            public FakeDebugLoggingProvider(LoggingEventType threshold) : base(threshold)
+            {
+                this.OverrideDelegate();
+            }
+
             public FakeDebugLoggingProvider()
             {
+                this.OverrideDelegate();
+            }
+
+            public string TextWrittenToDebugWindow
+            { 
+                get { return this.textWrittenToDebugWindow; }
+            }
+
+            private void OverrideDelegate()
+            {
                 Action<string> writeToDebugWindow =
-                    (formattedEvent) => this.TextWrittenToDebugWindow += formattedEvent;
+                    (formattedEvent) => this.textWrittenToDebugWindow += formattedEvent;
 
                 // Override the delegate to redirect the output.
                 this.SetWriteToDebugWindow(writeToDebugWindow);
             }
-
-            public string TextWrittenToDebugWindow { get; private set; }
         }
 #endif
     }

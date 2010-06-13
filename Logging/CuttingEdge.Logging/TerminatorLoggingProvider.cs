@@ -91,6 +91,11 @@ namespace CuttingEdge.Logging
     /// </remarks>
     public class TerminatorLoggingProvider : LoggingProviderBase
     {
+        /// <summary>Initializes a new instance of the <see cref="TerminatorLoggingProvider"/> class.</summary>
+        public TerminatorLoggingProvider()
+        {
+        }
+
         /// <summary>Initializes the provider.</summary>
         /// <param name="name">The friendly name of the provider.</param>
         /// <param name="config">A collection of the name/value pairs representing the provider-specific

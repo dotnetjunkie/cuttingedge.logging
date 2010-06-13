@@ -65,6 +65,7 @@
     <Compile Include="TerminatorLoggingProvider.cs" />
     <Compile Include="Web\AspNetExceptionLoggingModule.cs" />
     <Compile Include="Web\AspNetSqlLoggingProvider.cs" />
+    <Compile Include="Web\AspNetSqlLoggingProviderConfiguration.cs" />
     <Compile Include="Web\AspNetTraceLoggingProvider.cs" />
     <Compile Include="ConsoleLoggingProvider.cs" />
     <Compile Include="ILogger.cs" />

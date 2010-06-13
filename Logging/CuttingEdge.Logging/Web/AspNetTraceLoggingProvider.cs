@@ -109,6 +109,11 @@ namespace CuttingEdge.Logging.Web
     /// </example>
     public class AspNetTraceLoggingProvider : LoggingProviderBase
     {
+        /// <summary>Initializes a new instance of the <see cref="AspNetTraceLoggingProvider"/> class.</summary>
+        public AspNetTraceLoggingProvider()
+        {
+        }
+
         /// <summary>
         /// Initializes the provider.
         /// </summary>

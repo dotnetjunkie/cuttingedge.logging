@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Configuration;
 using System.Configuration.Provider;
 using System.Linq;
@@ -17,6 +19,163 @@ namespace CuttingEdge.Logging.Tests.Unit
     [TestClass]
     public class CompositeLoggingProviderTests
     {
+        [TestMethod]
+        public void Log_WithProviderInitializedWithCustomConstructor_LogsToAllSuppliedProviders()
+        {
+            // Arrange
+            var provider1 = new MemoryLoggingProvider();
+            var provider2 = new MemoryLoggingProvider();
+
+            var provider =
+                new CompositeLoggingProvider(LoggingEventType.Debug, null, provider1, provider2);
+
+            // Act
+            provider.Log("Test");
+
+            // Assert
+            Assert.AreEqual(1, provider1.GetLoggedEntries().Count(), "CompositeLoggingProvider did not log.");
+            Assert.AreEqual(1, provider2.GetLoggedEntries().Count(), "CompositeLoggingProvider did not log.");
+        }
+
+        [TestMethod]
+        public void Constructor_WithValidArguments_Succeeds()
+        {
+            // Arrange
+            var validThreshold = LoggingEventType.Critical;
+            LoggingProviderBase validFallbackProvider = null;
+            LoggingProviderBase validProvider = new FakeLoggingProvider();
+
+            // Act
+            new CompositeLoggingProvider(validThreshold, validFallbackProvider, validProvider);
+        }
+
+        [TestMethod]
+        public void Constructor_WithMultipleProviders_Succeeds()
+        {
+            // Arrange
+            var validThreshold = LoggingEventType.Critical;
+            LoggingProviderBase validFallbackProvider = null;
+            LoggingProviderBase provider1 = new FakeLoggingProvider();
+            LoggingProviderBase provider2 = new FakeLoggingProvider();
+
+            // Act
+            new CompositeLoggingProvider(validThreshold, validFallbackProvider, provider1, provider2);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidEnumArgumentException))]
+        public void Constructor_WithInvalidThreshold_ThrowsException()
+        {
+            var invalidThreshold = (LoggingEventType)(-1);
+            LoggingProviderBase validFallbackProvider = null;
+            LoggingProviderBase validProvider = new FakeLoggingProvider();
+
+            // Act
+            new CompositeLoggingProvider(invalidThreshold, validFallbackProvider, validProvider);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Constructor_WithoutProviders_ThrowsException()
+        {
+            // Arrange
+            var validThreshold = LoggingEventType.Critical;
+            LoggingProviderBase validFallbackProvider = null;
+
+            // Act
+            new CompositeLoggingProvider(validThreshold, validFallbackProvider, null);
+        }
+
+        [TestMethod]
+        public void Constructor_WithDuplicateProvider_ThrowsException()
+        {
+            // Arrange
+            var validThreshold = LoggingEventType.Critical;
+            LoggingProviderBase validFallbackProvider = null;
+
+            LoggingProviderBase provider = new FakeLoggingProvider();
+
+            LoggingProviderBase[] invalidProviderList = new[] { provider, provider };
+
+            try
+            {
+                // Act
+                new CompositeLoggingProvider(validThreshold, validFallbackProvider, invalidProviderList);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (Exception ex)
+            {
+                Assert.IsInstanceOfType(ex, typeof(ArgumentException));
+
+                var msg = ex.Message;
+
+                Assert.IsTrue(msg.Contains("providers"), "Message should contain argument name.");
+                Assert.IsTrue(msg.Contains("collection contains") && msg.Contains("duplicate references"), 
+                    "Message should be descriptive enough. Actual message: " + msg);
+            }
+        }
+
+        [TestMethod]
+        public void Constructor_WithEmptyProviderCollection_ThrowsException()
+        {
+            // Arrange
+            var validThreshold = LoggingEventType.Critical;
+            LoggingProviderBase validFallbackProvider = null;
+
+            var invalidProviderList = new LoggingProviderBase[0];
+
+            try
+            {
+                // Act
+                new CompositeLoggingProvider(validThreshold, validFallbackProvider, invalidProviderList);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (Exception ex)
+            {
+                Assert.IsInstanceOfType(ex, typeof(ArgumentException));
+
+                var message = ex.Message;
+
+                Assert.IsTrue(message.Contains("providers"), "Message should contain argument name.");
+                Assert.IsTrue(message.Contains("Collection should contain") && message.Contains("at least one"),
+                    "Message should be descriptive enough. Actual message: " + message);
+            }
+        }
+
+        [TestMethod]
+        public void Constructor_WithNullProvider_ThrowsException()
+        {
+            // Arrange
+            var validThreshold = LoggingEventType.Critical;
+            LoggingProviderBase validFallbackProvider = null;
+
+            IEnumerable<LoggingProviderBase> invalidProviderList = 
+                new LoggingProviderBase[] { new FakeLoggingProvider(), null };
+
+            try
+            {
+                // Act
+                new CompositeLoggingProvider(validThreshold, validFallbackProvider, invalidProviderList);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (Exception ex)
+            {
+                Assert.IsInstanceOfType(ex, typeof(ArgumentException));
+
+                var message = ex.Message;
+
+                Assert.IsTrue(message.Contains("providers"), "Message should contain argument name.");
+                Assert.IsTrue(message.Contains("collection contains") && message.Contains("null references"),
+                    "Message should be descriptive enough. Actual message: " + message);
+            }
+        }
+
         [TestMethod]
         public void Initialize_WithValidConfiguration_Succeeds()
         {
@@ -734,6 +893,14 @@ namespace CuttingEdge.Logging.Tests.Unit
 
         private class CustomProvider : CompositeLoggingProvider
         {
+        }
+
+        private sealed class FakeLoggingProvider : LoggingProviderBase
+        {
+            protected override object LogInternal(LogEntry entry)
+            {
+                return null;
+            }
         }
     }
 }

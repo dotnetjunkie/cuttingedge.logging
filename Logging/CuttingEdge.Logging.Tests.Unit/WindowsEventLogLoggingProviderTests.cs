@@ -17,6 +17,101 @@ namespace CuttingEdge.Logging.Tests.Unit
     [TestClass]
     public class WindowsEventLogLoggingProviderTests
     {
+        private const LoggingEventType ValidThreshold = LoggingEventType.Debug;
+        private const string ValidSource = "ValidSource";
+        private const string ValidLogName = "ValidLogName";
+
+        [TestMethod]
+        public void Constructor_WithValidArguments_Succeeds()
+        {
+            // Act
+            new WindowsEventLogLoggingProvider(ValidThreshold, ValidSource, ValidLogName, null);
+        }
+
+        [TestMethod]
+        public void Constructor_WithValidSource_SetsSourceProperty()
+        {
+            // Arrange
+            var expectedSource = "Some valid Source";
+
+            // Act
+            var provider = new WindowsEventLogLoggingProvider(ValidThreshold, ValidLogName, expectedSource, null);
+
+            // Assert
+            Assert.AreEqual(expectedSource, provider.Source);
+        }
+
+        [TestMethod]
+        public void Constructor_WithValidLogName_SetsLogNameProperty()
+        {
+            // Arrange
+            var expectedLogName = "Some valid Log Name";
+
+            // Act
+            var provider = new WindowsEventLogLoggingProvider(ValidThreshold, expectedLogName, ValidSource, null);
+
+            // Assert
+            Assert.AreEqual(expectedLogName, provider.LogName);
+        }
+
+        [TestMethod]
+        public void Log_CodeConfiguredFailingProvider_LogsToFallbackProvider()
+        {
+            // Arrange
+            var fallbackProvider = new MemoryLoggingProvider();
+            var provider = new FailingWindowsEventLogLoggingProvider(fallbackProvider);
+
+            // Act
+            provider.Log("Message");
+
+            // Assert
+            Assert.AreEqual(2, fallbackProvider.GetLoggedEntries().Length, "Two messages are expected to be logged.");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Constructor_WithNullSource_ThrowsException()
+        {
+            // Arrange
+            string invalidSource = null;
+
+            // Act
+            new WindowsEventLogLoggingProvider(ValidThreshold, invalidSource, ValidLogName, null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Constructor_WithEmptySource_ThrowsException()
+        {
+            // Arrange
+            string invalidSource = string.Empty;
+
+            // Act
+            new WindowsEventLogLoggingProvider(ValidThreshold, invalidSource, ValidLogName, null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Constructor_WithNullLogName_ThrowsException()
+        {
+            // Arrange
+            string invalidLogName = null;
+
+            // Act
+            new WindowsEventLogLoggingProvider(ValidThreshold, ValidSource, invalidLogName, null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Constructor_WithEmptyLogName_ThrowsException()
+        {
+            // Arrange
+            string invalidLogName = string.Empty;
+
+            // Act
+            new WindowsEventLogLoggingProvider(ValidThreshold, ValidSource, invalidLogName, null);
+        }
+
         [TestMethod]
         public void Initialize_WithValidConfiguration_Succeeds()
         {
@@ -384,6 +479,11 @@ namespace CuttingEdge.Logging.Tests.Unit
             {
             }
 
+            protected FakeWindowsEventLogLoggingProvider(LoggingProviderBase fallbackProvider)
+                : base(LoggingEventType.Debug, ValidSource, ValidLogName, fallbackProvider)
+            {
+            }
+
             public EventLogEntryType? LoggedType { get; private set; }
 
             // A public method that can be called.
@@ -403,6 +503,19 @@ namespace CuttingEdge.Logging.Tests.Unit
                 string eventLogMessage, EventLogEntryType type)
             {
                 this.LoggedType = type;
+            }
+        }
+
+        private sealed class FailingWindowsEventLogLoggingProvider : FakeWindowsEventLogLoggingProvider
+        {
+            public FailingWindowsEventLogLoggingProvider(LoggingProviderBase fallbackProvider) 
+                : base(fallbackProvider)
+            {
+            }
+
+            protected override object LogInternal(LogEntry entry)
+            {
+                throw new InvalidOperationException("Fail!");
             }
         }
     }

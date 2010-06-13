@@ -17,6 +17,34 @@ namespace CuttingEdge.Logging.Tests.Unit
     public class MemoryLoggingProviderTests
     {
         [TestMethod]
+        public void Log_ProviderInitializedWithDebugThresholdThroughConstructor_LogsMessage()
+        {
+            // Arrange
+            var expectedMessage = "Hello";
+            var provider = new MemoryLoggingProvider(LoggingEventType.Debug);
+
+            // Act
+            provider.Log(expectedMessage);
+
+            // Assert
+            Assert.AreEqual(1, provider.GetLoggedEntries().Length, "Message not logged");
+        }
+
+        [TestMethod]
+        public void Log_ProviderInitializedWithCriticalThresholdThroughConstructor_DoesNotLogMessage()
+        {
+            // Arrange
+            var expectedMessage = "Hello";
+            var provider = new MemoryLoggingProvider(LoggingEventType.Critical);
+
+            // Act
+            provider.Log(expectedMessage);
+
+            // Assert
+            Assert.AreEqual(0, provider.GetLoggedEntries().Length, "Message was expected not to be logged");
+        }
+
+        [TestMethod]
         public void Initialize_WithValidArguments_Succeeds()
         {
             // Arrange
