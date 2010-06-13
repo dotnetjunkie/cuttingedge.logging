@@ -126,6 +126,12 @@
   <data name="CircularReferenceInLoggingSection" xml:space="preserve">
     <value>There was an error in the &lt;{0}&gt; section of the configuration file. The given provider '{1}' is directly or indirectly circular referencing itself. Circular references can cause stack overflows when the logging system is used and are therefore not allowed. Please check the 'fallbackProvider' attributes of all providers to resolve this problem. When one or more CompositeLoggingProviders are configured, circular references can also be caused by the 'provider[n]' attributes (where [n] is an arbitrary number) of such a provider.</value>
   </data>
+  <data name="CollectionShouldContainAtleastOneElement" xml:space="preserve">
+    <value>Collection should contain at least one element.</value>
+  </data>
+  <data name="CollectionShouldNotContainNullElements" xml:space="preserve">
+    <value>Collection should not contain null elements.</value>
+  </data>
   <data name="CompositeLoggingProviderDoesNotReferenceAnyProviders" xml:space="preserve">
     <value>The {0} with name '{1}' should contain reference at least one other provider by it's name. Please add the following code to the configuration of the '{1}' provider: 'provider1="[NameOfOtherProvider]"'.</value>
   </data>
@@ -233,5 +239,14 @@
   </data>
   <data name="UnrecognizedAttributeInProviderConfiguration" xml:space="preserve">
     <value>The configuration for provider '{0}' contains the unrecognized attribute with name '{1}'.</value>
+  </data>
+  <data name="ValueIsNotAValidFormatString" xml:space="preserve">
+    <value>Value '{0}' is not a valid format string. {1}</value>
+  </data>
+  <data name="ValueShouldNotBeAnEmptyString" xml:space="preserve">
+    <value>Value should not be an empty string.</value>
+  </data>
+  <data name="ValueTooLong" xml:space="preserve">
+    <value>Value is too long. Value must be shorter or equals to {0}</value>
   </data>
 </root>

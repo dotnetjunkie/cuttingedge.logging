@@ -192,10 +192,48 @@ namespace CuttingEdge.Logging.Web
     /// </example>
     public class AspNetSqlLoggingProvider : SqlLoggingProvider
     {
+        internal const int MaxApplicationNameLength = 255;
+
         private bool logQueryString;
         private bool logFormData;
         private string applicationName;
         private UserIdentityRetrievalType retrievalType;
+
+        /// <summary>Initializes a new instance of the <see cref="AspNetSqlLoggingProvider"/> class.</summary>
+        public AspNetSqlLoggingProvider()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AspNetSqlLoggingProvider"/> class.
+        /// </summary>
+        /// <param name="threshold">The <see cref="LoggingEventType"/> logging threshold. The threshold limits
+        /// the number of event logged. <see cref="LoggingProviderBase.Threshold">Threshold</see> for more
+        /// information.</param>
+        /// <param name="configuration">The configuration that initializes this provider.</param>
+        /// <param name="connectionString">The connection string.</param>
+        /// <param name="fallbackProvider">The optional fallback provider.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="connectionString"/> or the
+        /// <paramref name="configuration"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="connectionString"/> is an
+        /// empty string.</exception>
+        public AspNetSqlLoggingProvider(LoggingEventType threshold,
+            AspNetSqlLoggingProviderConfiguration configuration, string connectionString,
+            LoggingProviderBase fallbackProvider)
+            : base(threshold, connectionString, fallbackProvider)
+        {
+            if (configuration == null)
+            {
+                throw new ArgumentNullException("configuration");
+            }
+
+            // We don't have to validate the configuration properties, because the configuration already did 
+            // this itself.
+            this.logQueryString = configuration.LogQueryString;
+            this.logFormData = configuration.LogFormData;
+            this.applicationName = configuration.ApplicationName;
+            this.retrievalType = configuration.RetrievalType;
+        }
 
         /// <summary>
         /// Gets a value indicating whether the query string should be logged.
@@ -409,7 +447,6 @@ namespace CuttingEdge.Logging.Web
         private static string GetApplicationNameFromConfig(string name, NameValueCollection config)
         {
             const string ApplicationNameAttribute = "applicationName";
-            const int MaxApplicationNameLength = 255;
 
             string applicationName = config[ApplicationNameAttribute];
 
@@ -437,17 +474,17 @@ namespace CuttingEdge.Logging.Web
             switch (this.retrievalType)
             {
                 case UserIdentityRetrievalType.Membership:
-                    return this.GetMembershipUserName();
+                    return GetMembershipUserName();
 
                 case UserIdentityRetrievalType.WindowsIdentity:
-                    return this.GetWindowsIdentityUserName();
+                    return GetWindowsIdentityUserName();
 
                 default:
                     return null;
             }
         }
 
-        private string GetMembershipUserName()
+        private static string GetMembershipUserName()
         {
             if (HostingEnvironment.IsHosted && HttpContext.Current != null)
             {
@@ -464,7 +501,7 @@ namespace CuttingEdge.Logging.Web
             return string.Empty;
         }
 
-        private string GetWindowsIdentityUserName()
+        private static string GetWindowsIdentityUserName()
         {
             WindowsIdentity identity = WindowsIdentity.GetCurrent();
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Configuration.Provider;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -166,6 +167,81 @@ namespace CuttingEdge.Logging
         private List<string> providerNames;
         private ReadOnlyCollection<LoggingProviderBase> providers;
 
+        /// <summary>Initializes a new instance of the <see cref="CompositeLoggingProvider"/> class.</summary>
+        public CompositeLoggingProvider()
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="CompositeLoggingProvider"/> class.</summary>
+        /// <param name="threshold">The <see cref="LoggingEventType"/> logging threshold. The threshold limits
+        /// the number of event logged. <see cref="LoggingProviderBase.Threshold">Threshold</see> for more 
+        /// information.</param>
+        /// <param name="fallbackProvider">The optional fallback provider.</param>
+        /// <param name="providers">The providers to which events will be forwarded.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="providers"/> argument is
+        /// a null reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="providers"/> contains
+        /// duplicate elements, null references or no elements.</exception>
+        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="threshold"/> has an
+        /// invalid value.</exception>
+        public CompositeLoggingProvider(LoggingEventType threshold, LoggingProviderBase fallbackProvider,
+            params LoggingProviderBase[] providers)
+            : this(threshold, fallbackProvider, (IEnumerable<LoggingProviderBase>)providers)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="CompositeLoggingProvider"/> class.</summary>
+        /// <param name="threshold">The <see cref="LoggingEventType"/> logging threshold. The threshold limits
+        /// the number of event logged. <see cref="LoggingProviderBase.Threshold">Threshold</see> for more 
+        /// information.</param>
+        /// <param name="fallbackProvider">The optional fallback provider.</param>
+        /// <param name="providers">The providers to which events will be forwarded.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="providers"/> argument is
+        /// a null reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="providers"/> contains
+        /// duplicate elements, null references or no elements.</exception>
+        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="threshold"/> has an
+        /// invalid value.</exception>
+        public CompositeLoggingProvider(LoggingEventType threshold, LoggingProviderBase fallbackProvider,
+            IEnumerable<LoggingProviderBase> providers)
+            : base(threshold, fallbackProvider)
+        {
+            if (providers == null)
+            {
+                throw new ArgumentNullException("providers");
+            }
+
+            // Make a copy to prevent changes during or after validation.
+            var providerList = new List<LoggingProviderBase>(providers);
+
+            if (providerList.Contains(null))
+            {
+                throw new ArgumentException(SR.CollectionMustNotContainNullElements(), "providers");
+            }
+
+            // We can't use HashSet<T> here, because it is a .NET 3.5 call and we need to stay compatible
+            // with .NET 2.0.
+            var set = new Dictionary<object, object>();
+
+            foreach (var provider in providerList)
+            {
+                // Add provider.
+                set[provider] = null;
+            }
+
+            if (set.Count != providerList.Count)
+            {
+                throw new ArgumentException(SR.CollectionMustNotContainDuplicates(), "providers");
+            }
+
+            if (providerList.Count == 0)
+            {
+                throw new ArgumentException(SR.CollectionShouldContainAtleastOneElement(), "providers");
+            }
+
+            this.providers = new ReadOnlyCollection<LoggingProviderBase>(providerList.ToArray());
+        }
+
         /// <summary>
         /// Gets the list of logging provider to which the logging events will be forwarded. This list will
         /// contain at least one provider.
@@ -220,16 +296,19 @@ namespace CuttingEdge.Logging
             LoggingProviderBase defaultProvider)
         {
             // Finish performing implementation-specific provider initialization here (this is 2nd/last part).
-            // This operation has to be executed here, because during Initialize is the list of configured
+            // This operation has to be executed here, because during Initialize this list of configured is
             // providers not available.
             this.InitializeProviders(configuredProviders);
         }
 
         internal override List<LoggingProviderBase> GetReferencedProviders()
         {
-            var referencedProviders = base.GetReferencedProviders();
+            List<LoggingProviderBase> referencedProviders = base.GetReferencedProviders();
 
-            referencedProviders.AddRange(this.Providers);
+            if (this.providers != null)
+            {
+                referencedProviders.AddRange(this.providers);
+            }
 
             return referencedProviders;
         }

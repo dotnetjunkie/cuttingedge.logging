@@ -12,7 +12,7 @@ namespace CuttingEdge.Logging
         /// <see cref="ConfigurationErrorsException"/> when a circular reference is found.</summary>
         /// <param name="providers">The providers.</param>
         /// <exception cref="ConfigurationErrorsException">Thrown when circular reference is found.</exception>
-        internal static void Validate(LoggingProviderCollection providers)
+        internal static void Validate(IEnumerable<LoggingProviderBase> providers)
         {
             var chain = LoggingProviderChain.Empty;
 

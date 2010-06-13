@@ -28,11 +28,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Configuration.Provider;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net.Mail;
 using System.Security;
-using System.Text;
 
 namespace CuttingEdge.Logging
 {
@@ -179,6 +180,64 @@ namespace CuttingEdge.Logging
         private const int MaximumMailSubjectSourceLength = 40;
 
         private string subjectFormatString;
+
+        /// <summary>Initializes a new instance of the <see cref="MailLoggingProvider"/> class.</summary>
+        public MailLoggingProvider()
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="MailLoggingProvider"/> class.</summary>
+        /// <param name="threshold">The <see cref="LoggingEventType"/> logging threshold. The threshold limits
+        /// the number of event logged. <see cref="LoggingProviderBase.Threshold">Threshold</see> for more 
+        /// information.</param>
+        /// <param name="recipients">A list of mail addresses to send the logging messages to.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="toAddresses"/> is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when on of the items in the 
+        /// <paramref name="recipients"/> collection is a null reference (Nothing in VB) or the collection is
+        /// empty.</exception>
+        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="threshold"/> has an
+        /// invalid value.</exception>
+        public MailLoggingProvider(LoggingEventType threshold, params MailAddress[] recipients)
+            : this(threshold, null, null, recipients)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="MailLoggingProvider"/> class.</summary>
+        /// <param name="threshold">The <see cref="LoggingEventType"/> logging threshold. The threshold limits
+        /// the number of event logged. <see cref="LoggingProviderBase.Threshold">Threshold</see> for more 
+        /// information.</param>
+        /// <param name="subjectFormatString">The string to format the email subject.</param>
+        /// <param name="fallbackProvider">The optional fallback provider.</param>
+        /// <param name="recipients">A list of mail addresses to send the logging messages to.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="toAddresses"/> is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when on of the items in the 
+        /// <paramref name="recipients"/> collection is a null reference (Nothing in VB) or the collection is
+        /// empty.</exception>
+        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="threshold"/> has an
+        /// invalid value.</exception>
+        [SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", 
+            MessageId = "string", Justification = "argument name must be same as property name.")]
+        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors",
+            Justification = "CreateSmtpClient is called, but is internal. Calling Name necessary.")]
+        public MailLoggingProvider(LoggingEventType threshold, string subjectFormatString,
+            LoggingProviderBase fallbackProvider, params MailAddress[] recipients)
+            : base(threshold, fallbackProvider)
+        {
+            this.To = BuildAddressList(recipients);
+
+            this.ValidateSubjectFormatString(subjectFormatString, InitializationModel.CodeOnly);
+            this.SetSubjectFormatString(subjectFormatString);
+
+            this.ValidateDotNetMailConfiguration();
+        }
+
+        private enum InitializationModel
+        {
+            CodeOnly,
+            Configuration
+        }
 
         /// <summary>Gets the specified list of email addresses to send the logging messages to.</summary>
         /// <value>A collection of email addresses.</value>
@@ -351,13 +410,19 @@ namespace CuttingEdge.Logging
         {
             string subjectFormatString = config[SubjectFormatStringAttribute];
 
+            this.ValidateSubjectFormatString(subjectFormatString, InitializationModel.Configuration);
+            this.SetSubjectFormatString(subjectFormatString);
+
+            // Remove this attribute from the configuration. This way the provider can spot unrecognized 
+            // attributes after the initialization process.
+            config.Remove(SubjectFormatStringAttribute);
+        }
+
+        private void SetSubjectFormatString(string subjectFormatString)
+        {
             // SubjectFormatString is an optional property.
             if (!String.IsNullOrEmpty(subjectFormatString))
             {
-                this.TestIfSubjectFormatStringIsFormattedCorrectly(subjectFormatString);
-
-                this.CheckWhetherFormatStringContainsIllegalCharacters(subjectFormatString);
-
                 this.subjectFormatString = subjectFormatString;
             }
             else
@@ -365,13 +430,20 @@ namespace CuttingEdge.Logging
                 // No subjectFormatString is specified: we use the default.
                 this.subjectFormatString = "{0}: {1}";
             }
-
-            // Remove this attribute from the configuration. This way the provider can spot unrecognized 
-            // attributes after the initialization process.
-            config.Remove(SubjectFormatStringAttribute);
         }
 
-        private void TestIfSubjectFormatStringIsFormattedCorrectly(string subjectFormatString)
+        private void ValidateSubjectFormatString(string subjectFormatString, InitializationModel model)
+        {
+            if (!String.IsNullOrEmpty(subjectFormatString))
+            {
+                this.TestIfSubjectFormatStringIsFormattedCorrectly(subjectFormatString, model);
+
+                this.CheckWhetherFormatStringContainsIllegalCharacters(subjectFormatString, model);
+            }
+        }
+
+        private void TestIfSubjectFormatStringIsFormattedCorrectly(string subjectFormatString,
+            InitializationModel model)
         {
             try
             {
@@ -382,23 +454,52 @@ namespace CuttingEdge.Logging
             }
             catch (FormatException ex)
             {
-                string exceptionMessage =
-                    SR.InvalidFormatStringAttribute(subjectFormatString, SubjectFormatStringAttribute, 
-                    this.Name, ex.Message);
-
-                throw new ProviderException(exceptionMessage, ex);
+                if (model == InitializationModel.Configuration)
+                {
+                    this.ThrowInvalidFormattedSubjectFormatStringProviderException(ex, subjectFormatString);
+                }
+                else
+                {
+                    ThrowInvalidFormattedSubjectFormatStringArgumentException(ex, subjectFormatString);
+                }
             }
         }
 
-        private void CheckWhetherFormatStringContainsIllegalCharacters(string subjectFormatString)
+        private void ThrowInvalidFormattedSubjectFormatStringProviderException(FormatException ex,
+            string subjectFormatString)
+        {
+            string exceptionMessage =
+                SR.InvalidFormatStringAttribute(subjectFormatString, SubjectFormatStringAttribute,
+                this.Name, ex.Message);
+
+            throw new ProviderException(exceptionMessage, ex);
+        }
+
+        private static void ThrowInvalidFormattedSubjectFormatStringArgumentException(FormatException ex, 
+            string subjectFormatString)
+        {           
+            string exceptionMessage = SR.ValueIsNotAValidFormatString(subjectFormatString, ex.Message);
+            
+            throw new ArgumentException(exceptionMessage, "subjectFormatString", ex);           
+        }
+
+        private void CheckWhetherFormatStringContainsIllegalCharacters(string subjectFormatString, 
+            InitializationModel model)
         {
             if (subjectFormatString.Contains("\n") || subjectFormatString.Contains("\r"))
             {
-                string exceptionMessage =
-                    SR.IllegalCharactersLineBreaksAreNotAllowed(subjectFormatString,
-                    SubjectFormatStringAttribute, this.Name);
+                if (model == InitializationModel.Configuration)
+                {
+                    string exceptionMessage = SR.IllegalCharactersLineBreaksAreNotAllowed(subjectFormatString,
+                        SubjectFormatStringAttribute, this.Name);
 
-                throw new ProviderException(exceptionMessage);
+                    throw new ProviderException(exceptionMessage);
+                }
+                else
+                {
+                    throw new ArgumentException(SR.IllegalCharactersLineBreaksAreNotAllowed(), 
+                        "subjectFormatString");
+                }
             }
         }
 
@@ -487,6 +588,28 @@ namespace CuttingEdge.Logging
             }
 
             return value.Substring(0, maxLength) + trailer;
+        }
+
+        private static ReadOnlyCollection<MailAddress> BuildAddressList(IEnumerable<MailAddress> recipients)
+        {            
+            if (recipients == null)
+            {
+                throw new ArgumentNullException("recipients");
+            }
+
+            var addresses = new List<MailAddress>(recipients);
+
+            if (addresses.Contains(null))
+            {
+                throw new ArgumentException(SR.CollectionShouldNotContainNullElements(), "recipients");
+            }
+
+            if (addresses.Count == 0)
+            {
+                throw new ArgumentException(SR.CollectionShouldContainAtleastOneElement(), "recipients");
+            }
+
+            return new ReadOnlyCollection<MailAddress>(addresses.ToArray());
         }
     }
 }

@@ -78,17 +78,17 @@ namespace CuttingEdge.Logging
     ///      </description>
     /// </item>
     /// <item>
-    ///     <attribute>source</attribute>
-    ///     <description>
-    ///         The source name to register and use when writing to the event log. This is the source name by
-    ///         which the application is registered on the local computer. This attribute is mandatory.
-    ///     </description>
-    /// </item>
-    /// <item>
     ///     <attribute>logName</attribute>
     ///     <description>
     ///         The name of the log where  the source's entries are written to. Possible values include: 
     ///         Application, System, or a custom event log. This attribute is mandatory.
+    ///     </description>
+    /// </item>
+    /// <item>
+    ///     <attribute>source</attribute>
+    ///     <description>
+    ///         The source name to register and use when writing to the event log. This is the source name by
+    ///         which the application is registered on the local computer. This attribute is mandatory.
     ///     </description>
     /// </item>
     /// </list>
@@ -114,8 +114,8 @@ namespace CuttingEdge.Logging
     ///                 name="WindowsEventLogLoggingProvider"
     ///                 type="CuttingEdge.Logging.WindowsEventLogLoggingProvider, CuttingEdge.Logging"
     ///                 threshold="Warning"
-    ///                 source="MyApplication"
     ///                 logName="MyApplication"
+    ///                 source="LogMessages"
     ///                 description="Windows event log logging provider"
     ///             />
     ///         </providers>
@@ -135,14 +135,42 @@ namespace CuttingEdge.Logging
         {
         }
 
-         /// <summary>
-        /// Gets the source name to register and use when writing to the event log. This is the source name by
-        /// which the application is registered on the local computer.
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WindowsEventLogLoggingProvider"/> class.
         /// </summary>
-        /// <value>The source.</value>
-        public string Source
+        /// <param name="threshold">The <see cref="LoggingEventType"/> logging threshold. The threshold limits
+        /// the number of event logged. <see cref="LoggingProviderBase.Threshold">Threshold</see> for more 
+        /// information.</param>
+        /// <param name="logName">The name of the log where the source's entries are written to. Possible 
+        /// values include: Application, System, or a custom event log.</param>
+        /// <param name="source">The source name to register and use when writing to the event log. This is 
+        /// the source name by which the application is registered on the local computer.</param>
+        /// <param name="fallbackProvider">The optional fallback provider.</param>
+        public WindowsEventLogLoggingProvider(LoggingEventType threshold, string logName, string source, 
+            LoggingProviderBase fallbackProvider) : base(threshold, fallbackProvider)
         {
-            get { return this.source; }
+            if (source == null)
+            {
+                throw new ArgumentNullException("source");
+            }
+
+            if (source.Length == 0)
+            {
+                throw new ArgumentException(SR.ValueShouldNotBeAnEmptyString(), "source");
+            }
+
+            if (logName == null)
+            {
+                throw new ArgumentNullException("logName");
+            }
+
+            if (logName.Length == 0)
+            {
+                throw new ArgumentException(SR.ValueShouldNotBeAnEmptyString(), "logName");
+            }
+
+            this.source = source;
+            this.logName = logName;
         }
 
         /// <summary>
@@ -153,6 +181,16 @@ namespace CuttingEdge.Logging
         public string LogName
         {
             get { return this.logName; }
+        }
+        
+        /// <summary>
+        /// Gets the source name to register and use when writing to the event log. This is the source name by
+        /// which the application is registered on the local computer.
+        /// </summary>
+        /// <value>The source.</value>
+        public string Source
+        {
+            get { return this.source; }
         }
 
         /// <summary>Overridden from base.</summary>

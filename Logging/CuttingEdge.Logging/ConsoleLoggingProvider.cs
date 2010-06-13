@@ -26,8 +26,8 @@
 
 using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Configuration.Provider;
-using System.Text;
 
 namespace CuttingEdge.Logging
 {
@@ -117,12 +117,21 @@ namespace CuttingEdge.Logging
         /// <summary>Initializes a new instance of the <see cref="ConsoleLoggingProvider"/> class.</summary>
         public ConsoleLoggingProvider()
         {
-            this.SetWriteToConsole((formattedEvent) => Console.Write(formattedEvent));
+            this.Initialize();
         }
 
-        /// <summary>
-        /// Initializes the provider.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="ConsoleLoggingProvider"/> class.</summary>
+        /// <param name="threshold">The <see cref="LoggingEventType"/> logging threshold. The threshold limits
+        /// the number of event logged. <see cref="LoggingProviderBase.Threshold">Threshold</see> for more 
+        /// information.</param>
+        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="threshold"/> has an
+        /// invalid value.</exception>
+        public ConsoleLoggingProvider(LoggingEventType threshold) : base(threshold, null)
+        {
+            this.Initialize();
+        }
+
+        /// <summary>Initializes the provider.</summary>
         /// <param name="name">The friendly name of the provider.</param>
         /// <param name="config">A collection of the name/value pairs representing the provider-specific
         /// attributes specified in the configuration for this provider.</param>
@@ -171,6 +180,11 @@ namespace CuttingEdge.Logging
 
             // Returning an ID is inappropriate for this type of logger.
             return null;
+        }
+
+        private void Initialize()
+        {
+            this.SetWriteToConsole((formattedEvent) => Console.Write(formattedEvent));
         }
     }
 }

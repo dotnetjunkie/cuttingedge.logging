@@ -63,6 +63,33 @@ namespace CuttingEdge.Logging
         private string fallbackProviderName;
         private LoggingEventType threshold;
 
+        /// <summary>Initializes a new instance of the <see cref="LoggingProviderBase"/> class.</summary>
+        protected LoggingProviderBase()
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="LoggingProviderBase"/> class.</summary>
+        /// <param name="threshold">The <see cref="LoggingEventType"/> logging threshold. The threshold limits
+        /// the number of event logged. <see cref="Threshold"/> for more information.</param>
+        /// <param name="fallbackProvider">The optional fallback provider.</param>
+        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="threshold"/> has an
+        /// invalid value.</exception>
+        protected LoggingProviderBase(LoggingEventType threshold, LoggingProviderBase fallbackProvider)
+        {
+            if (threshold < LoggingEventType.Debug || threshold > LoggingEventType.Critical)
+            {
+                throw new InvalidEnumArgumentException("threshold", (int)threshold, typeof(LoggingEventType));
+            }
+
+            base.Initialize(this.GetType().Name, null);
+
+            this.threshold = threshold;
+
+            // NOTE: We don't have to check for circular references, because a provider is immutable after
+            // creation and can therefore never be circular referencing itself.
+            this.FallbackProvider = fallbackProvider;
+        }
+
         /// <summary>
         /// Gets the supplied fallback provider that the <see cref="Logger"/> class will use when logging
         /// failed on this logging provider. When no fallback provider is defined in the configuration file,

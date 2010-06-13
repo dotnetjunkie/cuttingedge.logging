@@ -26,11 +26,11 @@
 
 using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Configuration;
 using System.Configuration.Provider;
 using System.Data;
 using System.Data.SqlClient;
-using System.Globalization;
 
 namespace CuttingEdge.Logging
 {
@@ -94,7 +94,8 @@ namespace CuttingEdge.Logging
     /// <item>
     ///     <attribute>connectionStringName</attribute>
     ///     <description>
-    ///         The connection string provided with this provider. This attribute is mandatory.
+    ///         The name of the connection string in the connectionString section of the application 
+    ///         configuration file that will be used to connect to the database. This attribute is mandatory.
     ///     </description>
     /// </item>  
     /// <item>
@@ -143,6 +144,55 @@ namespace CuttingEdge.Logging
     public class SqlLoggingProvider : LoggingProviderBase
     {
         private string connectionString;
+
+        /// <summary>Initializes a new instance of the <see cref="SqlLoggingProvider"/> class.</summary>
+        public SqlLoggingProvider()
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="SqlLoggingProvider"/> class.</summary>
+        /// <param name="threshold">The <see cref="LoggingEventType"/> logging threshold. The threshold limits
+        /// the number of event logged. <see cref="LoggingProviderBase.Threshold">Threshold</see> for more 
+        /// information.</param>
+        /// <param name="connectionString">The connection string.</param>
+        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="threshold"/> has an
+        /// invalid value.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="connectionString"/> is a
+        /// null reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="connectionString"/> is an
+        /// empty string.</exception>
+        public SqlLoggingProvider(LoggingEventType threshold, string connectionString) 
+            : this(threshold, connectionString, null)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="SqlLoggingProvider"/> class.</summary>
+        /// <param name="threshold">The <see cref="LoggingEventType"/> logging threshold. The threshold limits
+        /// the number of event logged. <see cref="LoggingProviderBase.Threshold">Threshold</see> for more 
+        /// information.</param>
+        /// <param name="connectionString">The connection string.</param>
+        /// <param name="fallbackProvider">The optional fallback provider.</param>
+        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="threshold"/> has an
+        /// invalid value.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="connectionString"/> is a
+        /// null reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="connectionString"/> is an
+        /// empty string.</exception>
+        public SqlLoggingProvider(LoggingEventType threshold, string connectionString, 
+            LoggingProviderBase fallbackProvider) : base(threshold, fallbackProvider)
+        {
+            if (connectionString == null)
+            {
+                throw new ArgumentNullException("connectionString");
+            }
+
+            if (connectionString.Length == 0)
+            {
+                throw new ArgumentException(SR.ValueShouldNotBeAnEmptyString(), "connectionString");
+            }
+
+            this.connectionString = connectionString;
+        }
 
         /// <summary>Gets the connection string provided with this provider.</summary>
         /// <value>The connection string.</value>

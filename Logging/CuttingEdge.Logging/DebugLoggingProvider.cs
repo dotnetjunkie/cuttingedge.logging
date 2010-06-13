@@ -26,9 +26,9 @@
 
 using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Configuration.Provider;
 using System.Diagnostics;
-using System.Text;
 
 namespace CuttingEdge.Logging
 {
@@ -118,7 +118,18 @@ namespace CuttingEdge.Logging
         /// <summary>Initializes a new instance of the <see cref="DebugLoggingProvider"/> class.</summary>
         public DebugLoggingProvider()
         {
-            this.SetWriteToDebugWindow((formattedEvent) => Trace.Write(formattedEvent));
+            this.Initialize();
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="DebugLoggingProvider"/> class.</summary>
+        /// <param name="threshold">The <see cref="LoggingEventType"/> logging threshold. The threshold limits
+        /// the number of event logged. <see cref="LoggingProviderBase.Threshold">Threshold</see> for more 
+        /// information.</param>
+        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="threshold"/> has an
+        /// invalid value.</exception>
+        public DebugLoggingProvider(LoggingEventType threshold) : base(threshold, null)
+        {
+            this.Initialize();
         }
 
         /// <summary>Initializes the provider.</summary>
@@ -168,6 +179,11 @@ namespace CuttingEdge.Logging
 
             // Returning an ID is inappropriate for this type of logger.
             return null;
+        }
+
+        private void Initialize()
+        {
+            this.SetWriteToDebugWindow((formattedEvent) => Trace.Write(formattedEvent));
         }
     }
 }

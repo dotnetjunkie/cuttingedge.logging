@@ -17,6 +17,46 @@ namespace CuttingEdge.Logging.Tests.Unit
     {
 #if DEBUG // This test code only runs in debug mode
         [TestMethod]
+        public void Log_ProviderInitializedWithDebugThresholdThroughConstructor_LogsMessage()
+        {
+            // Arrange
+            var expectedMessage = "Hello";
+            var provider = new FakeConsoleLoggingProvider(LoggingEventType.Debug);
+            
+            // Act
+            provider.Log(expectedMessage);
+
+            // Assert
+            Assert.IsTrue(provider.TextWrittenToConsole.Contains(expectedMessage), "Message not logged");
+        }
+
+        [TestMethod]
+        public void Log_ProviderInitializedWithDebugThresholdThroughConstructor_Succeeds()
+        {
+            // Arrange
+            var expectedMessage = "Hello";
+            var provider = new ConsoleLoggingProvider(LoggingEventType.Debug);
+
+            // Act
+            provider.Log(expectedMessage);
+        }
+
+        [TestMethod]
+        public void Log_ProviderInitializedWithCriticalThresholdThroughConstructor_DoesNotLogMessage()
+        {
+            // Arrange
+            var expectedMessage = "Hello";
+            var provider = new FakeConsoleLoggingProvider(LoggingEventType.Critical);
+
+            // Act
+            provider.Log(expectedMessage);
+
+            // Assert
+            Assert.AreEqual(string.Empty, provider.TextWrittenToConsole, 
+                "Actual text: " + provider.TextWrittenToConsole);
+        }
+        
+        [TestMethod]
         public void Initialize_WithValidArguments_Succeeds()
         {
             // Arrange
@@ -140,13 +180,28 @@ namespace CuttingEdge.Logging.Tests.Unit
 #if DEBUG // This test code only runs in debug mode
         private sealed class FakeConsoleLoggingProvider : ConsoleLoggingProvider
         {
-            public FakeConsoleLoggingProvider()
+            private string textWrittenToConsole = string.Empty;
+
+            public FakeConsoleLoggingProvider(LoggingEventType threshold) : base(threshold)
             {
-                // Override the delegate to redirect the output.
-                this.SetWriteToConsole((formattedEvent) => this.TextWrittenToConsole += formattedEvent);
+                this.OverrideDelegate();
             }
 
-            public string TextWrittenToConsole { get; private set; }
+            public FakeConsoleLoggingProvider()
+            {
+                this.OverrideDelegate();
+            }
+
+            public string TextWrittenToConsole
+            {
+                get { return this.textWrittenToConsole; }
+            }
+
+            private void OverrideDelegate()
+            {
+                // Override the delegate to redirect the output.
+                this.SetWriteToConsole((formattedEvent) => this.textWrittenToConsole += formattedEvent);
+            }
         }
 #endif
     }

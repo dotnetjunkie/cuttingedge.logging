@@ -4,6 +4,10 @@ Version vNext
 	General description:
 	
 	Code changes:
+		-The API of the provided logging provider classes is now changed in such a way that code-based 
+		 configuration becomes possible. This means that the logging providers now support optional 
+		 constructors that allow a provider to be completely initialized, without the need to call 
+		 Initialize(string, NameValueCollection). Work item 5143.
 		-AspNetSqlLoggingProvider now uses HttpContext.User.Identity.Name and IPrincipal.Identity.Name for 
 		 retrieving the current logged-on user name, instead of using the System.Web.Security.Membership.
 		 This makes the usage of this logger more flexible and improves performance. Work item 6092.
