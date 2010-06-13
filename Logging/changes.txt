@@ -4,6 +4,7 @@ Version vNext
 	General description:
 	
 	Code changes:
+		-SmtpClient is now disposed when running inside .NET 4.0 or higher. Work item 6133.
 		-The API of the provided logging provider classes is now changed in such a way that code-based 
 		 configuration becomes possible. This means that the logging providers now support optional 
 		 constructors that allow a provider to be completely initialized, without the need to call 
