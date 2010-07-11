@@ -4,6 +4,13 @@ Version vNext
 	General description:
 	
 	Code changes:
+		-The library is now able to handle exceptions with multiple inner exceptions. (Work item 4028.) 
+		 When an Exception contains a public 'InnerExceptions' property (such as both the .NET 4.0 
+		 System.AggregateException and CuttingEdge.Logging.CompositeException contain), the framework will use
+		 this property instead of the InnerException property. The SqlLoggingProvider and
+		 AspNetSqlLoggingProvider will store all inner exceptions in the database. The MailLoggingProvider and 
+		 WindowsEventLogLoggingProvider will display information about the inner exceptions in their output by
+		 using the exception's ToString() method.
 		-SmtpClient is now disposed when running inside .NET 4.0 or higher. Work item 6133.
 		-The API of the provided logging provider classes is now changed in such a way that code-based 
 		 configuration becomes possible. This means that the logging providers now support optional 

@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Runtime.Serialization;
 
 using CuttingEdge.Logging.Tests.Common;
 using CuttingEdge.Logging.Tests.Unit.Helpers;
@@ -314,6 +318,134 @@ namespace CuttingEdge.Logging.Tests.Unit
             }
         }
 
+#if DEBUG
+        [TestMethod]
+        public void Log_ExceptionWithoutInnerException_LogsThatSingleException()
+        {
+            // Arrange
+            int expectedNumberOfLoggedExceptions = 1;
+
+            Exception exceptionToLog = CreateThrownException<ArgumentNullException>();
+
+            var logger = new CachingSqlLoggingProvider();
+
+            // Act
+            logger.Log(exceptionToLog);
+
+            // Arrange
+            Assert.AreEqual(expectedNumberOfLoggedExceptions, logger.LoggedExceptions.Count,
+                "We'd expect a single exception to be logged and nothing else..");
+            Assert.AreEqual(exceptionToLog, logger.LoggedExceptions[0].Exception);
+        }
+
+        [TestMethod]
+        public void Log_ExceptionWithInnerException_LogsExceptionAndItsInnerException()
+        {
+            // Arrange
+            int expectedNumberOfLoggedExceptions = 2;
+
+            Exception exceptionToLog = new InvalidCastException("message", new FormatException());
+
+            var logger = new CachingSqlLoggingProvider();
+
+            // Act
+            logger.Log(exceptionToLog);
+
+            // Arrange
+            Assert.AreEqual(expectedNumberOfLoggedExceptions, logger.LoggedExceptions.Count,
+                "We'd expect a single exception to be logged and nothing else..");
+            Assert.AreEqual(exceptionToLog.InnerException, logger.LoggedExceptions[1].Exception);
+        }
+
+        [TestMethod]
+        public void Log_CompositeExceptionWithMultipleInnerExceptions_LogsMultipleInnerExceptions()
+        {
+            // Arrange
+            int expectedNumberOfLoggedExceptions = 3;
+            Exception exceptionWithMultipleInnerExceptions;
+
+            try
+            {
+                throw new CompositeException("failure 1 / parent exception",
+                    new Exception[]
+                    {
+                        CreateThrownException<ArgumentException>(),
+                        CreateThrownException<InvalidOperationException>()
+                    });
+            }
+            catch (Exception ex)
+            {
+                exceptionWithMultipleInnerExceptions = ex;
+            }
+
+            var logger = new CachingSqlLoggingProvider();
+
+            // Act
+            logger.Log(exceptionWithMultipleInnerExceptions);
+
+            // Arrange
+            Assert.AreEqual(expectedNumberOfLoggedExceptions, logger.LoggedExceptions.Count,
+                "The logged exception contains two inner exceptions and they are expected to be logged.");
+        }
+
+        [TestMethod]
+        public void Logging_CustomExceptionWithMultipleInnerExceptions_LogsMultipleInnerExceptions()
+        {
+            // Arrange
+            int expectedNumberOfLoggedExceptions = 3;
+
+            var exceptionWithMultipleInnerExceptions = new MultipleFailuresException("failure 1 / parent")
+            {
+                InnerExceptions = new Exception[]
+                {
+                    new ArgumentException("failure 2 / inner exception 1"),
+                    new InvalidOperationException("failure 3 / inner exception 2")
+                }
+            };
+
+            var logger = new CachingSqlLoggingProvider();
+
+            // Act
+            logger.Log(exceptionWithMultipleInnerExceptions);
+
+            // Arrange
+            Assert.AreEqual(expectedNumberOfLoggedExceptions, logger.LoggedExceptions.Count,
+                "The logged exception exposed two inner exceptions through it's public 'InnerExceptions' " +
+                "property and they are expected to be logged.");
+        }
+
+        [TestMethod]
+        public void Log_ExceptionWithMultipleLevelsOfInnerExceptions_LogsWholeHierachyAsExpected()
+        {
+            // Arrange
+            int expectedNumberOfLoggedExceptions = 6;
+
+            var exceptionWithMultipleInnerExceptions = new CompositeException("failure 1 / parent",
+                new Exception[]
+                {
+                    new ArgumentException("failure 2 / inner level 1"),
+                    new InvalidOperationException("failure 3 / inner level 1"),
+                    new MultipleFailuresException("failure 4 / parent level 1")
+                    {
+                        InnerExceptions = new Exception[]
+                        {
+                            new ArgumentException("failure 5 / inner level 2"),
+                            new InvalidOperationException("failure 6 / inner level 2")
+                        },
+                    }
+                });
+
+            var logger = new CachingSqlLoggingProvider();
+
+            // Act
+            logger.Log(exceptionWithMultipleInnerExceptions);
+
+            // Arrange
+            Assert.AreEqual(expectedNumberOfLoggedExceptions, logger.LoggedExceptions.Count,
+                "Inner exceptions that contain multiple exceptions by them selves should be logged.");
+        }
+#endif
+
         private static NameValueCollection CreateValidConfiguration()
         {
             var configuration = new NameValueCollection();
@@ -321,6 +453,18 @@ namespace CuttingEdge.Logging.Tests.Unit
             configuration.Add("connectionStringName", ConfigurationManager.ConnectionStrings[0].Name);
 
             return configuration;
+        }
+
+        private static Exception CreateThrownException<TException>() where TException : Exception, new()
+        {
+            try
+            {
+                throw new TException();
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
         }
 
         private sealed class FailingSqlLoggingProvider : FakeSqlLoggingProvider
@@ -335,6 +479,47 @@ namespace CuttingEdge.Logging.Tests.Unit
                 throw new InvalidOperationException("Fail!");
             }
         }
+
+#if DEBUG
+        private sealed class CachingSqlLoggingProvider : FakeSqlLoggingProvider
+        {
+            private int lastExceptionId = 0;
+
+            public CachingSqlLoggingProvider() : base(null)
+            {
+                this.LoggedExceptions = new Collection<ExceptionRecord>();
+            }
+
+            public Collection<ExceptionRecord> LoggedExceptions { get; private set; }
+
+            // Override log internal and prevent the creation of a SqlConnection and Transaction.
+            protected override object LogInternal(LogEntry entry)
+            {
+                return this.LogWithinTransaction(entry, null);
+            }
+
+            protected override int SaveEventToDatabase(SqlTransaction transaction, LoggingEventType severity,
+                string message, string source)
+            {
+                return 0;
+            }
+
+            protected override int SaveExceptionToDatabase(SqlTransaction transaction, Exception exception,
+                int parentEventId, int? parentExceptionId)
+            {
+                this.lastExceptionId++;
+
+                this.LoggedExceptions.Add(new ExceptionRecord()
+                {
+                    ExceptionId = this.lastExceptionId,
+                    ParentExceptionId = parentExceptionId,
+                    Exception = exception
+                });
+
+                return this.lastExceptionId;
+            }
+        }
+#endif
 
         private class FakeSqlLoggingProvider : SqlLoggingProvider
         {
@@ -365,6 +550,41 @@ namespace CuttingEdge.Logging.Tests.Unit
                 Assert.Fail("This method should not be called.");
                 throw new NotSupportedException();
             }
+        }
+
+        [DebuggerDisplay("{Exception.GetType().Name}, Id: {ExceptionId}, ParentExceptionId: {ParentExceptionId}, Message: {Exception.Message}")]
+        private sealed class ExceptionRecord
+        {
+            public int ExceptionId { get; set; }
+
+            public int? ParentExceptionId { get; set; }
+
+            public Exception Exception { get; set; }
+        }
+
+        [Serializable]
+        private class MultipleFailuresException : Exception
+        {
+            public MultipleFailuresException()
+            {
+            }
+
+            public MultipleFailuresException(string message)
+                : base(message)
+            {
+            }
+
+            public MultipleFailuresException(string message, Exception inner)
+                : base(message, inner)
+            {
+            }
+
+            protected MultipleFailuresException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+            }
+
+            public IEnumerable<Exception> InnerExceptions { get; set; }
         }
     }
 }
