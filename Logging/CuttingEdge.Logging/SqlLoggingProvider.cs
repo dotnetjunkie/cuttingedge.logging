@@ -239,6 +239,16 @@ namespace CuttingEdge.Logging
             }
         }
 
+        internal int LogWithinTransaction(LogEntry entry, SqlTransaction transaction)
+        {
+            // Log the message
+            int eventId = this.SaveEventToDatabase(transaction, entry.Severity, entry.Message, entry.Source);
+
+            this.SaveExceptionChainToDatabase(transaction, entry.Exception, eventId);
+
+            return eventId;
+        }
+
         /// <summary>Initializes the database schema.</summary>
         protected virtual void InitializeDatabaseSchema()
         {
@@ -266,17 +276,13 @@ namespace CuttingEdge.Logging
         /// database.</exception>
         protected override object LogInternal(LogEntry entry)
         {
-            using (SqlConnection connection = new SqlConnection(this.ConnectionString))
+            using (var connection = new SqlConnection(this.ConnectionString))
             {
                 connection.Open();
 
-                using (SqlTransaction transaction = connection.BeginTransaction())
+                using (var transaction = connection.BeginTransaction())
                 {
-                    // Log the message
-                    int eventId = 
-                        this.SaveEventToDatabase(transaction, entry.Severity, entry.Message, entry.Source);
-
-                    this.SaveExceptionChainToDatabase(transaction, entry.Exception, eventId);
+                    int eventId = this.LogWithinTransaction(entry, transaction);
 
                     transaction.Commit();
 
@@ -350,14 +356,23 @@ namespace CuttingEdge.Logging
         private void SaveExceptionChainToDatabase(SqlTransaction transaction, Exception exception,
             int eventId)
         {
-            int? parentExceptionId = null;
+            int exceptionId = this.SaveExceptionToDatabase(transaction, exception, eventId, null);
 
-            while (exception != null)
+            this.SaveInnerExceptionsToDatabase(transaction, exception, eventId, exceptionId);
+        }
+
+        private void SaveInnerExceptionsToDatabase(SqlTransaction transaction, Exception parentException,
+            int eventId, int parentExceptionId)
+        {
+            foreach (var innerException in LoggingHelper.GetInnerExceptions(parentException))
             {
-                parentExceptionId =
-                    this.SaveExceptionToDatabase(transaction, exception, eventId, parentExceptionId);
+                if (innerException != null)
+                {
+                    int exceptionId = 
+                        this.SaveExceptionToDatabase(transaction, innerException, eventId, parentExceptionId);
 
-                exception = exception.InnerException;
+                    this.SaveInnerExceptionsToDatabase(transaction, innerException, eventId, exceptionId);
+                }
             }
         }
 

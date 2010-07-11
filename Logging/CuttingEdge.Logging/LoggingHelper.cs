@@ -25,6 +25,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection;
@@ -164,6 +165,37 @@ namespace CuttingEdge.Logging
             }
         }
 
+        internal static Exception[] GetInnerExceptions(Exception exception)
+        {
+            List<Exception> innerExceptions = new List<Exception>();
+
+            var innerExceptionsProperty = exception.GetType().GetProperty("InnerExceptions");
+
+            if (innerExceptionsProperty != null && innerExceptionsProperty.CanRead)
+            {
+                var exceptions =
+                    innerExceptionsProperty.GetValue(exception, null) as IEnumerable<Exception>;
+
+                if (exceptions != null)
+                {
+                    foreach (var innerException in exceptions)
+                    {
+                        if (innerException != null)
+                        {
+                            innerExceptions.Add(innerException);
+                        }
+                    }
+                }
+            }
+
+            if (innerExceptions.Count == 0 && exception.InnerException != null)
+            {
+                innerExceptions.Add(exception.InnerException);
+            }
+
+            return innerExceptions.ToArray();
+        }
+
         private static int EstimateInitialCapacity(MethodBase method, ParameterInfo[] parameters)
         {
             const int AverageLengthOfParameterName = 15;
@@ -209,18 +241,16 @@ namespace CuttingEdge.Logging
 
         private static void AppendExceptionInformation(Exception exception, StringBuilder message)
         {
-            while (exception != null)
+            if (exception == null)
             {
-                message.AppendLine();
-
-                message
-                    .Append("Exception: ").AppendLine(exception.GetType().FullName)
-                    .Append("Message: ").AppendLine(exception.Message)
-                    .AppendLine("StackTrace:")
-                    .AppendLine(exception.StackTrace);
-
-                exception = exception.InnerException;
+                return;
             }
+
+            message.AppendLine();
+
+            // The exception ToString method will display the exception type, message, stack trace and
+            // information about the inner exception or (if appropriate) inner exceptions.
+            message.Append(exception.ToString());
         }
     }
 }

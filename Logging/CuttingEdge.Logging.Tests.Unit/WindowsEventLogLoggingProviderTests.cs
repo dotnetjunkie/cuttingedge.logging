@@ -313,9 +313,7 @@ namespace CuttingEdge.Logging.Tests.Unit
                 "Severity: Error\r\n" +
                 "Source: This is a source\r\n" +
                 "\r\n" +
-                "Exception: System.InvalidOperationException\r\n" +
-                "Message: Invalid operation\r\n" +
-                "StackTrace:\r\n";
+                "System.InvalidOperationException: Invalid operation\r\n";
 
             // Act
             var actualEventLogMessage = provider.BuildEventLogMessage(entry);
