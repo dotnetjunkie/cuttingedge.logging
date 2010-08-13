@@ -198,6 +198,9 @@
   <data name="MissingLoggingProviderInConfig" xml:space="preserve">
     <value>Missing logging provider '{0}' in &lt;{1}&gt; section of the configuration file. The logging provider that was configured in the '{2}' web event provider could not be found.</value>
   </data>
+  <data name="MissingPathAttribute" xml:space="preserve">
+    <value>There was an error while initializing the provider '{0}'. There was an error creating or writing to the file '{1}'. {2}</value>
+  </data>
   <data name="MissingUserNameRetrievalTypeAttributeInConfig" xml:space="preserve">
     <value>Empty or missing userNameRetrievalType attribute in provider '{0}' in configuration file. Please supply one of the following values: {1}.</value>
   </data>

@@ -366,13 +366,10 @@ namespace CuttingEdge.Logging
         {
             foreach (var innerException in LoggingHelper.GetInnerExceptions(parentException))
             {
-                if (innerException != null)
-                {
-                    int exceptionId = 
-                        this.SaveExceptionToDatabase(transaction, innerException, eventId, parentExceptionId);
+                int exceptionId = 
+                    this.SaveExceptionToDatabase(transaction, innerException, eventId, parentExceptionId);
 
-                    this.SaveInnerExceptionsToDatabase(transaction, innerException, eventId, exceptionId);
-                }
+                this.SaveInnerExceptionsToDatabase(transaction, innerException, eventId, exceptionId);
             }
         }
 

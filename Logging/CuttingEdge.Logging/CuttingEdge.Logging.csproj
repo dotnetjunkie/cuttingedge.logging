@@ -83,6 +83,7 @@
     <Compile Include="Web\LoggingWebEventProvider.cs" />
     <Compile Include="Web\UserIdentityRetrievalType.enum.cs" />
     <Compile Include="WindowsEventLogLoggingProvider.cs" />
+    <Compile Include="XmlFileLoggingProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="LoggingExceptionMessages.resx">
