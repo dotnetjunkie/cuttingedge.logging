@@ -14,7 +14,7 @@ namespace CuttingEdge.Logging
     /// </summary>
     [Serializable]
     [DebuggerDisplay("Count = {InnerExceptions.Count}")]
-    //// NOTE: The public interface of this class is identical to a part of that of of the .NET 4.0 beta 2
+    //// NOTE: The public interface of this class is identical to a part of that of of the .NET 4.0
     //// AggregateException. We can't use AggregateException, because CuttingEdge.Logging should be usable
     //// with .NET 2.0. But by having a copy of AggregateException's public API when can later on do two
     //// important things:

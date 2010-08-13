@@ -50,7 +50,7 @@ namespace CuttingEdge.Logging
         {
             return GetString("ValueShouldNotBeAnEmptyString");
         }
-        
+
         internal static string CollectionShouldNotContainNullElements()
         {
             return GetString("CollectionShouldNotContainNullElements");
@@ -64,7 +64,7 @@ namespace CuttingEdge.Logging
         // Exception messages for Logger class
         internal static string LoggingSectionMissingFromConfigSettings(string sectionName, Type type)
         {
-            return GetString("LoggingSectionMissingFromConfigSettings", sectionName, type.FullName, 
+            return GetString("LoggingSectionMissingFromConfigSettings", sectionName, type.FullName,
                 type.Assembly.GetName().Name);
         }
 
@@ -86,7 +86,7 @@ namespace CuttingEdge.Logging
         internal static string ProviderMustInheritFromType(string providerName, Type actualType,
             Type expectedBaseType)
         {
-            return GetString("ProviderMustInheritFromType", providerName, actualType.FullName, 
+            return GetString("ProviderMustInheritFromType", providerName, actualType.FullName,
                 expectedBaseType.FullName);
         }
 
@@ -105,10 +105,10 @@ namespace CuttingEdge.Logging
         }
 
         // Exception messages for LoggingProviderBase class
-        internal static string InvalidFallbackProviderPropertyInConfig(string sectionName, 
+        internal static string InvalidFallbackProviderPropertyInConfig(string sectionName,
             LoggingProviderBase provider)
         {
-            return GetString("InvalidFallbackProviderPropertyInConfig", sectionName, 
+            return GetString("InvalidFallbackProviderPropertyInConfig", sectionName,
                 provider.GetType().FullName, provider.Name, provider.FallbackProviderName);
         }
 
@@ -117,10 +117,10 @@ namespace CuttingEdge.Logging
             return GetString("EventCouldNotBeLoggedWithX", providerName);
         }
 
-        internal static string UnrecognizedAttributeInProviderConfiguration(string providerName, 
+        internal static string UnrecognizedAttributeInProviderConfiguration(string providerName,
             string attributeName)
         {
-            return GetString("UnrecognizedAttributeInProviderConfiguration", providerName, 
+            return GetString("UnrecognizedAttributeInProviderConfiguration", providerName,
                 attributeName);
         }
 
@@ -148,9 +148,9 @@ namespace CuttingEdge.Logging
         }
 
         // Exception messages for SqlLoggingProvider
-        internal static string MissingConnectionStringAttribute(string connectionStringName)
+        internal static string MissingConnectionStringAttribute(string loggingProviderName)
         {
-            return GetString("MissingConnectionStringAttribute", connectionStringName);
+            return GetString("MissingConnectionStringAttribute", loggingProviderName);
         }
 
         internal static string MissingConnectionStringInConfig(string connectionStringName)
@@ -171,7 +171,7 @@ namespace CuttingEdge.Logging
             }
         }
 
-        internal static string InitializationOfDatabaseSchemaFailed(string providerName, 
+        internal static string InitializationOfDatabaseSchemaFailed(string providerName,
             string exceptionMessage)
         {
             return GetString("InitializationOfDatabaseSchemaFailed", providerName, exceptionMessage);
@@ -200,8 +200,15 @@ namespace CuttingEdge.Logging
             return GetString("ValueTooLong", maxLength);
         }
 
+        // Exception messages for XmlFileLoggingProvider
+        internal static string MissingPathAttribute(string loggingProviderName, string path, 
+            string exceptionMessage)
+        {
+            return GetString("MissingPathAttribute", loggingProviderName, path, exceptionMessage);
+        }
+
         // Exception messages for LoggingWebEventProvider
-        internal static string MissingLoggingProviderInConfig(string loggingProviderName, 
+        internal static string MissingLoggingProviderInConfig(string loggingProviderName,
             string loggingWebEventProviderName, string sectionName)
         {
             return GetString("MissingLoggingProviderInConfig", loggingProviderName, sectionName,
@@ -211,7 +218,7 @@ namespace CuttingEdge.Logging
         internal static string InvalidMailAddressAttribute(string attributeValue, string attributeName,
             string providerName)
         {
-            return GetString("InvalidMailAddressAttribute", attributeValue, attributeName, 
+            return GetString("InvalidMailAddressAttribute", attributeValue, attributeName,
                 providerName);
         }
 
@@ -228,7 +235,7 @@ namespace CuttingEdge.Logging
             return GetString("IllegalCharactersLineBreaksAreNotAllowed");
         }
 
-        internal static string IllegalCharactersLineBreaksAreNotAllowed(string attributeValue, 
+        internal static string IllegalCharactersLineBreaksAreNotAllowed(string attributeValue,
             string attributeName, string providerName)
         {
             string illegalCharactersMessage = GetString("IllegalCharactersLineBreaksAreNotAllowed");
@@ -240,7 +247,7 @@ namespace CuttingEdge.Logging
         internal static string MissingAttributeInMailSettings(string providerName, string attributeName,
             string sectionName)
         {
-            return GetString("MissingAttributeInMailSettings", providerName, attributeName, 
+            return GetString("MissingAttributeInMailSettings", providerName, attributeName,
                 sectionName);
         }
 
@@ -254,7 +261,7 @@ namespace CuttingEdge.Logging
             return GetString("ExampleMailConfigurationSettings");
         }
 
-        internal static string PossibleInvalidMailConfigurationInConfigFile(Type messageType, 
+        internal static string PossibleInvalidMailConfigurationInConfigFile(Type messageType,
             string exceptionMessage)
         {
             return GetString("PossibleInvalidMailConfigurationInConfigFile", messageType.FullName) +
@@ -272,10 +279,10 @@ namespace CuttingEdge.Logging
             return GetString("EmptyOrMissingApplicationNameAttributeInConfig", providerName);
         }
 
-        internal static string ApplicationNameAttributeInConfigTooLong(string providerName, 
+        internal static string ApplicationNameAttributeInConfigTooLong(string providerName,
             int maximumNumberOfCharacters)
         {
-            return GetString("ApplicationNameAttributeInConfigTooLong", providerName, 
+            return GetString("ApplicationNameAttributeInConfigTooLong", providerName,
                 maximumNumberOfCharacters);
         }
 
@@ -318,22 +325,22 @@ namespace CuttingEdge.Logging
             // the provider's Name property will be null and supplying it to the message is useless.
             return GetString("ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst", providerTypeName);
         }
-      
-        internal static string ReferencedProviderDoesNotExist(CompositeLoggingProvider provider, 
+
+        internal static string ReferencedProviderDoesNotExist(CompositeLoggingProvider provider,
             string missingProviderName)
         {
             string providerTypeName = GetShortTypeNameForOwnTypes(provider.GetType());
-                        
-            return GetString("ReferencedProviderDoesNotExist", providerTypeName, provider.Name, 
+
+            return GetString("ReferencedProviderDoesNotExist", providerTypeName, provider.Name,
                 missingProviderName);
         }
 
-        internal static string ProviderReferencedMultipleTimes(CompositeLoggingProvider provider, 
+        internal static string ProviderReferencedMultipleTimes(CompositeLoggingProvider provider,
             string doubleReferencedProviderName)
         {
             string providerTypeName = GetShortTypeNameForOwnTypes(provider.GetType());
-          
-            return GetString("ProviderReferencedMultipleTimes", providerTypeName, provider.Name, 
+
+            return GetString("ProviderReferencedMultipleTimes", providerTypeName, provider.Name,
                 doubleReferencedProviderName);
         }
 
@@ -342,7 +349,7 @@ namespace CuttingEdge.Logging
         {
             string providerTypeName = GetShortTypeNameForOwnTypes(provider.GetType());
 
-            return GetString("CompositeLoggingProviderDoesNotReferenceAnyProviders", providerTypeName, 
+            return GetString("CompositeLoggingProviderDoesNotReferenceAnyProviders", providerTypeName,
                 provider.Name);
         }
 
