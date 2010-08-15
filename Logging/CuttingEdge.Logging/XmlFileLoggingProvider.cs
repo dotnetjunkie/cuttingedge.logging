@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Configuration.Provider;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text;
 using System.Xml;
 
 namespace CuttingEdge.Logging
@@ -208,6 +209,8 @@ namespace CuttingEdge.Logging
         private static readonly Dictionary<string, object> PathLockers =
             new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
+        private static readonly byte[] NewLine = new UTF8Encoding(false, true).GetBytes(Environment.NewLine);
+
         private string path;
 
         /// <summary>
@@ -243,7 +246,7 @@ namespace CuttingEdge.Logging
             {
                 throw new ArgumentException(SR.ValueShouldNotBeAnEmptyString(), "path");
             }
-
+            
             this.path = GetFullCanonicalPath(path);
 
             this.CheckAuthorizationsByCreatingFile();
@@ -254,6 +257,11 @@ namespace CuttingEdge.Logging
         public string Path
         {
             get { return this.path; }
+        }
+        
+        internal virtual DateTime CurrentTime
+        {
+            get { return DateTime.Now; }
         }
 
         /// <summary>Initializes the provider.</summary>
@@ -288,6 +296,13 @@ namespace CuttingEdge.Logging
             this.CheckAuthorizationsByCreatingFile();
         }
 
+        // This method is virtual to allow the file system to be replaced for testing.
+        internal virtual void AppendAllText(string contents)
+        {
+            // Opens or creates a file and appends the contents to it.
+            File.AppendAllText(this.Path, contents);
+        }
+
         /// <summary>Implements the functionality to log the event.</summary>
         /// <param name="entry">The entry to log.</param>
         /// <returns>This logger returns null, because returning an id is inappropriate.</returns>
@@ -297,28 +312,30 @@ namespace CuttingEdge.Logging
             // same AppDomain).
             var locker = this.GetLockObjectForCurrentPath();
 
+            string contents = this.SerializeLogEntryToXml(entry);
+
             lock (locker)
             {
-                this.WriteEntryToDisk(entry);
+                this.AppendAllText(contents);
             }
 
             // Returning an ID is inappropriate for this type of logger.
             return null;
         }
 
-        /// <summary>Writes the entry's properties to the <paramref name="xmlWriter"/>.</summary>
-        /// <param name="xmlWriter">The XML writer to write to.</param>
+        /// <summary>Writes the entry's properties to the <paramref name="writer"/>.</summary>
+        /// <param name="writer">The XML writer to write to.</param>
         /// <param name="entry">The entry.</param>
-        protected virtual void WriteEntryInnerElements(XmlWriter xmlWriter, LogEntry entry)
+        protected virtual void WriteEntryInnerElements(XmlWriter writer, LogEntry entry)
         {
-            WriteElement(xmlWriter, "EventTime", DateTime.Now);
-            WriteElement(xmlWriter, "Severity", entry.Severity.ToString());
-            WriteElement(xmlWriter, "Message", entry.Message);
-            WriteElement(xmlWriter, "Source", entry.Source);
+            WriteElement(writer, "EventTime", this.CurrentTime);
+            WriteElement(writer, "Severity", entry.Severity.ToString());
+            WriteElement(writer, "Message", entry.Message);
+            WriteElement(writer, "Source", entry.Source);
             
             if (entry.Exception != null)
             {
-                WriteException(xmlWriter, "Exception", entry.Exception);
+                WriteExceptionRecursive(writer, "Exception", entry.Exception);
             }
         }
 
@@ -338,27 +355,46 @@ namespace CuttingEdge.Logging
             return pathLocker;
         }
 
-        private void WriteEntryToDisk(LogEntry entry)
+        private string SerializeLogEntryToXml(LogEntry entry)
         {
-            using (var file = OpenOrCreateFileForAppending(this.Path))
+            int initialCapacity = EstimateCapacity(entry);
+
+            using (var stream = new MemoryStream(initialCapacity))
             {
-                using (var xml = CreateXmlWriter(file))
-                {
-                    xml.WriteStartElement("LogEntry");
+                this.SerializeLogEntryToXml(entry, stream);
 
-                    this.WriteEntryInnerElements(xml, entry);
+                // By writing a new line we ensure pretty formatting.
+                WriteNewLineTo(stream);
 
-                    xml.WriteEndElement();
-                }
-
-                // By writing a new line we 
-                WriteNewLine(file);
+                return ConvertStreamToString(stream);
             }
         }
 
-        private static Stream OpenOrCreateFileForAppending(string path)
+        private void SerializeLogEntryToXml(LogEntry entry, Stream stream)
         {
-            return new FileStream(path, FileMode.Append | FileMode.OpenOrCreate, FileAccess.Write);
+            using (XmlWriter writer = CreateXmlWriter(stream))
+            {
+                writer.WriteStartElement("LogEntry");
+
+                this.WriteEntryInnerElements(writer, entry);
+
+                writer.WriteEndElement();
+            }
+        }
+
+        private static int EstimateCapacity(LogEntry entry)
+        {
+            return entry.Exception != null ? 4096 : 512;
+        }
+
+        private static string ConvertStreamToString(Stream stream)
+        {
+            stream.Position = 0;
+
+            using (var reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
         }
 
         private void InitializePath(NameValueCollection config)
@@ -389,7 +425,7 @@ namespace CuttingEdge.Logging
                 // instances are manually created and not when the they are configured in the app.config).
                 lock (this.GetLockObjectForCurrentPath())
                 {
-                    File.AppendAllText(this.Path, string.Empty);
+                    this.AppendAllText(string.Empty);
                 }
             }
             catch (Exception ex)
@@ -435,50 +471,45 @@ namespace CuttingEdge.Logging
             return XmlWriter.Create(source, settings);
         }
 
-        private static void WriteException(XmlWriter xmlWriter, string elementName, Exception exception)
+        private static void WriteExceptionRecursive(XmlWriter writer, string elementName, Exception exception)
         {
-            xmlWriter.WriteStartElement(elementName);
+            writer.WriteStartElement(elementName);
 
-            WriteElement(xmlWriter, "Message", exception.Message);
-            WriteElement(xmlWriter, "StackTrace", exception.StackTrace);
+            WriteElement(writer, "Message", exception.Message);
+            WriteElement(writer, "StackTrace", exception.StackTrace);
 
-            // Recursive call:
-            WriteInnerExceptions(xmlWriter, exception);
+            WriteInnerExceptionsRecursive(writer, exception);
 
-            xmlWriter.WriteEndElement();
+            writer.WriteEndElement();
         }
 
-        private static void WriteInnerExceptions(XmlWriter xmlWriter, Exception parentException)
+        private static void WriteInnerExceptionsRecursive(XmlWriter writer, Exception parentException)
         {
             var innerExceptions = LoggingHelper.GetInnerExceptions(parentException);
 
             if (innerExceptions.Length > 0)
             {
-                xmlWriter.WriteStartElement("InnerExceptions");
+                writer.WriteStartElement("InnerExceptions");
 
                 foreach (var innerException in innerExceptions)
                 {
-                    // Recursive call:
-                    WriteException(xmlWriter, "InnerException", innerException);
+                    WriteExceptionRecursive(writer, "InnerException", innerException);
                 }
 
-                xmlWriter.WriteEndElement();
+                writer.WriteEndElement();
             }
         }
 
-        private static void WriteElement(XmlWriter xmlWriter, string elementName, object value)
+        private static void WriteElement(XmlWriter writer, string elementName, object value)
         {
-            xmlWriter.WriteStartElement(elementName);
-            xmlWriter.WriteValue(value ?? string.Empty);
-            xmlWriter.WriteEndElement();
+            writer.WriteStartElement(elementName);
+            writer.WriteValue(value ?? string.Empty);
+            writer.WriteEndElement();
         }
 
-        private static void WriteNewLine(Stream source)
+        private static void WriteNewLineTo(Stream source)
         {
-            using (var writer = new StreamWriter(source))
-            {
-                writer.WriteLine();
-            }
+            source.Write(NewLine, 0, NewLine.Length);
         }
     }
 }
