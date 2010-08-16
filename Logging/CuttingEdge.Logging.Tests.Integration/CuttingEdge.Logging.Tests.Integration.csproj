@@ -59,6 +59,7 @@
     <Compile Include="SqlLoggingProviderTests.cs" />
     <Compile Include="IntegrationTestLoggingAppDomainManager.cs" />
     <Compile Include="TestConfiguration.cs" />
+    <Compile Include="XmlFileLoggerProviderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

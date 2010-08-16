@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.Logging.Tests.Unit
@@ -173,6 +173,24 @@ namespace CuttingEdge.Logging.Tests.Unit
             Assert.AreEqual(secondInnerException.Message, deserializedException.InnerExceptions[1].Message);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Constructor_SerializationInfoArgumentNull_ThrowsException()
+        {
+            new FakeCompositeException(null, new StreamingContext());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void GetObjectData_SerializationInfoArgumentNull_ThrowsException()
+        {
+            // Arrange
+            var exception = new CompositeException();
+
+            // Act
+            exception.GetObjectData(null, new StreamingContext());
+        }
+
         private static byte[] SerializeCompositeException(CompositeException exceptionToSerialize)
         {
             using (MemoryStream stream = new MemoryStream())
@@ -192,6 +210,14 @@ namespace CuttingEdge.Logging.Tests.Unit
                 BinaryFormatter formatter = new BinaryFormatter();
 
                 return (CompositeException)formatter.Deserialize(stream);
+            }
+        }
+
+        private class FakeCompositeException : CompositeException
+        {
+            public FakeCompositeException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
             }
         }
     }

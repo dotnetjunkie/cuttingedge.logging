@@ -306,11 +306,8 @@ namespace CuttingEdge.Logging
                 case LoggingEventType.Information:
                     return EventLogEntryType.Information;
 
-                case LoggingEventType.Debug:
-                    return null;
-
                 default:
-                    throw new InvalidEnumArgumentException("severity", (int)severity, typeof(LoggingEventType));
+                    return null;
             }
         }
 

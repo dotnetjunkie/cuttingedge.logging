@@ -368,6 +368,9 @@ namespace CuttingEdge.Logging.Tests.Unit
 
         private sealed class FakeXmlFileLoggingProvider : XmlFileLoggingProvider
         {
+            [ThreadStatic]
+            private static Exception exceptionToThrowFromAppendAllText;
+
             private DateTime currentTime;
 
             public FakeXmlFileLoggingProvider()
@@ -380,9 +383,6 @@ namespace CuttingEdge.Logging.Tests.Unit
             {
             }
 
-            [ThreadStatic]
-            private static Exception exceptionToThrowFromAppendAllText;
-
             public static Exception ExceptionToThrowFromAppendAllText
             {
                 get { return exceptionToThrowFromAppendAllText; }
@@ -391,16 +391,18 @@ namespace CuttingEdge.Logging.Tests.Unit
 
             public string LoggedText { get; set; }
 
+#if DEBUG
             internal override DateTime CurrentTime
             {
                 get { return this.currentTime; }
             }
-
+#endif
             public void SetCurrentTime(DateTime currentTime)
             {
                 this.currentTime = currentTime;
             }
 
+#if DEBUG
             internal override void AppendAllText(string contents)
             {
                 if (exceptionToThrowFromAppendAllText != null)
@@ -410,6 +412,7 @@ namespace CuttingEdge.Logging.Tests.Unit
 
                 this.LoggedText = contents;
             }
+#endif
         }
     }
 }
