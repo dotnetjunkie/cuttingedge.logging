@@ -227,16 +227,7 @@ namespace CuttingEdge.Logging
                 methodName.Append("out ");
             }
 
-            if (parameter.IsRetval == true)
-            {
-                methodName.Append("ret ");
-                methodName.Insert(0, " ");
-                methodName.Insert(0, parameter.ParameterType.Name);
-            }
-            else
-            {
-                methodName.Append(parameter.ParameterType.Name);
-            }
+            methodName.Append(parameter.ParameterType.Name);
         }
 
         private static void AppendExceptionInformation(Exception exception, StringBuilder message)

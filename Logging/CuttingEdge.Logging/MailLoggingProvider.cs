@@ -325,16 +325,9 @@ namespace CuttingEdge.Logging
         /// <exception cref="SmtpException">Thrown when the provider was unable to send the mail message.</exception>
         protected override object LogInternal(LogEntry entry)
         {
-            // Create and configure the SMTP client
-            var smtpClient = this.CreateSmtpClient();
+            MailMessage mailMessage = this.BuildMailMessage(entry);
 
-            // SmtpClient implements IDisposable in .NET 4.0.
-            using (smtpClient as IDisposable)
-            {
-                MailMessage mailMessage = this.BuildMailMessage(entry);
-
-                smtpClient.Send(mailMessage);
-            }
+            this.Send(mailMessage);
 
             // Returning an ID is inappropriate for this type of logger.
             return null;
@@ -368,6 +361,27 @@ namespace CuttingEdge.Logging
         protected virtual string BuildMailBody(LogEntry entry)
         {
             return LoggingHelper.BuildMessageFromLogEntry(entry);
+        }
+
+        private void Send(MailMessage message)
+        {
+            // Create and configure the SMTP client
+            var smtpClient = this.CreateSmtpClient();
+
+            try
+            {
+                smtpClient.Send(message);
+            }
+            finally
+            {
+                // SmtpClient implements IDisposable in .NET 4.0.
+                var disposable = smtpClient as IDisposable;
+
+                if (disposable != null)
+                {
+                    disposable.Dispose();
+                }
+            }
         }
 
         private void InitializeToProperty(NameValueCollection config)

@@ -77,11 +77,6 @@ namespace CuttingEdge.Logging
         protected CompositeException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            if (info == null)
-            {
-                throw new ArgumentNullException("info");
-            }
-
             Exception[] list = info.GetValue("InnerExceptions", typeof(Exception[])) as Exception[];
 
             if (list == null)

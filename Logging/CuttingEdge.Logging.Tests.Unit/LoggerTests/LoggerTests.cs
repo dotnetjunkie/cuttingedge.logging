@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Configuration.Provider;
+using System.Web.Security;
 
 using CuttingEdge.Logging.Tests.Common;
 using CuttingEdge.Logging.Tests.Unit.Helpers;
@@ -109,18 +110,17 @@ namespace CuttingEdge.Logging.Tests.Unit.LoggerTests
         {
             // Arrange
             var config = new TemplatedConfigurationWriter(
-                @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+              @"<?xml version=""1.0"" encoding=""utf-8"" ?>
                 <configuration>
                     <configSections>
 	                    <section name=""cuttingEdge_logging"" 
-                            type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"" 
-                            allowDefinition=""MachineToApplication"" />
+                            type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"" />
                     </configSections>
                     <cuttingEdge_logging defaultProvider=""MemoryLoggingProvider"">
                        <providers>
                             <add 
                                 name=""MemoryLoggingProvider""
-                                type=""CuttingEdge.Logging.MemoryLoggingProvider, CuttingEdge.Logging""
+                                type=""CuttingEdge.Logging.MemoryLoggingProvider""
                             />
                        </providers>
                     </cuttingEdge_logging>
@@ -187,8 +187,7 @@ namespace CuttingEdge.Logging.Tests.Unit.LoggerTests
                     <configSections>
                         <sectionGroup name=""cuttingEdge"">
                             <section name=""logging"" 
-                                type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"" 
-                                allowDefinition=""MachineToApplication"" />
+                                type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"" />
                         </sectionGroup>
                     </configSections>
                     <cuttingEdge>
@@ -232,7 +231,7 @@ namespace CuttingEdge.Logging.Tests.Unit.LoggerTests
                                <providers>
                                     <add 
                                         name=""MemoryLoggingProvider""
-                                        type=""CuttingEdge.Logging.MemoryLoggingProvider, CuttingEdge.Logging""
+                                        type=""CuttingEdge.Logging.MemoryLoggingProvider""
                                     />
                                </providers>
                             </logging>
@@ -257,8 +256,7 @@ namespace CuttingEdge.Logging.Tests.Unit.LoggerTests
                  <configuration>
                      <configSections>
                          <section name=""logging"" 
-                             type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging""
-                             allowDefinition=""MachineToApplication"" />
+                             type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"" />
                      </configSections>
                      <logging defaultProvider=""MemoryLoggingProvider"">
                         <providers>
@@ -303,8 +301,7 @@ namespace CuttingEdge.Logging.Tests.Unit.LoggerTests
                  <configuration>
                      <configSections>
                          <section name=""logging"" 
-                             type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging""
-                             allowDefinition=""MachineToApplication"" />
+                             type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"" />
                      </configSections>
                      <logging defaultProvider=""MemoryLoggingProvider"">
                         <providers>
@@ -393,6 +390,114 @@ namespace CuttingEdge.Logging.Tests.Unit.LoggerTests
 
                     Assert.IsTrue(ex.Message.Contains(typeof(ProviderWithNoDefaultConstructor).FullName),
                         "The exception message should contain the type name of the provider. " +
+                        "Actual message: " + ex.Message);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void Configuration_WithProviderTypeThatDoesNotInheritFromLoggingProviderBase_ThrowsException()
+        {
+            Type invalidType = typeof(SqlMembershipProvider);
+
+            // Arrange
+            string xmlWithMissingProviderType =
+                @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+                 <configuration>
+                     <configSections>
+                         <section name=""logging"" 
+                             type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"" />
+                     </configSections>
+                     <logging defaultProvider=""MemoryLoggingProvider"">
+                        <providers>
+                             <!-- next line has invalid 'type' attribute -->
+                             <add 
+                                 name=""MemoryLoggingProvider""
+                                 type=""" + invalidType.AssemblyQualifiedName + @"""
+                             />
+                        </providers>
+                     </logging>
+                 </configuration>";
+
+            var config = new TemplatedConfigurationWriter(xmlWithMissingProviderType);
+
+            using (var manager = new UnitTestAppDomainManager(config))
+            {
+                try
+                {
+                    // Act
+                    manager.DomainUnderTest.InitializeLoggingSystem();
+
+                    // Assert
+                    Assert.Fail("Exception expected.");
+                }
+                catch (ConfigurationErrorsException ex)
+                {
+                    Assert.IsTrue(ex.Message.Contains("MemoryLoggingProvider"),
+                        "The exception message should contain the name of the incorrect provider. " +
+                        "Actual message: " + ex.Message);
+
+                    Assert.IsTrue(ex.Message.Contains(invalidType.Name),
+                        "The exception message should contain the incorrect type. " +
+                        "Actual message: " + ex.Message);
+
+                    Assert.IsTrue(ex.Message.Contains(
+                        "does not inherit from type CuttingEdge.Logging.LoggingProviderBase"),
+                        "The exception message should explain the reason for the error. " +
+                        "Actual message: " + ex.Message);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void Configuration_WithNonExistingFallbackProvider_ThrowsException()
+        {
+            string nonExistingProviderName = "NonExistingProviderName";
+
+            // Arrange
+            string xmlWithMissingProviderType =
+                @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+                 <configuration>
+                     <configSections>
+                         <section name=""logging"" 
+                             type=""CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"" />
+                     </configSections>
+                     <logging defaultProvider=""MemoryLoggingProvider"">
+                        <providers>
+                             <!-- next line has invalid 'type' attribute -->
+                             <add 
+                                 name=""MemoryLoggingProvider""
+                                 type=""CuttingEdge.Logging.MemoryLoggingProvider""
+                                 fallbackProvider=""" + nonExistingProviderName + @"""
+                             />
+                        </providers>
+                     </logging>
+                 </configuration>";
+
+            var config = new TemplatedConfigurationWriter(xmlWithMissingProviderType);
+
+            using (var manager = new UnitTestAppDomainManager(config))
+            {
+                try
+                {
+                    // Act
+                    manager.DomainUnderTest.InitializeLoggingSystem();
+
+                    // Assert
+                    Assert.Fail("Exception expected.");
+                }
+                catch (ProviderException ex)
+                {
+                    Assert.IsTrue(ex.Message.Contains("MemoryLoggingProvider"),
+                        "The exception message should contain the name of the incorrect provider. " +
+                        "Actual message: " + ex.Message);
+
+                    Assert.IsTrue(ex.Message.Contains(nonExistingProviderName),
+                        "The exception message should contain the incorrect fallback provider. " +
+                        "Actual message: " + ex.Message);
+
+                    Assert.IsTrue(ex.Message.Contains("No provider with that name could be found."),
+                        "The exception message should explain the reason for the error. " +
                         "Actual message: " + ex.Message);
                 }
             }

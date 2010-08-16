@@ -935,6 +935,58 @@ namespace CuttingEdge.Logging.Tests.Unit
             }
         }
 
+#if DEBUG // This test code only runs in debug mode
+
+        [TestMethod]
+        public void Log_AfterInitializingProvider_DisposedCreatedSmtpClient()
+        {
+            // Arrange
+            var provider = new DisposeTesterMailLoggingProvider();
+
+            var smtpClient = new DisposableSmtpClient();
+
+            Assert.IsFalse(smtpClient.IsDisposed, "Test setup failed.");
+
+            // Set the SmtpClient before calling Initialize.
+            provider.SmtpClientToReturnFromCreateSmtpClient = smtpClient;
+
+            // Act
+            provider.Initialize("valid name", CreateValidConfiguration());
+
+            Assert.IsTrue(smtpClient.IsDisposed);
+        }
+
+        [TestMethod]
+        public void Log_Always_DisposedCreatedSmtpClient()
+        {
+            // Arrange
+            var smtpClient = new DisposableSmtpClient();
+            Assert.IsFalse(smtpClient.IsDisposed, "Test setup failed.");
+
+            var provider = CreateInitializedDisposeTesterMailLoggingProvider();
+
+            provider.SmtpClientToReturnFromCreateSmtpClient = smtpClient;
+
+            // By letting the BuildMailMessage return null, we force the SmtpClient.Send method to throw an
+            // exception. This prevents a mail message from actually being send and also checks whether an
+            // exception will still result in the SmtpClient being disposed.
+            provider.MailMessageToReturnFromBuildMailMessage = null;
+
+            try
+            {
+                // Act
+                provider.Log("Some message");
+
+                // Assert
+                Assert.Fail("ArgumentNullException expected.");
+            }
+            catch (ArgumentNullException)
+            {
+                Assert.IsTrue(smtpClient.IsDisposed, "The StmpClient should have been disposed.");
+            }            
+        }
+#endif
+
         private static NameValueCollection CreateValidConfiguration()
         {
             var configuration = new NameValueCollection();
@@ -943,6 +995,47 @@ namespace CuttingEdge.Logging.Tests.Unit
 
             return configuration;
         }
+
+#if DEBUG // This test code only runs in debug mode
+        private static DisposeTesterMailLoggingProvider CreateInitializedDisposeTesterMailLoggingProvider()
+        {
+            var provider = new DisposeTesterMailLoggingProvider();
+
+            // Set the SmtpClient before calling Initialize.
+            provider.SmtpClientToReturnFromCreateSmtpClient = new SmtpClient();
+
+            provider.Initialize("valid name", CreateValidConfiguration());
+
+            return provider;
+        }
+
+        private sealed class DisposeTesterMailLoggingProvider : MailLoggingProvider
+        {
+            public MailMessage MailMessageToReturnFromBuildMailMessage { get; set; }
+
+            public SmtpClient SmtpClientToReturnFromCreateSmtpClient { get; set; }
+
+            internal override SmtpClient CreateSmtpClient()
+            {
+                return this.SmtpClientToReturnFromCreateSmtpClient;
+            }
+            
+            protected override MailMessage BuildMailMessage(LogEntry entry)
+            {
+                return this.MailMessageToReturnFromBuildMailMessage;
+            }
+        }
+
+        private sealed class DisposableSmtpClient : SmtpClient, IDisposable
+        {
+            public bool IsDisposed { get; private set; }
+
+            public void Dispose()
+            {
+                this.IsDisposed = true;
+            }
+        }
+#endif
 
         private sealed class FakeMailLoggingProvider : MailLoggingProvider
         {
