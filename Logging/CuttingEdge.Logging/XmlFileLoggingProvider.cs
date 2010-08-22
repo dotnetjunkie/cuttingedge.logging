@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration.Provider;
 using System.Diagnostics.CodeAnalysis;
@@ -81,7 +79,8 @@ namespace CuttingEdge.Logging
     /// application domain. Instead it will close the file directly after logging an event. This alows other
     /// applications to process that file more easily. This however, can lead to a failure when other processes
     /// are writing to this file. Writing to that file from outside the context of the 
-    /// <see cref="XmlFileLoggingProvider"/> is discouraged. Do use the 
+    /// <see cref="XmlFileLoggingProvider"/> or any other type that inherits from the 
+    /// <see cref="FileLoggingProviderBase"/> is discouraged. Do use the 
     /// <see cref="LoggingProviderBase.FallbackProvider">FallbackProvider</see> mechanism to prevent a failure
     /// to bubble up the application's call stack.
     /// </para>
@@ -202,16 +201,9 @@ namespace CuttingEdge.Logging
     /// }
     /// ]]></code>
     /// </example>
-    public class XmlFileLoggingProvider : LoggingProviderBase
+    public class XmlFileLoggingProvider : FileLoggingProviderBase
     {
-        // Collection of lock objects for all paths used by XmlFileLoggingProvider instances in the current
-        // AppDomain. We assume all paths are case insensitive (although we know this is not completely correct).
-        private static readonly Dictionary<string, object> PathLockers =
-            new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-
         private static readonly byte[] NewLine = new UTF8Encoding(false, true).GetBytes(Environment.NewLine);
-
-        private string path;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="XmlFileLoggingProvider"/> class.
@@ -235,92 +227,34 @@ namespace CuttingEdge.Logging
             "exception message, which is not a big problem.")]
         public XmlFileLoggingProvider(LoggingEventType threshold, string path,
             LoggingProviderBase fallbackProvider)
-            : base(threshold, fallbackProvider)
+            : base(threshold, path, fallbackProvider)
         {
-            if (path == null)
-            {
-                throw new ArgumentNullException("path");
-            }
-
-            if (path.Length == 0)
-            {
-                throw new ArgumentException(SR.ValueShouldNotBeAnEmptyString(), "path");
-            }
-            
-            this.path = GetFullCanonicalPath(path);
-
-            this.CheckAuthorizationsByCreatingFile();
         }
 
-        /// <summary>Gets the rooted canonical path provided with this provider.</summary>
-        /// <value>The path to write to.</value>
-        public string Path
-        {
-            get { return this.path; }
-        }
-        
         internal virtual DateTime CurrentTime
         {
             get { return DateTime.Now; }
         }
 
-        /// <summary>Initializes the provider.</summary>
-        /// <param name="name">The friendly name of the provider.</param>
-        /// <param name="config">A collection of the name/value pairs representing the provider-specific
-        /// attributes specified in the configuration for this provider.</param>
-        /// <exception cref="ArgumentNullException">Thrown when the name of the provider is null or when the
-        /// <paramref name="config"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when the name of the provider has a length of zero.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when an attempt is made to call Initialize on a
-        /// provider after the provider has already been initialized.</exception>
-        /// <exception cref="ProviderException">Thrown when the <paramref name="config"/> contains
-        /// unrecognized attributes or the provider could not initialized correctly.</exception>
-        public override void Initialize(string name, NameValueCollection config)
-        {
-            if (config == null)
-            {
-                throw new ArgumentNullException("config");
-            }
-
-            LoggingHelper.SetDescriptionWhenMissing(config, "XML file logging provider");
-
-            // Call initialize first.
-            base.Initialize(name, config);
-
-            // Performing implementation-specific provider initialization here.
-            this.InitializePath(config);
-
-            // Check if the configuration is valid, before testing file authorizations.
-            this.CheckForUnrecognizedAttributes(name, config);
-
-            this.CheckAuthorizationsByCreatingFile();
-        }
-
-        // This method is virtual to allow the file system to be replaced for testing.
-        internal virtual void AppendAllText(string contents)
-        {
-            // Opens or creates a file and appends the contents to it.
-            File.AppendAllText(this.Path, contents);
-        }
-
-        /// <summary>Implements the functionality to log the event.</summary>
+        /// <summary>
+        /// Serializes the log entry to a XML string representation that that can be appended to the
+        /// configured <see cref="Path"/>.
+        /// </summary>
         /// <param name="entry">The entry to log.</param>
-        /// <returns>This logger returns null, because returning an id is inappropriate.</returns>
-        protected override object LogInternal(LogEntry entry)
+        /// <returns>The string representation of the supplied <paramref name="entry"/>.</returns>
+        protected override string SerializeLogEntry(LogEntry entry)
         {
-            // This lock prevents multiple instances from simultaneously writing to the same path (within the
-            // same AppDomain).
-            var locker = this.GetLockObjectForCurrentPath();
+            int initialCapacity = EstimateCapacity(entry);
 
-            string contents = this.SerializeLogEntryToXml(entry);
-
-            lock (locker)
+            using (var stream = new MemoryStream(initialCapacity))
             {
-                this.AppendAllText(contents);
-            }
+                this.SerializeLogEntryToXml(entry, stream);
 
-            // Returning an ID is inappropriate for this type of logger.
-            return null;
+                // By writing a new line we ensure pretty formatting.
+                AppendWithNewLine(stream);
+
+                return ConvertStreamToString(stream);
+            }
         }
 
         /// <summary>Writes the entry's properties to the <paramref name="writer"/>.</summary>
@@ -339,37 +273,6 @@ namespace CuttingEdge.Logging
             }
         }
 
-        private object GetLockObjectForCurrentPath()
-        {
-            object pathLocker;
-
-            lock (PathLockers)
-            {
-                if (!PathLockers.TryGetValue(this.Path, out pathLocker))
-                {
-                    pathLocker = new object();
-                    PathLockers.Add(this.Path, pathLocker);
-                }
-            }
-
-            return pathLocker;
-        }
-
-        private string SerializeLogEntryToXml(LogEntry entry)
-        {
-            int initialCapacity = EstimateCapacity(entry);
-
-            using (var stream = new MemoryStream(initialCapacity))
-            {
-                this.SerializeLogEntryToXml(entry, stream);
-
-                // By writing a new line we ensure pretty formatting.
-                WriteNewLineTo(stream);
-
-                return ConvertStreamToString(stream);
-            }
-        }
-
         private void SerializeLogEntryToXml(LogEntry entry, Stream stream)
         {
             using (XmlWriter writer = CreateXmlWriter(stream))
@@ -384,6 +287,7 @@ namespace CuttingEdge.Logging
 
         private static int EstimateCapacity(LogEntry entry)
         {
+            // This is a pretty naive capicity estimation. We might need some 
             return entry.Exception != null ? 4096 : 512;
         }
 
@@ -395,68 +299,6 @@ namespace CuttingEdge.Logging
             {
                 return reader.ReadToEnd();
             }
-        }
-
-        private void InitializePath(NameValueCollection config)
-        {
-            const string PathAttribute = "path";
-
-            string path = config[PathAttribute];
-
-            // Throw exception when no connectionStringName is provided
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ProviderException(SR.MissingConnectionStringAttribute(this.Name));
-            }
-
-            // Remove this attribute from the config. This way the provider can spot unrecognized attributes
-            // after the initialization process.
-            config.Remove(PathAttribute);
-
-            this.path = GetFullCanonicalPath(path);
-        }
-
-        private void CheckAuthorizationsByCreatingFile()
-        {
-            try
-            {
-                // This lock is needed at this point, because this instance could be created at a time that
-                // other instances are already writing to that same log file. (This can only happen when
-                // instances are manually created and not when the they are configured in the app.config).
-                lock (this.GetLockObjectForCurrentPath())
-                {
-                    this.AppendAllText(string.Empty);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new ProviderException(SR.MissingPathAttribute(this.Name, this.Path, ex.Message), ex);
-            }
-        }
-
-        private static string GetFullCanonicalPath(string path)
-        {
-            string fullPath;
-
-            if (System.IO.Path.IsPathRooted(path))
-            {
-                fullPath = path;
-            }
-            else
-            {
-                fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path);
-            }
-
-            return GetCanonicalPath(fullPath);
-        }
-
-        private static string GetCanonicalPath(string fullPath)
-        {
-            // The canonical name is the path in its simplest presentation. Determining the canonical name is
-            // important, because it allows writing to the same file by multiple instances thread-safe.
-            // For instance that path 'c:\test\..\foo.xml' and 'c:\test\bla\..\..\foo.xml' have the same
-            // canonical representation 'c:\foo.xml'. Path.GetFullPath gets the canonical name.
-            return System.IO.Path.GetFullPath(fullPath);
         }
 
         private static XmlWriter CreateXmlWriter(Stream source)
@@ -507,7 +349,7 @@ namespace CuttingEdge.Logging
             writer.WriteEndElement();
         }
 
-        private static void WriteNewLineTo(Stream source)
+        private static void AppendWithNewLine(Stream source)
         {
             source.Write(NewLine, 0, NewLine.Length);
         }

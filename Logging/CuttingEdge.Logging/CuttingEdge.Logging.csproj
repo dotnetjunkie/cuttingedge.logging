@@ -59,6 +59,7 @@
     <Compile Include="CompositeException.cs" />
     <Compile Include="CompositeLoggingProvider.cs" />
     <Compile Include="DebugLoggingProvider.cs" />
+    <Compile Include="FileLoggingProviderBase.cs" />
     <Compile Include="LoggerExtensions.cs" />
     <Compile Include="MailLoggingProvider.cs" />
     <Compile Include="SqlLoggingHelper.cs" />

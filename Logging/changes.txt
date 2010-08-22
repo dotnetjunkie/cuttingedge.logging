@@ -4,8 +4,9 @@ Version vNext
 	General description:
 	
 	Code changes:
-	    -A new XmlFileLoggingProvider has been added.
-		-The library is now able to handle exceptions with multiple inner exceptions. (Work item 4028.) 
+	    -Added a base class FileLoggingProviderBase that acts as base class for logging to a file.
+	    -A new XmlFileLoggingProvider has been added. Work item 6006.
+		-The library is now able to handle exceptions with multiple inner exceptions. Work item 4028
 		 When an Exception contains a public 'InnerExceptions' property (such as both the .NET 4.0 
 		 System.AggregateException and CuttingEdge.Logging.CompositeException contain), the framework will use
 		 this property instead of the InnerException property. The SqlLoggingProvider and
