@@ -20,7 +20,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         [TestMethod]
         public void Constructor_WithRelativePath_Succeeds()
         {
-            string relativePath = "logs\\log.xml";
+            string relativePath = "logs\\..\\log.xml";
 
             CreateXmlFileLogger(relativePath);
         }
@@ -177,6 +177,7 @@ namespace CuttingEdge.Logging.Tests.Unit
             Assert.AreEqual(expectedPath, provider.Path);
         }
 
+#if DEBUG
         [TestMethod]
         public void Log_ValidEvent_HasExpectedRootElement()
         {
@@ -335,6 +336,7 @@ namespace CuttingEdge.Logging.Tests.Unit
                 FakeXmlFileLoggingProvider.ExceptionToThrowFromAppendAllText = null;
             }
         }
+#endif
 
         private static NameValueCollection CreateValidConfiguration()
         {
@@ -389,9 +391,9 @@ namespace CuttingEdge.Logging.Tests.Unit
                 set { exceptionToThrowFromAppendAllText = value; }
             }
 
+#if DEBUG
             public string LoggedText { get; set; }
 
-#if DEBUG
             internal override DateTime CurrentTime
             {
                 get { return this.currentTime; }
