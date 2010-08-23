@@ -163,10 +163,10 @@ namespace CuttingEdge.Logging
     /// The <see cref="XmlFileLoggingProvider"/> writes to the configured file by appending new entries to the
     /// file one by one, node by node. The <see cref="XmlFileLoggingProvider"/> will therefore produce a
     /// document with multiple root nodes. Because of this the produced document will not be a valid XML 
-    /// document. This is a program when using this file for automatic analysis using some sort of XML parser.
+    /// document. This is a problem when using this file for automatic analysis using some sort of XML parser.
     /// </para>
     /// <para>
-    /// A workaround to this problem, a user can define a valid XML document that includes the log file by
+    /// As workaround to this problem, a user can define a valid XML document that includes the log file by
     /// defining an <b>ENTITY</b> that references that file. This way most XML parsers can successfully parse
     /// that document.
     /// </para>
