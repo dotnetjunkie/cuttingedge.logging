@@ -382,7 +382,7 @@ namespace CuttingEdge.Logging
             // Throw exception when no connectionStringName is provided
             if (string.IsNullOrEmpty(connectionStringName))
             {
-                throw new ProviderException(SR.MissingConnectionStringAttribute(this.Name));
+                throw new ProviderException(SR.MissingAttribute(ConnectionStringNameAttribute, this.Name));
             }
 
             var settings = ConfigurationManager.ConnectionStrings[connectionStringName];

@@ -338,6 +338,28 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 #endif
 
+        [TestMethod]
+        public void Initialize_WithMissingPath_ThrowsExpectedException()
+        {
+            // Arrange
+            var provider = new XmlFileLoggingProvider();
+            var invalidConfiguration = new NameValueCollection();
+
+            try
+            {
+                // Act
+                provider.Initialize("Valid name", invalidConfiguration);
+
+                // Assert
+                Assert.Fail("Exception expected");
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("missing 'path' attribute"),
+                    "Exception not expressive enough. Actual message: " + ex.Message);
+            }
+        }
+
         private static NameValueCollection CreateValidConfiguration()
         {
             var configuration = new NameValueCollection();

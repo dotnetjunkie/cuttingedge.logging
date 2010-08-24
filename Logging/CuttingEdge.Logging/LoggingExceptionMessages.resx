@@ -141,6 +141,9 @@
   <data name="EmptyOrMissingPropertyInConfiguration" xml:space="preserve">
     <value>Empty or missing '{0}' property in provider '{1}' in configuration file.</value>
   </data>
+  <data name="ErrorCreatingOrWritingToFile" xml:space="preserve">
+    <value>There was an error while initializing the provider '{0}'. There was an error creating or writing to the file '{1}'. {2}</value>
+  </data>
   <data name="EventCouldNotBeLoggedWithX" xml:space="preserve">
     <value>The event could not be logged with provider '{0}'.</value>
   </data>
@@ -184,22 +187,19 @@
     <value>Logging failed. {0}</value>
   </data>
   <data name="LoggingSectionMissingFromConfigSettings" xml:space="preserve">
-    <value>The Logger has not been configured properly. Please register the logger as &lt;section&gt; element in the &lt;configSections&gt; of your configurations file as follows: &lt;configSections&gt;&lt;section name="{0}" type="{1}, {2}" allowDefinition="MachineToApplication" /&gt;&lt;/configSections&gt;.</value>
+    <value>The Logger has not been configured properly. Please register the logger as &lt;section&gt; element in the &lt;configSections&gt; of your configurations file as follows: &lt;configSections&gt;&lt;section name="{0}" type="{1}, {2}" /&gt;&lt;/configSections&gt;.</value>
+  </data>
+  <data name="MissingAttribute" xml:space="preserve">
+    <value>Empty or missing '{0}' attribute in provider '{1}' in configuration file.</value>
   </data>
   <data name="MissingAttributeInMailSettings" xml:space="preserve">
     <value>There was an error while initializing the provider '{0}'. Please make sure the 'configuration/system.net/mailSettings' section in the application configuration file is correctly configured. Could not find the '{1}' attribute in the '{2}' section.</value>
-  </data>
-  <data name="MissingConnectionStringAttribute" xml:space="preserve">
-    <value>Empty or missing 'connectionStringName' attribute in provider '{0}' in configuration file.</value>
   </data>
   <data name="MissingConnectionStringInConfig" xml:space="preserve">
     <value>Missing connection string '{0}' in &lt;connectionStrings&gt; section of the configuration file.</value>
   </data>
   <data name="MissingLoggingProviderInConfig" xml:space="preserve">
     <value>Missing logging provider '{0}' in &lt;{1}&gt; section of the configuration file. The logging provider that was configured in the '{2}' web event provider could not be found.</value>
-  </data>
-  <data name="MissingPathAttribute" xml:space="preserve">
-    <value>There was an error while initializing the provider '{0}'. There was an error creating or writing to the file '{1}'. {2}</value>
   </data>
   <data name="MissingUserNameRetrievalTypeAttributeInConfig" xml:space="preserve">
     <value>Empty or missing userNameRetrievalType attribute in provider '{0}' in configuration file. Please supply one of the following values: {1}.</value>
@@ -235,7 +235,7 @@
     <value>The type attribute of the provider '{0}' has an invalid value. The type '{1}' could not created. {2}</value>
   </data>
   <data name="TypeNameCouldNotBeResolvedForProvider" xml:space="preserve">
-    <value>The type attribute of the provider '{0}' has an invalid value. The type '{1}' could not be resolved. {2}</value>
+    <value>The type attribute of the provider '{0}' has an invalid value. The type '{1}' could not be resolved. Make sure you spelled the name of the type correctly using the complete name including namespace and assembly name. {2}</value>
   </data>
   <data name="TypeNameMustBeSpecifiedForThisProvider" xml:space="preserve">
     <value>The provider '{0}' has no type attribute. The type must be specified for this provider.</value>

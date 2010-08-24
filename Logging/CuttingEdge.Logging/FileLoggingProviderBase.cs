@@ -216,7 +216,7 @@ namespace CuttingEdge.Logging
             // Throw exception when no connectionStringName is provided
             if (string.IsNullOrEmpty(path))
             {
-                throw new ProviderException(SR.MissingConnectionStringAttribute(this.Name));
+                throw new ProviderException(SR.MissingAttribute(PathAttribute, this.Name));
             }
 
             // Remove this attribute from the config. This way the provider can spot unrecognized attributes
@@ -265,7 +265,8 @@ namespace CuttingEdge.Logging
             }
             catch (Exception ex)
             {
-                throw new ProviderException(SR.MissingPathAttribute(this.Name, this.Path, ex.Message), ex);
+                throw new ProviderException(SR.ErrorCreatingOrWritingToFile(this.Name, this.Path, ex.Message),
+                    ex);
             }
         }
 

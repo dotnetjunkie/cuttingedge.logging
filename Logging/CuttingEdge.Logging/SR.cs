@@ -41,6 +41,11 @@ namespace CuttingEdge.Logging
             new ResourceManager(typeof(SR).Namespace + ".LoggingExceptionMessages", typeof(SR).Assembly);
 
         // General messages
+        internal static string MissingAttribute(string attributeName, string loggingProviderName)
+        {
+            return GetString("MissingAttribute", attributeName, loggingProviderName);
+        }
+
         internal static string ArgumentMustNotBeNullOrEmptyString()
         {
             return GetString("ArgumentMustNotBeNullOrEmptyString");
@@ -148,11 +153,6 @@ namespace CuttingEdge.Logging
         }
 
         // Exception messages for SqlLoggingProvider
-        internal static string MissingConnectionStringAttribute(string loggingProviderName)
-        {
-            return GetString("MissingConnectionStringAttribute", loggingProviderName);
-        }
-
         internal static string MissingConnectionStringInConfig(string connectionStringName)
         {
             return GetString("MissingConnectionStringInConfig", connectionStringName);
@@ -201,10 +201,10 @@ namespace CuttingEdge.Logging
         }
 
         // Exception messages for XmlFileLoggingProvider
-        internal static string MissingPathAttribute(string loggingProviderName, string path, 
+        internal static string ErrorCreatingOrWritingToFile(string loggingProviderName, string path, 
             string exceptionMessage)
         {
-            return GetString("MissingPathAttribute", loggingProviderName, path, exceptionMessage);
+            return GetString("ErrorCreatingOrWritingToFile", loggingProviderName, path, exceptionMessage);
         }
 
         // Exception messages for LoggingWebEventProvider
