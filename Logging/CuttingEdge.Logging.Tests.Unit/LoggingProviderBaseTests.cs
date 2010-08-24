@@ -21,7 +21,7 @@ namespace CuttingEdge.Logging.Tests.Unit
             "The Logger has not been configured properly. Please register the logger as <section> element " +
             "in the <configSections> of your configurations file as follows: " +
             "<configSections><section name=\"logging\" type=\"CuttingEdge.Logging.LoggingSection, " +
-            "CuttingEdge.Logging\" allowDefinition=\"MachineToApplication\" /></configSections>.";
+            "CuttingEdge.Logging\" /></configSections>.";
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
