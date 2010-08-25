@@ -34,6 +34,32 @@ namespace CuttingEdge.Logging.Tests.Unit
         private static readonly MailAddress ValidRecipient = new MailAddress("dev1@cuttingedge.it");
 
         [TestMethod]
+        public void Log_WithUninitializedProvider_ThrowsDescriptiveException()
+        {
+            // Arrange
+            var provider = new MailLoggingProvider();
+
+            try
+            {
+                // Act
+                provider.Log("Some message");
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("The provider has not been initialized"),
+                    "A provider that hasn't been initialized correctly, should throw a descriptive " +
+                    "exception. Actual: " + ex.Message + Environment.NewLine + ex.StackTrace);
+
+                Assert.IsTrue(ex.Message.Contains("MailLoggingProvider"),
+                    "The message should contain the type name of the unitialized provider. Actual: " + 
+                    ex.Message);
+            }
+        }
+
+        [TestMethod]
         public void Constructor_WithValidArguments_Succeeds()
         {
             // Act
@@ -157,7 +183,7 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
-        public void Initiailze_WithMultipleMailAddressesInToAttribute_Succeeds()
+        public void Initialize_WithMultipleMailAddressesInToAttribute_Succeeds()
         {
             // Arrange
             var provider = new FakeMailLoggingProvider();
@@ -957,13 +983,13 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
-        public void Log_Always_DisposedCreatedSmtpClient()
+        public void Log_Always_DisposesCreatedSmtpClient()
         {
             // Arrange
             var smtpClient = new DisposableSmtpClient();
             Assert.IsFalse(smtpClient.IsDisposed, "Test setup failed.");
 
-            var provider = CreateInitializedDisposeTesterMailLoggingProvider();
+            DisposeTesterMailLoggingProvider provider = CreateInitializedDisposeTesterMailLoggingProvider();
 
             provider.SmtpClientToReturnFromCreateSmtpClient = smtpClient;
 
@@ -1011,6 +1037,11 @@ namespace CuttingEdge.Logging.Tests.Unit
 
         private sealed class DisposeTesterMailLoggingProvider : MailLoggingProvider
         {
+            public DisposeTesterMailLoggingProvider()
+            {
+                this.SetInitialized(true);
+            }
+
             public MailMessage MailMessageToReturnFromBuildMailMessage { get; set; }
 
             public SmtpClient SmtpClientToReturnFromCreateSmtpClient { get; set; }

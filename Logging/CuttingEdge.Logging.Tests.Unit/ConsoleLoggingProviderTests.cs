@@ -17,6 +17,26 @@ namespace CuttingEdge.Logging.Tests.Unit
     {
 #if DEBUG // This test code only runs in debug mode
         [TestMethod]
+        public void Log_ProviderInitializedWithDefaultConstructor_LogsSuccesfully()
+        {
+            // Arrange
+            string expectedMessage = "Some message";
+
+            var provider = new FakeConsoleLoggingProvider();
+
+            // Act
+            // In contrast with most other providers, this provider should succeed in logging the event when
+            // it was created with the default constructor, and not initialized with Initialize(string, NVC).
+            // This behavior is different, because the the only initialization argument the provider needs is
+            // the severity, which will be retain its default value of 'Debug' when not set.
+            provider.Log(LoggingEventType.Debug, expectedMessage);
+
+            // Arrange
+            Assert.IsTrue(provider.TextWrittenToConsole.Contains(expectedMessage),
+                "The expected message was not logged. Actual: " + provider.TextWrittenToConsole);
+        }
+
+        [TestMethod]
         public void Log_ProviderInitializedWithDebugThresholdThroughConstructor_LogsMessage()
         {
             // Arrange

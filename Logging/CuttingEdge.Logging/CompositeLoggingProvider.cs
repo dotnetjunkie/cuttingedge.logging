@@ -167,9 +167,15 @@ namespace CuttingEdge.Logging
         private List<string> providerNames;
         private ReadOnlyCollection<LoggingProviderBase> providers;
 
-        /// <summary>Initializes a new instance of the <see cref="CompositeLoggingProvider"/> class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompositeLoggingProvider"/> class. Please do not use 
+        /// this constructor to initialize this type. Use one of the overloaded constructors instead.
+        /// </summary>
         public CompositeLoggingProvider()
         {
+            // Set Initialized to false explicitly to prevent this type from being used until it is correctly
+            // initialized using Initialize().
+            this.SetInitialized(false);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CompositeLoggingProvider"/> class.</summary>
@@ -255,7 +261,8 @@ namespace CuttingEdge.Logging
             {
                 if (this.providers == null)
                 {
-                    throw new InvalidOperationException("The provider has not been initialized.");
+                    throw new InvalidOperationException(
+                        SR.ProviderHasNotBeenInitializedCorrectlyCallAnOverloadedConstructor(this));
                 }
 
                 return this.providers;
@@ -297,8 +304,10 @@ namespace CuttingEdge.Logging
         {
             // Finish performing implementation-specific provider initialization here (this is 2nd/last part).
             // This operation has to be executed here, because during Initialize this list of configured is
-            // providers not available.
+            // providers not yet available.
             this.InitializeProviders(configuredProviders);
+
+            this.SetInitialized(true);
         }
 
         internal override List<LoggingProviderBase> GetReferencedProviders()
@@ -507,22 +516,9 @@ namespace CuttingEdge.Logging
 
         private void InitializeProviders(LoggingProviderCollection configuredProviders)
         {
-            this.CheckIfProviderIsInitialized();
-
             var providers = this.GetReferencedProviders(configuredProviders);
 
             this.providers = new ReadOnlyCollection<LoggingProviderBase>(providers);
-        }
-
-        private void CheckIfProviderIsInitialized()
-        {
-            if (this.providerNames == null)
-            {
-                string exceptionMessage =
-                    SR.ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst(this);
-
-                throw new InvalidOperationException(exceptionMessage);
-            }
         }
 
         private LoggingProviderBase[] GetReferencedProviders(LoggingProviderCollection configuredProviders)

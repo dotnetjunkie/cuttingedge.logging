@@ -129,6 +129,8 @@ namespace CuttingEdge.Logging
             this.path = GetFullCanonicalPath(path);
 
             this.CheckAuthorizationsByCreatingFile();
+
+            this.SetInitialized(true);
         }
 
         /// <summary>Gets the rooted canonical path provided with this provider.</summary>

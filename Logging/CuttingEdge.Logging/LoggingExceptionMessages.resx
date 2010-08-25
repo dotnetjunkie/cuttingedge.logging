@@ -213,8 +213,8 @@
   <data name="PossibleInvalidMailConfigurationInConfigFile" xml:space="preserve">
     <value>There is a possible miss configuration in the 'configuration/system.net/mailSettings' section in the application configuration file. The {0} class could not be created.</value>
   </data>
-  <data name="ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst" xml:space="preserve">
-    <value>The {0} has not been initialized correctly. Make sure Initialize(String, NameValueCollection) is called.</value>
+  <data name="ProviderHasNotBeenInitializedCorrectlyCallAnOverloadedConstructor" xml:space="preserve">
+    <value>The provider has not been initialized. Please ensure that the {0} is initialized correctly by instantiating it using one of overloaded constructors.</value>
   </data>
   <data name="ProviderMustInheritFromType" xml:space="preserve">
     <value>Provider '{0}' is configured with type {1} that does not inherit from type {2}.</value>

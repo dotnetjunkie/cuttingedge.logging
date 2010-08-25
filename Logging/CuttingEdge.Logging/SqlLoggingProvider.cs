@@ -145,9 +145,15 @@ namespace CuttingEdge.Logging
     {
         private string connectionString;
 
-        /// <summary>Initializes a new instance of the <see cref="SqlLoggingProvider"/> class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlLoggingProvider"/> class. Please do not use 
+        /// this constructor to initialize this type. Use one of the overloaded constructors instead.
+        /// </summary>
         public SqlLoggingProvider()
         {
+            // Set Initialized to false explicitly to prevent this type from being used until it is correctly
+            // initialized using Initialize().
+            this.SetInitialized(false);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SqlLoggingProvider"/> class.</summary>
@@ -237,6 +243,8 @@ namespace CuttingEdge.Logging
             {
                 this.InitializeDatabaseSchema();
             }
+
+            this.SetInitialized(true);
         }
 
         internal int LogWithinTransaction(LogEntry entry, SqlTransaction transaction)
