@@ -129,10 +129,14 @@ namespace CuttingEdge.Logging
         private string logName;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WindowsEventLogLoggingProvider"/> class.
+        /// Initializes a new instance of the <see cref="WindowsEventLogLoggingProvider"/> class. Please do
+        /// not use this constructor to initialize this type. Use one of the overloaded constructors instead.
         /// </summary>
         public WindowsEventLogLoggingProvider()
         {
+            // Set Initialized to false explicitly to prevent this type from being used until it is correctly
+            // initialized using Initialize().
+            this.SetInitialized(false);
         }
 
         /// <summary>
@@ -215,6 +219,8 @@ namespace CuttingEdge.Logging
             
             // Always call this method last
             this.CheckForUnrecognizedAttributes(name, config);
+
+            this.SetInitialized(true);
         }
 
         internal virtual void WriteEntryToEventLog(WindowsEventLogLoggingProvider provider,

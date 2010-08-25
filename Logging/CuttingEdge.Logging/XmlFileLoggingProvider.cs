@@ -206,10 +206,14 @@ namespace CuttingEdge.Logging
         private static readonly byte[] NewLine = new UTF8Encoding(false, true).GetBytes(Environment.NewLine);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="XmlFileLoggingProvider"/> class.
+        /// Initializes a new instance of the <see cref="XmlFileLoggingProvider"/> class. Please do not use 
+        /// this constructor to initialize this type. Use one of the overloaded constructors instead.
         /// </summary>
         public XmlFileLoggingProvider()
         {
+            // Set Initialized to false explicitly to prevent this type from being used until it is correctly
+            // initialized using Initialize().
+            this.SetInitialized(false);
         }
 
         /// <summary>Initializes a new instance of the <see cref="XmlFileLoggingProvider"/> class.</summary>

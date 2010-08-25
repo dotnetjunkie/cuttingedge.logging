@@ -38,6 +38,32 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        public void Log_UnitializedProvider_ShouldFail()
+        {
+            // Arrange
+            var provider = new CompositeLoggingProvider();
+
+            try
+            {
+                // Act
+                provider.Log("Some message");
+
+                // Assert
+                Assert.Fail("Exception expected");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("The provider has not been initialized"),
+                    "A provider that hasn't been initialized correctly, should throw a descriptive " +
+                    "exception. Actual: " + ex.Message + Environment.NewLine + ex.StackTrace);
+
+                Assert.IsTrue(ex.Message.Contains("CompositeLoggingProvider"),
+                    "The message should contain the type name of the unitialized provider. Actual: " + 
+                    ex.Message);
+            }
+        }
+
+        [TestMethod]
         public void Constructor_WithValidArguments_Succeeds()
         {
             // Arrange
@@ -257,6 +283,23 @@ namespace CuttingEdge.Logging.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
+        public void Log_OnPartiallyInitializedProvider_Fails()
+        {
+            // Arrange
+            var provider = new CompositeLoggingProvider();
+            var validConfiguration = CreateValidConfiguration("Referenced Provider");
+
+            provider.Initialize("Valid provider name", validConfiguration);
+
+            // Act
+            // The Composite logging provider is the only provider that can not be initialized by hand by
+            // calling the Initialize() method. It needs to be either initialized by configuring it in the
+            // application configuration file, or by instantiating it with an overloaded constructor.
+            provider.Log("Some message");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void Providers_UninitializedInstance_ThrowsException()
         {
             // Arrange
@@ -392,44 +435,6 @@ namespace CuttingEdge.Logging.Tests.Unit
             Assert.AreEqual(thirdExpectedReferencedProvider, actualThirdReferencedFirstProvider,
                 "The third provider in the list is not the expected provider. Expected: {0}, Actual: {1}",
                 firstExpectedReferencedProvider.Name, actualFirstReferencedProvider.Name);
-        }
-
-        [TestMethod]
-        public void CompleteInitialization_OnUninitializedProvider_ThrowsException()
-        {
-            // Arrange
-            var providerUnderTest = new CompositeLoggingProvider();
-            var defaultProvider = CreateInitializedMemoryLogger("Default Provider");
-
-            // List of configured providers in order 
-            var configuredProviders = new LoggingProviderCollection()
-            {
-                defaultProvider
-            };
-
-            try
-            {
-                // Act
-                providerUnderTest.CompleteInitialization(configuredProviders, defaultProvider);
-
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                string actualMessage = ex.Message ?? string.Empty;
-
-                Assert.IsTrue(actualMessage.Contains("has not been initialized"),
-                    "Exception message should describe the problem. Actual: " + actualMessage);
-
-                Assert.IsTrue(actualMessage.Contains("CompositeLoggingProvider"),
-                    "Exception message should describe the provider type. Actual: " + actualMessage);
-
-                // Note that the name of the provider is set during initialization, therefore it's impossible
-                // for the exception message to contain the name of the provider.
-                Assert.IsTrue(actualMessage.Contains("Initialize"),
-                    "Exception message should describe how to solve the problem. Actual: " + actualMessage);
-            }
         }
 
         [TestMethod]

@@ -55,6 +55,32 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        public void Log_UninitializedProvider_ThrowsDescriptiveException()
+        {
+            // Arrange
+            var provider = new WindowsEventLogLoggingProvider();
+
+            try
+            {
+                // Act
+                provider.Log("Some message");
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("The provider has not been initialized"),
+                     "A provider that hasn't been initialized correctly, should throw a descriptive " +
+                     "exception. Actual: " + ex.Message + Environment.NewLine + ex.StackTrace);
+
+                Assert.IsTrue(ex.Message.Contains("WindowsEventLogLoggingProvider"),
+                    "The message should contain the type name of the unitialized provider. Actual: " +
+                    ex.Message);
+            }
+        }
+
+        [TestMethod]
         public void Log_CodeConfiguredFailingProvider_LogsToFallbackProvider()
         {
             // Arrange

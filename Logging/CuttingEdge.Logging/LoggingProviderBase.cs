@@ -63,6 +63,11 @@ namespace CuttingEdge.Logging
         private string fallbackProviderName;
         private LoggingEventType threshold;
 
+        // Set initialize to true by default. This allows custom (user defined) providers to work without
+        // initialization and allows backwards compatibility with existing providers in the library.
+        // Providers can set initialized to false if needed.
+        private bool initialized = true;
+
         /// <summary>Initializes a new instance of the <see cref="LoggingProviderBase"/> class.</summary>
         protected LoggingProviderBase()
         {
@@ -426,12 +431,23 @@ namespace CuttingEdge.Logging
         /// Returning an id is not supported by the current implementation;
         /// The event has been logged to a fallback provider, because of an error in the current implementation.
         /// </returns>
-        /// <exception cref="ArgumentNullException">Thrown when the given <paramref name="entry"/> is a null reference.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the given <paramref name="entry"/> is a null 
+        /// reference.</exception>
         /// <exception cref="Exception">Thrown when the logging provider failed to log the event. The 
         /// exact type of exception thrown depends on the actual provider implementation. See documentation
         /// of the <see cref="LogInternal"/> method for more information.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the provider is not initialized correctly.
+        /// This can happen when the provider is manually created using the default constructor without
+        /// calling <see cref="Initialize"/>. Initialize the provider using an overloaded constructor or
+        /// configure it in the application's configuration file.</exception>
         object ILogger.Log(LogEntry entry)
         {
+            if (!this.initialized)
+            {
+                throw new InvalidOperationException(
+                    SR.ProviderHasNotBeenInitializedCorrectlyCallAnOverloadedConstructor(this));
+            }
+
             if (entry == null)
             {
                 throw new ArgumentNullException("entry");
@@ -489,6 +505,11 @@ namespace CuttingEdge.Logging
             }
 
             return referencedProviders;
+        }
+
+        internal void SetInitialized(bool initialized)
+        {
+            this.initialized = initialized;
         }
 
         /// <summary>Implements the functionality to log the event.</summary>

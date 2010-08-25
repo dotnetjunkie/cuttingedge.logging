@@ -316,14 +316,14 @@ namespace CuttingEdge.Logging
             return "The collection contains one or more duplicate references.";
         }
 
-        internal static string ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst(
-            CompositeLoggingProvider provider)
+        internal static string ProviderHasNotBeenInitializedCorrectlyCallAnOverloadedConstructor(
+            LoggingProviderBase provider)
         {
-            string providerTypeName = GetShortTypeNameForOwnTypes(provider.GetType());
+            string name = GetShortTypeNameForOwnTypes(provider.GetType());
 
             // Note that this message is returned in the case that initialize hasn't been called. Therefore
             // the provider's Name property will be null and supplying it to the message is useless.
-            return GetString("ProviderHasNotBeenInitializedCorrectlyCallInitializeFirst", providerTypeName);
+            return GetString("ProviderHasNotBeenInitializedCorrectlyCallAnOverloadedConstructor", name);
         }
 
         internal static string ReferencedProviderDoesNotExist(CompositeLoggingProvider provider,

@@ -181,9 +181,15 @@ namespace CuttingEdge.Logging
 
         private string subjectFormatString;
 
-        /// <summary>Initializes a new instance of the <see cref="MailLoggingProvider"/> class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MailLoggingProvider"/> class. Please do not use this 
+        /// constructor to initialize this type. Use one of the overloaded constructors instead.
+        /// </summary>
         public MailLoggingProvider()
         {
+            // Set Initialized to false explicitly to prevent this type from being used until it is correctly
+            // initialized using Initialize().
+            this.SetInitialized(false);
         }
 
         /// <summary>Initializes a new instance of the <see cref="MailLoggingProvider"/> class.</summary>
@@ -286,6 +292,8 @@ namespace CuttingEdge.Logging
 
             // Always call this method last
             this.CheckForUnrecognizedAttributes(name, config);
+
+            this.SetInitialized(true);
         }
 
         internal static MailPriority DetermineMailPriority(LoggingEventType severity)
