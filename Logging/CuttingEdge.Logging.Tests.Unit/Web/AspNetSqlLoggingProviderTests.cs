@@ -143,6 +143,17 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
         }
 
         [TestMethod]
+        public void Log_InitializedProvider_Succeeds()
+        {
+            // Arrange
+            var provider = new FakeAspNetSqlLoggingProvider();
+            provider.Initialize("Valid name", CreateValidAspNetSqlLoggingSettings().BuildConfiguration());
+            
+            // Act
+            provider.Log("Some message");
+        }
+
+        [TestMethod]
         public void Log_UninitializedProvider_ThrowsDescriptiveException()
         {
             // Arrange
@@ -175,6 +186,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
             var fallbackProvider = new MemoryLoggingProvider();
 
             var provider = new FakeAspNetSqlLoggingProvider(fallbackProvider);
+            provider.ExceptionToThrowFromLogInternal = new Exception();
 
             // Act
             provider.Log("Message");
@@ -587,6 +599,18 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
                 : base(LoggingEventType.Debug, new AspNetSqlLoggingProviderConfiguration("Valid app name"),
                     "some unimportant connection string", fallbackProvider)
             {
+            }
+
+            public Exception ExceptionToThrowFromLogInternal { get; set; }
+
+            protected override object LogInternal(LogEntry entry)
+            {
+                if (this.ExceptionToThrowFromLogInternal != null)
+                {
+                    throw this.ExceptionToThrowFromLogInternal;
+                }
+
+                return null;
             }
 
             protected override void InitializeDatabaseSchema()

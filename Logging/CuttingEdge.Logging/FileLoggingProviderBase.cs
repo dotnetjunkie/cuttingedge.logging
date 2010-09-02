@@ -170,6 +170,8 @@ namespace CuttingEdge.Logging
             this.CheckForUnrecognizedAttributes(name, config);
 
             this.CheckAuthorizationsByCreatingFile();
+
+            this.SetInitialized(true);
         }
 
         // This method is virtual to allow the file system to be replaced for testing.
