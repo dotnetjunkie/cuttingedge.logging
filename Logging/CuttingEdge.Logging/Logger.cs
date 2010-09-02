@@ -171,6 +171,26 @@ namespace CuttingEdge.Logging
         }
 
         /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
+        /// <param name="entry">The entry that has to be logged.</param>
+        /// <returns>The id of the logged event or null in one of the following reasons:
+        /// The event hasn't been logged, because of the current 
+        /// <see cref="LoggingProviderBase.Threshold">Threshold</see> level;
+        /// Returning an id is not supported by the current implementation;
+        /// The event has been logged to a fallback provider, because of an error in the current implementation.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Thrown when the supplied <paramref name="entry"/> is
+        /// a null reference (Nothing in VB).</exception>
+        /// <exception cref="Exception">Thrown when the <b>Logger</b> failed to log to the underlying logging
+        /// provider. The exact type of exception thrown depends on the actual provider implementation.
+        /// </exception>
+        public static object Log(LogEntry entry)
+        {
+            ILogger logger = Logger.Provider;
+            
+            return logger.Log(entry);
+        }
+
+        /// <summary>Logs an error event to the default <see cref="Provider"/>.</summary>
         /// <param name="exception">The exception that has to be logged.</param>
         /// <returns>The id of the logged event or null in one of the following reasons:
         /// The event hasn't been logged, because of the current 

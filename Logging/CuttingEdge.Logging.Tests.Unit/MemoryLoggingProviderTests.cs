@@ -31,6 +31,17 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        public void Log_InitializedProvider_Succeeds()
+        {
+            // Arrange
+            var provider = new MemoryLoggingProvider();
+            provider.Initialize("Valid name", CreateValidConfiguration());
+
+            // Act
+            provider.Log("Some message");
+        }
+
+        [TestMethod]
         public void Log_ProviderInitializedWithCriticalThresholdThroughConstructor_DoesNotLogMessage()
         {
             // Arrange

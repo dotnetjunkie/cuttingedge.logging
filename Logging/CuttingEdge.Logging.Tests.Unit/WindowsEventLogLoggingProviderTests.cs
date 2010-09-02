@@ -55,6 +55,17 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        public void Log_InitializedProvider_Succeeds()
+        {
+            // Arrange
+            var provider = new FakeWindowsEventLogLoggingProvider();
+            provider.Initialize("Valid name", CreateValidConfiguration());
+
+            // Act
+            provider.Log("Some message");
+        }
+
+        [TestMethod]
         public void Log_UninitializedProvider_ThrowsDescriptiveException()
         {
             // Arrange

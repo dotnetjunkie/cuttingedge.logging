@@ -37,6 +37,17 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        public void Log_InitializedProvider_Succeeds()
+        {
+            // Arrange
+            var provider = new NonLoggingSqlLoggingProvider();
+            provider.Initialize("Valid name", CreateValidConfiguration());
+
+            // Act
+            provider.Log("Some message");
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(InvalidEnumArgumentException))]
         public void Constructor_WithInvalidThreshold_ThrowsException()
         {
@@ -490,6 +501,15 @@ namespace CuttingEdge.Logging.Tests.Unit
             catch (Exception ex)
             {
                 return ex;
+            }
+        }
+
+        private sealed class NonLoggingSqlLoggingProvider : FakeSqlLoggingProvider
+        {
+            protected override object LogInternal(LogEntry entry)
+            {
+                // Do nothing.
+                return null;
             }
         }
 

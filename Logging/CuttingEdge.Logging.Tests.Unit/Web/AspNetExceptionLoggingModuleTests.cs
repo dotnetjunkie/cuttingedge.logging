@@ -14,17 +14,17 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
     [TestClass]
     public class AspNetExceptionLoggingModuleTests
     {
+#if DEBUG // This test code only runs in debug mode
         [TestMethod]
         public void Dispose_Always_Succeeds()
         {
             // Arrange
-            var module = new AspNetExceptionLoggingModule();
+            var module = new FakeAspNetExceptionLoggingModule();
             
             // Act
             module.Dispose();
         }
 
-#if DEBUG // This test code only runs in debug mode
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Init_WithNullArgument_ThrowsException()
@@ -75,14 +75,13 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
             // Assert
             Assert.IsFalse(moduleUnderTest.IsLogCalled);
         }
-#endif
 
         [TestMethod]
         public void Error_WithoutException_DoesNotLog()
         {
             // Arrange
             var expectedNumberOfLogEntries = 0;
-            var moduleUnderTest = new AspNetExceptionLoggingModule();
+            var moduleUnderTest = new FakeAspNetExceptionLoggingModule();
             var context = new HttpApplication();
             moduleUnderTest.Init(context);
 
@@ -100,7 +99,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
         public void Error_WithException_LogsException()
         {
             // Arrange
-            var moduleUnderTest = new AspNetExceptionLoggingModule();
+            var moduleUnderTest = new TestAspNetExceptionLoggingModule();
             var context = new HttpApplication();
             var expectedException = new Exception();
             moduleUnderTest.Init(context);
@@ -117,11 +116,31 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
         }
 
         [TestMethod]
+        public void Error_WithException_LogsEventWithSeverityOfError()
+        {
+            // Arrange
+            var expectedSeverity = LoggingEventType.Error;
+            var moduleUnderTest = new TestAspNetExceptionLoggingModule();
+            var context = new HttpApplication();
+
+            moduleUnderTest.Init(context);
+
+            using (var scope = new LoggingProviderScope(ScopeOption.AllowOnlyASingleEntryToBeLogged))
+            {
+                // Act
+                RaisErrorOnContext(context, new Exception());
+
+                // Assert
+                Assert.AreEqual(expectedSeverity, scope.LoggedEntries.First().Severity);
+            }
+        }
+
+        [TestMethod]
         public void Error_WithThreadAbortException_DoesNotLogException()
         {
             // Arrange
             var expectedNumberOfLogEntries = 0;
-            var moduleUnderTest = new AspNetExceptionLoggingModule();
+            var moduleUnderTest = new FakeAspNetExceptionLoggingModule();
             var context = new HttpApplication();
             var expectedException = CreateThreadAbortException();
             moduleUnderTest.Init(context);
@@ -140,7 +159,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
         public void Error_WithHttpUnhandledExceptionWithInnerException_LogsInnerException()
         {
             // Arrange
-            var moduleUnderTest = new AspNetExceptionLoggingModule();
+            var moduleUnderTest = new TestAspNetExceptionLoggingModule();
             var context = new HttpApplication();
             var expectedException = new InvalidOperationException();
             var exceptionForError = new HttpUnhandledException("some message", expectedException);
@@ -158,10 +177,121 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
         }
 
         [TestMethod]
+        public void LogUnhandledException_EventArgsWithoutException_DoesNotLog()
+        {
+            // Arrange
+            var moduleUnderTest = new TestAspNetExceptionLoggingModule();
+            Exception exceptionToLog = null;
+            var eventArgs = new UnhandledExceptionEventArgs(exceptionToLog, false);
+
+            using (var scope = new LoggingProviderScope(ScopeOption.AllowOnlyASingleEntryToBeLogged))
+            {
+                // Act
+                moduleUnderTest.LogUnhandledException(null, eventArgs);
+
+                // Assert
+                Assert.AreEqual(0, scope.LoggedEntries.Count());
+            }
+        }
+
+        [TestMethod]
+        public void LogUnhandledException_EventArgsWithNonExceptionObject_DoesNotLog()
+        {
+            // Arrange
+            var moduleUnderTest = new TestAspNetExceptionLoggingModule();
+            object exceptionToLog = new object();
+            var eventArgs = new UnhandledExceptionEventArgs(exceptionToLog, false);
+
+            using (var scope = new LoggingProviderScope(ScopeOption.AllowOnlyASingleEntryToBeLogged))
+            {
+                // Act
+                moduleUnderTest.LogUnhandledException(null, eventArgs);
+
+                // Assert
+                Assert.AreEqual(0, scope.LoggedEntries.Count());
+            }
+        }
+
+        [TestMethod]
+        public void LogUnhandledException_EventArgsWithException_DoesLog()
+        {
+            // Arrange
+            var moduleUnderTest = new TestAspNetExceptionLoggingModule();
+            object exceptionToLog = new InvalidOperationException();
+            var eventArgs = new UnhandledExceptionEventArgs(exceptionToLog, false);
+
+            using (var scope = new LoggingProviderScope(ScopeOption.AllowOnlyASingleEntryToBeLogged))
+            {
+                // Act
+                moduleUnderTest.LogUnhandledException(null, eventArgs);
+
+                // Assert
+                Assert.AreEqual(1, scope.LoggedEntries.Count());
+            }
+        }
+
+        [TestMethod]
+        public void LogUnhandledException_EventArgsWithHttpUnhandledException_DoesLog()
+        {
+            // Arrange
+            var moduleUnderTest = new TestAspNetExceptionLoggingModule();
+            object exceptionToLog = new HttpUnhandledException();
+            var eventArgs = new UnhandledExceptionEventArgs(exceptionToLog, false);
+
+            using (var scope = new LoggingProviderScope(ScopeOption.AllowOnlyASingleEntryToBeLogged))
+            {
+                // Act
+                moduleUnderTest.LogUnhandledException(null, eventArgs);
+
+                // Assert
+                Assert.AreEqual(1, scope.LoggedEntries.Count());
+            }
+        }
+
+        [TestMethod]
+        public void LogUnhandledException_EventArgsWithThreadAbortException_DoesLog()
+        {
+            // Arrange
+            var moduleUnderTest = new TestAspNetExceptionLoggingModule();
+            ThreadAbortException exceptionToLog = CreateThreadAbortException();
+                
+            var eventArgs = new UnhandledExceptionEventArgs(exceptionToLog, false);
+
+            using (var scope = new LoggingProviderScope(ScopeOption.AllowOnlyASingleEntryToBeLogged))
+            {
+                // Act
+                moduleUnderTest.LogUnhandledException(null, eventArgs);
+
+                // Assert
+                Assert.AreEqual(1, scope.LoggedEntries.Count());
+            }
+        }
+
+        [TestMethod]
+        public void LogUnhandledException_EventArgsWithException_LogsCriticalEvent()
+        {
+            // Arrange
+            var expectedSeverity = LoggingEventType.Critical;
+            var moduleUnderTest = new TestAspNetExceptionLoggingModule();
+            object exceptionToLog = new Exception();
+
+            var eventArgs = new UnhandledExceptionEventArgs(exceptionToLog, false);
+
+            using (var scope = new LoggingProviderScope(ScopeOption.AllowOnlyASingleEntryToBeLogged))
+            {
+                // Act
+                moduleUnderTest.LogUnhandledException(null, eventArgs);
+
+                // Assert
+                Assert.AreEqual(expectedSeverity, scope.LoggedEntries.First().Severity);
+            }
+        }
+
+        [TestMethod]
         public void Error_WithHttpUnhandledExceptionWithoutInnerException_LogsHttpUnhandledException()
         {
             // Arrange
-            var moduleUnderTest = new AspNetExceptionLoggingModule();
+            var moduleUnderTest = new TestAspNetExceptionLoggingModule();
             var context = new HttpApplication();
             var expectedException = new HttpUnhandledException("some message");
             moduleUnderTest.Init(context);
@@ -206,14 +336,28 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
             return (ThreadAbortException)defaultConstructor.Invoke(null);
         }
 
-#if DEBUG // This code only runs in debug mode
         private sealed class FakeAspNetExceptionLoggingModule : AspNetExceptionLoggingModule
         {
             public bool IsLogCalled { get; private set; }
 
+            internal override void RegisterAppDomainUnhandledException()
+            {
+                // Do not register anything. This prevents many events from being hooked to the app domain.
+            }
+
             internal override void Log(object sender, EventArgs e)
             {
                 this.IsLogCalled = true;
+            }
+        }
+
+        private sealed class TestAspNetExceptionLoggingModule : AspNetExceptionLoggingModule
+        {
+            public bool IsLogCalled { get; private set; }
+
+            internal override void RegisterAppDomainUnhandledException()
+            {
+                // Do not register anything. This prevents many events from being hooked to the app domain.
             }
         }
 #endif

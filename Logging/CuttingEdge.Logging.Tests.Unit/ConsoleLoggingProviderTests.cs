@@ -37,6 +37,17 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        public void Log_CorrectlyInitializedProvider_Succeeds()
+        {
+            // Arrange
+            var provider = new FakeConsoleLoggingProvider();
+            provider.Initialize("Valid name", CreateValidConfiguration());
+
+            // Act
+            provider.Log("Some message");
+        }
+
+        [TestMethod]
         public void Log_ProviderInitializedWithDebugThresholdThroughConstructor_LogsMessage()
         {
             // Arrange

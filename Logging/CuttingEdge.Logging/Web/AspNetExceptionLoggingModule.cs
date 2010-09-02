@@ -26,6 +26,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Security;
 using System.Threading;
 using System.Web;
 
@@ -105,7 +106,31 @@ namespace CuttingEdge.Logging.Web
                 throw new ArgumentNullException("context");
             }
 
+            this.RegisterHttpApplicationError(context);
+            this.RegisterAppDomainUnhandledException();
+        }
+
+        internal void RegisterHttpApplicationError(HttpApplication context)
+        {
+            // Route any unhandled exceptions within a request to the logging infrastructure.
             context.Error += this.Log;
+        }
+
+        [SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands",
+            Justification = "The possible security exception is caught.")]
+        internal virtual void RegisterAppDomainUnhandledException()
+        {
+            try
+            {
+                // Route any unhandled exceptions within the app domain to the logging infrastructure.
+                AppDomain.CurrentDomain.UnhandledException += this.LogUnhandledException;
+            }
+            catch (SecurityException)
+            {
+                // This event can only be set when the application has the ControlAppDomain SecurityPermission.
+                // When the application doesn't have this permission (mainly when not running in full trust),
+                // we simply skip this. The logging system does not depend on this.
+            }
         }
 
         internal virtual void Log(object sender, EventArgs e)
@@ -118,7 +143,17 @@ namespace CuttingEdge.Logging.Web
 
             if (shouldLog)
             {
-                LogException(exception);
+                LogException(exception, LoggingEventType.Error);
+            }
+        }
+
+        internal void LogUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            var exception = e.ExceptionObject as Exception;
+
+            if (exception != null)
+            {
+                LogException(exception, LoggingEventType.Critical);
             }
         }
 
@@ -134,12 +169,14 @@ namespace CuttingEdge.Logging.Web
             return !(exception is ThreadAbortException);
         }
 
-        private static void LogException(Exception exception)
+        private static void LogException(Exception exception, LoggingEventType severity)
         {
             Exception exceptionToLog = ExtractUsefulExceptionToLog(exception);
 
+            string message = LoggingHelper.GetExceptionMessageOrExceptionType(exception);
+
             // We use the default LoggingProvider and we simply expect logging to succeed.
-            Logger.Log(exceptionToLog);
+            Logger.Log(new LogEntry(severity, message, null, exceptionToLog));
         }
 
         private static Exception ExtractUsefulExceptionToLog(Exception exception)

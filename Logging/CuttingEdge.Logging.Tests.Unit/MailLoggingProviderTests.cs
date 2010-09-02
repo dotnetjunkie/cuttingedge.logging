@@ -34,6 +34,17 @@ namespace CuttingEdge.Logging.Tests.Unit
         private static readonly MailAddress ValidRecipient = new MailAddress("dev1@cuttingedge.it");
 
         [TestMethod]
+        public void Log_WithInitializedProvider_Succeeds()
+        {
+            // Arrange
+            var provider = new FakeMailLoggingProvider();
+            provider.Initialize("Valid name", CreateValidConfiguration());
+
+            // Act
+            provider.Log("Some message");
+        }
+
+        [TestMethod]
         public void Log_WithUninitializedProvider_ThrowsDescriptiveException()
         {
             // Arrange

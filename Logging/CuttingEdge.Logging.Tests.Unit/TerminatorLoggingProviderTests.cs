@@ -24,6 +24,17 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        public void Log_InitializedProvider_Succeeds()
+        {
+            // Arrange
+            var provider = new TerminatorLoggingProvider();
+            provider.Initialize("Valid name", CreateValidConfiguration());
+
+            // Act
+            provider.Log("Some message");
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Initialize_WithNullConfiguration_ThrowsException()
         {

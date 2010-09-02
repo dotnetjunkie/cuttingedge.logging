@@ -1,6 +1,6 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
-Version 1.3.0.10237 (1.3) 2010-08-25
+Version 1.3.0.10246 (1.3) 2010-09-03
 	General description:
 	    This release has some great usability improvements. First of all the new XmlFileLoggingProvider has
 	    been added to allow writing information to the file system in an XML format. Besides this, all loggers
@@ -12,6 +12,8 @@ Version 1.3.0.10237 (1.3) 2010-08-25
 	    scenario from .NET 4.0 and up.
 	
 	Code changes:
+	    -The AspNetExceptionLoggingModule will now hook up to the AppDomain.UnhandledException event to log
+	     any fatal exceptions that might take the AppDomain down.
 	    -Added a base class FileLoggingProviderBase that acts as base class for logging to a file.
 	    -A new XmlFileLoggingProvider has been added. Work item 6006.
 		-The library is now able to handle exceptions with multiple inner exceptions. Work item 4028

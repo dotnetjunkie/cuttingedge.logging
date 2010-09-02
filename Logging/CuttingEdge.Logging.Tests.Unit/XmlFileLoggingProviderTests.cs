@@ -205,6 +205,23 @@ namespace CuttingEdge.Logging.Tests.Unit
 
 #if DEBUG
         [TestMethod]
+        public void Log_AfterCallingInitialize_LogsSuccesfully()
+        {
+            // Arrange
+            var expectedMessage = "Some message";
+            var provider = new FakeXmlFileLoggingProvider();
+            var validConfiguration = CreateValidConfiguration();
+
+            provider.Initialize("Valid name", validConfiguration);
+
+            // Act
+            provider.Log(expectedMessage);
+
+            // Assert
+            Assert.IsTrue(provider.LoggedText.Contains(expectedMessage), provider.LoggedText);
+        }
+
+        [TestMethod]
         public void Log_ValidEvent_HasExpectedRootElement()
         {
             // Arrange
