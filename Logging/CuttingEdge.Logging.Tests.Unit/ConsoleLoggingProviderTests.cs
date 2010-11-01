@@ -86,7 +86,18 @@ namespace CuttingEdge.Logging.Tests.Unit
             Assert.AreEqual(string.Empty, provider.TextWrittenToConsole, 
                 "Actual text: " + provider.TextWrittenToConsole);
         }
-        
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void LogInternal_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeConsoleLoggingProvider();
+
+            // Act
+            provider.LogInternal(null);
+        }
+
         [TestMethod]
         public void Initialize_WithValidArguments_Succeeds()
         {
@@ -226,6 +237,11 @@ namespace CuttingEdge.Logging.Tests.Unit
             public string TextWrittenToConsole
             {
                 get { return this.textWrittenToConsole; }
+            }
+
+            public new object LogInternal(LogEntry entry)
+            {
+                return base.LogInternal(entry);
             }
 
             private void OverrideDelegate()

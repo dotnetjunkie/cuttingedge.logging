@@ -81,6 +81,17 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void LogInternal_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeSqlLoggingProvider();
+
+            // Act
+            provider.Public_LogInternal(null);
+        }
+
+        [TestMethod]
         public void Log_CodeConfiguredFailingProvider_LogsToFallbackProvider()
         {
             // Arrange
@@ -119,6 +130,50 @@ namespace CuttingEdge.Logging.Tests.Unit
                     "The message should contain the type name of the unitialized provider. Actual: " +
                     ex.Message);
             }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SaveEventToDatabase_WithNullTransaction_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeSqlLoggingProvider();
+
+            SqlTransaction invalidTransaction = null;
+
+            // Act
+            provider.Public_SaveEventToDatabase(invalidTransaction, LoggingEventType.Debug, "Valid message",
+                "Valid source");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Public_SaveExceptionToDatabase_WithNullTransaction_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeSqlLoggingProvider();
+
+            SqlTransaction invalidTransaction = null;
+            Exception validException = new Exception();
+
+            // Act
+            provider.Public_SaveExceptionToDatabase(invalidTransaction, validException, 1, 1);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Public_SaveExceptionToDatabase_WithNullException_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeSqlLoggingProvider();
+
+            Exception invalidException = null;
+
+            // To bad, we can't create a Transaction, but atleast we get code coverage.
+            SqlTransaction invalidTransaction = null;
+
+            // Act
+            provider.Public_SaveExceptionToDatabase(invalidTransaction, invalidException, 1, 1);
         }
 
         [TestMethod]
@@ -576,6 +631,23 @@ namespace CuttingEdge.Logging.Tests.Unit
             protected FakeSqlLoggingProvider(LoggingProviderBase fallbackProvider)
                 : base(LoggingEventType.Debug, ValidConnectionString, fallbackProvider)
             {
+            }
+
+            public object Public_LogInternal(LogEntry entry)
+            {
+                return this.LogInternal(entry);
+            }
+
+            public int Public_SaveEventToDatabase(SqlTransaction transaction, LoggingEventType severity,
+                string message, string source)
+            {
+                return base.SaveEventToDatabase(transaction, severity, message, source);
+            }
+
+            public int Public_SaveExceptionToDatabase(SqlTransaction transaction, Exception exception,
+                int parentEventId, int? parentExceptionId)
+            {
+                return base.SaveExceptionToDatabase(transaction, exception, parentEventId, parentExceptionId);
             }
 
             protected override void InitializeDatabaseSchema()

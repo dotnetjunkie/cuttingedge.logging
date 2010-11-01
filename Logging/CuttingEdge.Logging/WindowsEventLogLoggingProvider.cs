@@ -247,8 +247,15 @@ namespace CuttingEdge.Logging
         /// <exception cref="Win32Exception">
         /// Thrown when the provider fails writing the <paramref name="entry"/> to the windows event log.
         /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="entry"/> is a null (Nothing
+        /// in VB) reference.</exception>
         protected override object LogInternal(LogEntry entry)
         {
+            if (entry == null)
+            {
+                throw new ArgumentNullException("entry");
+            }
+
             EventLogEntryType? eventLogType = ConvertToEventLogEntry(entry.Severity);
 
             string eventLogMessage = this.BuildEventLogMessage(entry);
@@ -270,8 +277,15 @@ namespace CuttingEdge.Logging
         /// <param name="entry">The entry that will be used to build the message.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="entry"/> is null.</exception>
         /// <returns>The message.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="entry"/> is a null (Nothing
+        /// in VB) reference.</exception>
         protected virtual string BuildEventLogMessage(LogEntry entry)
         {
+            if (entry == null)
+            {
+                throw new ArgumentNullException("entry");
+            }
+
             return LoggingHelper.BuildMessageFromLogEntry(entry);
         }
 

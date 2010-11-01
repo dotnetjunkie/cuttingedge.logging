@@ -195,6 +195,16 @@ namespace CuttingEdge.Logging
             }
         }
 
+        internal static string StoredProcedureReturnedInvalidValue(string procedureName, object value, 
+            Type expectedType)
+        {
+            string valueDescription = 
+                value == null ? "null" : "'" + value.ToString() + "' of type " + value.GetType().Name;
+
+            return GetString("StoredProcedureReturnedInvalidValue", 
+                procedureName, valueDescription, expectedType);
+        }
+
         internal static string ValueTooLong(int maxLength)
         {
             return GetString("ValueTooLong", maxLength);

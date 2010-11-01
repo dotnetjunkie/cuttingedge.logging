@@ -197,6 +197,55 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
+        public void LogInternal_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeAspNetSqlLoggingProvider();
+
+            // Act
+            provider.Public_LogInternal(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SaveEventToDatabase_WithNullTransaction_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeAspNetSqlLoggingProvider();
+
+            // Act
+            provider.Public_SaveEventToDatabase(null, LoggingEventType.Debug, "Valid", "Valid");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SaveExceptionToDatabase_WithNullTransaction_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeAspNetSqlLoggingProvider();
+
+            // Act
+            provider.Public_SaveExceptionToDatabase(null, new Exception(), 1, 1);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Public_SaveExceptionToDatabase_WithNullException_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeAspNetSqlLoggingProvider();
+
+            Exception invalidException = null;
+
+            // To bad, we can't create a Transaction, but atleast we get code coverage.
+            SqlTransaction invalidTransaction = null;
+
+            // Act
+            provider.Public_SaveExceptionToDatabase(invalidTransaction, invalidException, 1, 1);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void Initialize_WithNullConfiguration_ThrowsException()
         {
             // Arrange
@@ -563,7 +612,7 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
             public bool LogQueryString { get; set; }
 
             public UserIdentityRetrievalType RetrievalType { get; set; }
-
+            
             public string ApplicationName { get; set; }
 
             public string ConnectionStringName { get; set; }
@@ -602,6 +651,23 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
             }
 
             public Exception ExceptionToThrowFromLogInternal { get; set; }
+
+            public object Public_LogInternal(LogEntry entry)
+            {
+                return base.LogInternal(entry);
+            }
+
+            public int Public_SaveEventToDatabase(SqlTransaction transaction, LoggingEventType severity,
+                string message, string source)
+            {
+                return base.SaveEventToDatabase(transaction, severity, message, source);
+            }
+
+            public int Public_SaveExceptionToDatabase(SqlTransaction transaction, Exception exception,
+                int parentEventId, int? parentExceptionId)
+            {
+                return base.SaveExceptionToDatabase(transaction, exception, parentEventId, parentExceptionId);
+            }
 
             protected override object LogInternal(LogEntry entry)
             {

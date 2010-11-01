@@ -75,6 +75,17 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void LogInternal_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeMemoryLoggingProvider();
+
+            // Act
+            provider.LogInternal(null);
+        }
+
+        [TestMethod]
         public void Initialize_WithValidArguments_Succeeds()
         {
             // Arrange
@@ -231,6 +242,14 @@ namespace CuttingEdge.Logging.Tests.Unit
         private static NameValueCollection CreateValidConfiguration()
         {
             return new NameValueCollection();
+        }
+
+        private sealed class FakeMemoryLoggingProvider : MemoryLoggingProvider
+        {
+            public new object LogInternal(LogEntry entry)
+            {
+                return base.LogInternal(entry);
+            }
         }
     }
 }

@@ -71,6 +71,19 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void LogInternal_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeMailLoggingProvider();
+
+            LogEntry invalidEntry = null;
+
+            // Act
+            provider.Public_LogInternal(invalidEntry);
+        }
+
+        [TestMethod]
         public void Constructor_WithValidArguments_Succeeds()
         {
             // Act
@@ -1086,6 +1099,11 @@ namespace CuttingEdge.Logging.Tests.Unit
 
             public Exception ExceptionThrownByMailMessageConstructor { get; set; }
 #endif
+
+            public object Public_LogInternal(LogEntry entry)
+            {
+                return base.LogInternal(entry);
+            }
 
             public new string BuildMailBody(LogEntry entry)
             {

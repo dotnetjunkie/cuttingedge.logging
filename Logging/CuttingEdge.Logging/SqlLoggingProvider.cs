@@ -143,6 +143,9 @@ namespace CuttingEdge.Logging
     /// </example>
     public class SqlLoggingProvider : LoggingProviderBase
     {
+        internal const string AddEventProcedure = "dbo.logging_AddEvent";
+        internal const string AddExceptionProcedure = "dbo.logging_AddException";
+
         private string connectionString;
 
         /// <summary>
@@ -282,8 +285,15 @@ namespace CuttingEdge.Logging
         /// <returns>An <see cref="Int32"/> with the id of the logged event.</returns>
         /// <exception cref="SqlException">Thrown when the <paramref name="entry"/> could not be logged to the
         /// database.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="entry"/> is a null (Nothing
+        /// in VB) reference.</exception>
         protected override object LogInternal(LogEntry entry)
         {
+            if (entry == null)
+            {
+                throw new ArgumentNullException("entry");
+            }
+
             using (var connection = new SqlConnection(this.ConnectionString))
             {
                 connection.Open();
@@ -305,11 +315,17 @@ namespace CuttingEdge.Logging
         /// <param name="message">The message.</param>
         /// <param name="source">The source.</param>
         /// <returns>The database's primary key of the saved event.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="transaction"/> is a null 
+        /// (Nothing in VB) reference.</exception>
         protected virtual int SaveEventToDatabase(SqlTransaction transaction, LoggingEventType severity, 
             string message, string source)
         {
-            using (SqlCommand command =
-                new SqlCommand("dbo.logging_AddEvent", transaction.Connection, transaction))
+            if (transaction == null)
+            {
+                throw new ArgumentNullException("transaction");
+            }
+
+            using (var command = new SqlCommand(AddEventProcedure, transaction.Connection, transaction))
             {
                 command.CommandType = CommandType.StoredProcedure;
 
@@ -317,7 +333,15 @@ namespace CuttingEdge.Logging
                 SqlLoggingHelper.AddParameter(command, "Message", SqlDbType.NText, message);
                 SqlLoggingHelper.AddParameter(command, "Source", SqlDbType.NText, source);
 
-                return (int)command.ExecuteScalar();
+                object eventId = command.ExecuteScalar();
+
+                if (!(eventId is int))
+                {
+                    throw new InvalidOperationException(SR.StoredProcedureReturnedInvalidValue(
+                        AddEventProcedure, eventId, typeof(int)));
+                }
+
+                return (int)eventId;
             }
         }
 
@@ -327,11 +351,22 @@ namespace CuttingEdge.Logging
         /// <param name="parentEventId">The parent event id.</param>
         /// <param name="parentExceptionId">The parent exception id.</param>
         /// <returns>The database's primary key of the saved exception.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="transaction"/> or
+        /// <paramref name="exception"/> are null (Nothing in VB) references.</exception>
         protected virtual int SaveExceptionToDatabase(SqlTransaction transaction, Exception exception,
             int parentEventId, int? parentExceptionId)
         {
-            using (SqlCommand command =
-                new SqlCommand("dbo.logging_AddException", transaction.Connection, transaction))
+            if (exception == null)
+            {
+                throw new ArgumentNullException("exception");
+            }
+
+            if (transaction == null)
+            {
+                throw new ArgumentNullException("transaction");
+            }
+
+            using (var command = new SqlCommand(AddExceptionProcedure, transaction.Connection, transaction))
             {
                 command.CommandType = CommandType.StoredProcedure;
 
@@ -341,7 +376,15 @@ namespace CuttingEdge.Logging
                 SqlLoggingHelper.AddParameter(command, "Message", SqlDbType.NText, exception.Message);
                 SqlLoggingHelper.AddParameter(command, "StackTrace", SqlDbType.NText, exception.StackTrace);
 
-                return (int)command.ExecuteScalar();
+                object exceptionId = command.ExecuteScalar();
+
+                if (!(exceptionId is int))
+                {
+                    throw new InvalidOperationException(SR.StoredProcedureReturnedInvalidValue(
+                        AddExceptionProcedure, exceptionId, typeof(int)));
+                }
+
+                return (int)exceptionId;
             }
         }
 

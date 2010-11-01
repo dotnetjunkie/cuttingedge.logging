@@ -64,6 +64,17 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void LogInternal_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeCompositeLoggingProvider();
+
+            // Act
+            provider.LogInternal(null);
+        }
+
+        [TestMethod]
         public void Constructor_WithValidArguments_Succeeds()
         {
             // Arrange
@@ -898,6 +909,14 @@ namespace CuttingEdge.Logging.Tests.Unit
 
         private class CustomProvider : CompositeLoggingProvider
         {
+        }
+
+        private sealed class FakeCompositeLoggingProvider : CompositeLoggingProvider
+        {
+            public new object LogInternal(LogEntry entry)
+            {
+                return base.LogInternal(entry);
+            }
         }
 
         private sealed class FakeLoggingProvider : LoggingProviderBase

@@ -150,8 +150,15 @@ namespace CuttingEdge.Logging.Web
         /// <summary>Implements the functionality to log the event.</summary>
         /// <param name="entry">The entry to log.</param>
         /// <returns>Returns null.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="entry"/> is a null (Nothing
+        /// in VB) reference.</exception>
         protected override object LogInternal(LogEntry entry)
         {
+            if (entry == null)
+            {
+                throw new ArgumentNullException("entry");
+            }
+
             HttpContext currentContext = HttpContext.Current;
             TraceContext currentTrace = currentContext != null ? currentContext.Trace : null;
 
