@@ -46,6 +46,25 @@ namespace CuttingEdge.Logging.Tests.Integration
             }
         }
 
+        [TestMethod]
+        public void Log_WithValidLogEntryWithoutException_Succeeds()
+        {
+            // Arrange
+            bool initializeSchema = true;
+            IConfigurationWriter configuration = BuildValidConfiguration(initializeSchema);
+
+            LogEntry entry =
+                new LogEntry(LoggingEventType.Critical, "my message", "my source", null);
+
+            using (var manager = new IntegrationTestLoggingAppDomainManager(configuration))
+            {
+                manager.DomainUnderTest.InitializeLoggingSystem();
+
+                // Act
+                manager.DomainUnderTest.Log(entry);
+            }
+        }
+
         private static IConfigurationWriter BuildValidConfiguration(bool initializeSchema)
         {
             var configBuilder = new ConfigurationBuilder()
