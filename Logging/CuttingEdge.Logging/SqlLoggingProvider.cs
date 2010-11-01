@@ -255,7 +255,10 @@ namespace CuttingEdge.Logging
             // Log the message
             int eventId = this.SaveEventToDatabase(transaction, entry.Severity, entry.Message, entry.Source);
 
-            this.SaveExceptionChainToDatabase(transaction, entry.Exception, eventId);
+            if (entry.Exception != null)
+            {
+                this.SaveExceptionChainToDatabase(transaction, entry.Exception, eventId);
+            }
 
             return eventId;
         }

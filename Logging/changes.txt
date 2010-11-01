@@ -6,8 +6,9 @@ Version vNext
 	Code changes:
 	
     Bug fixes:
+        -Logging events without an exception to the SqlLoggingProvider and AspNetSqlLoggingProvider failed. 
+         Work item 7534.
         -Several methods in the public API did not check arguments for null. Work item 7533.
-        -
     
 
 Version 1.3.0.10246 (1.3) 2010-09-03

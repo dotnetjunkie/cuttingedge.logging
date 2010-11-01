@@ -50,6 +50,26 @@ namespace CuttingEdge.Logging.Tests.Integration
         }
 
         [TestMethod]
+        public void Configuration_LoggingAValidLogEntryWithoutAnException_Succeeds()
+        {
+            // Arrange
+            const bool InitializeSchema = true;
+            string validConnectionString = TestConfiguration.ConnectionString;
+            IConfigurationWriter configuration =
+                BuildValidConfiguration(InitializeSchema, validConnectionString);
+            
+            LogEntry entry = new LogEntry(LoggingEventType.Critical, "my message", "my source", null);
+
+            using (var manager = new IntegrationTestLoggingAppDomainManager(configuration))
+            {
+                manager.DomainUnderTest.InitializeLoggingSystem();
+
+                // Act
+                manager.DomainUnderTest.Log(entry);
+            }
+        }
+
+        [TestMethod]
         public void Configuration_WithInitializeSchemaTrueButInvalidConnectionString_ThrowsException()
         {
             // Arrange
