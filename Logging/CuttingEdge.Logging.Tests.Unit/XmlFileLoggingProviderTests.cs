@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.IO;
+using System.Xml;
 using System.Xml.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -66,6 +67,47 @@ namespace CuttingEdge.Logging.Tests.Unit
 
             // Act
             CreateXmlFileLogger(validPath);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SerializeLogEntry_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeXmlFileLoggingProvider();
+
+            LogEntry invalidEntry = null;
+
+            // Act
+            provider.SerializeLogEntry(invalidEntry);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void WriteEntryInnerElements_WithNullWriter_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeXmlFileLoggingProvider();
+
+            XmlWriter invalidWriter = null;
+            LogEntry validEntry = new LogEntry(LoggingEventType.Debug, "Message", null, null);
+
+            // Act
+            provider.WriteEntryInnerElements(invalidWriter, validEntry);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void WriteEntryInnerElements_WithNullEntry_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeXmlFileLoggingProvider();
+
+            XmlWriter validWriter = XmlWriter.Create(new MemoryStream());
+            LogEntry invalidEntry = null;
+
+            // Act
+            provider.WriteEntryInnerElements(validWriter, invalidEntry);
         }
 
         [TestMethod]
@@ -467,6 +509,16 @@ namespace CuttingEdge.Logging.Tests.Unit
             public void SetCurrentTime(DateTime currentTime)
             {
                 this.currentTime = currentTime;
+            }
+
+            public new void SerializeLogEntry(LogEntry entry)
+            {
+                base.SerializeLogEntry(entry);
+            }
+
+            public new void WriteEntryInnerElements(XmlWriter writer, LogEntry entry)
+            {
+                base.WriteEntryInnerElements(writer, entry);
             }
 
 #if DEBUG

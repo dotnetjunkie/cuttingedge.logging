@@ -215,8 +215,15 @@ namespace CuttingEdge.Logging
         /// <summary>Implements the functionality to log the event.</summary>
         /// <param name="entry">The entry to log.</param>
         /// <returns>An <see cref="Int32"/> with the index of the inserted event in the internal cache.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="entry"/> is a null (Nothing
+        /// in VB) reference.</exception>
         protected override object LogInternal(LogEntry entry)
         {
+            if (entry == null)
+            {
+                throw new ArgumentNullException("entry");
+            }
+
             lock (this.locker)
             {
                 this.loggingEvents.Add(entry);

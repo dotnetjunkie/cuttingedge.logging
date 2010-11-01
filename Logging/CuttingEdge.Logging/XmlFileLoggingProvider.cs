@@ -246,8 +246,15 @@ namespace CuttingEdge.Logging
         /// </summary>
         /// <param name="entry">The entry to log.</param>
         /// <returns>The string representation of the supplied <paramref name="entry"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="entry"/> is a null (Nothing
+        /// in VB) reference.</exception>
         protected override string SerializeLogEntry(LogEntry entry)
         {
+            if (entry == null)
+            {
+                throw new ArgumentNullException("entry");
+            }
+
             int initialCapacity = EstimateCapacity(entry);
 
             using (var stream = new MemoryStream(initialCapacity))
@@ -264,8 +271,20 @@ namespace CuttingEdge.Logging
         /// <summary>Writes the entry's properties to the <paramref name="writer"/>.</summary>
         /// <param name="writer">The XML writer to write to.</param>
         /// <param name="entry">The entry.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="writer"/> or
+        /// <paramref name="entry"/> are null (Nothing in VB) references.</exception>
         protected virtual void WriteEntryInnerElements(XmlWriter writer, LogEntry entry)
         {
+            if (writer == null)
+            {
+                throw new ArgumentNullException("writer");
+            }
+
+            if (entry == null)
+            {
+                throw new ArgumentNullException("entry");
+            }
+
             WriteElement(writer, "EventTime", this.CurrentTime);
             WriteElement(writer, "Severity", entry.Severity.ToString());
             WriteElement(writer, "Message", entry.Message);

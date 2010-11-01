@@ -172,8 +172,15 @@ namespace CuttingEdge.Logging
         /// </summary>
         /// <param name="entry">The entry to log.</param>
         /// <returns>Returns null.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="entry"/> is a null (Nothing
+        /// in VB) reference.</exception>
         protected override object LogInternal(LogEntry entry)
         {
+            if (entry == null)
+            {
+                throw new ArgumentNullException("entry");
+            }
+
             string formattedEvent = LoggingHelper.FormatEvent(entry);
 
             this.writeToConsole(formattedEvent);

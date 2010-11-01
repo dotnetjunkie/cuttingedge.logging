@@ -335,8 +335,15 @@ namespace CuttingEdge.Logging
         /// <exception cref="Exception">Thrown when a single provider is configured in the list of
         /// <see cref="Providers"/>. The exact type of exception being thrown depends on the configured
         /// provider.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="entry"/> is a null (Nothing
+        /// in VB) reference.</exception>
         protected override object LogInternal(LogEntry entry)
         {
+            if (entry == null)
+            {
+                throw new ArgumentNullException("entry");
+            }
+
             if (this.Providers.Count == 1)
             {
                 return this.ForwardToSingleProvider(entry);

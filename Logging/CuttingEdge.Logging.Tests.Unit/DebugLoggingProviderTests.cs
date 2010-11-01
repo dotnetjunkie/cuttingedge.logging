@@ -77,6 +77,17 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void LogInternal_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeDebugLoggingProvider();
+
+            // Act
+            provider.LogInternal(null);
+        }
+
+        [TestMethod]
         public void Initialize_WithValidArguments_Succeeds()
         {
             // Arrange
@@ -215,6 +226,11 @@ namespace CuttingEdge.Logging.Tests.Unit
             public string TextWrittenToDebugWindow
             { 
                 get { return this.textWrittenToDebugWindow; }
+            }
+
+            public new object LogInternal(LogEntry entry)
+            {
+                return base.LogInternal(entry);
             }
 
             private void OverrideDelegate()

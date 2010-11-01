@@ -321,7 +321,7 @@ namespace CuttingEdge.Logging.Web
             {
                 throw new ProviderException(SR.InitializationOfDatabaseSchemaFailed(this.Name, ex.Message), ex);
             }
-        }
+        }     
 
         /// <summary>Saves the event to database.</summary>
         /// <param name="transaction">The transaction.</param>
@@ -332,10 +332,15 @@ namespace CuttingEdge.Logging.Web
         protected override int SaveEventToDatabase(SqlTransaction transaction, LoggingEventType severity,
             string message, string source)
         {
+            if (transaction == null)
+            {
+                throw new ArgumentNullException("transaction");
+            }
+
             var requestLogData =
                 new RequestLogData(HttpContext.Current, this.logQueryString, this.logFormData);
 
-            using (var command = new SqlCommand("dbo.logging_AddEvent", transaction.Connection, transaction))
+            using (var command = new SqlCommand(AddEventProcedure, transaction.Connection, transaction))
             {
                 command.CommandType = CommandType.StoredProcedure;
 
@@ -350,7 +355,15 @@ namespace CuttingEdge.Logging.Web
                 SqlLoggingHelper.AddParameter(command, "QueryString", SqlDbType.NText, requestLogData.QueryString);
                 SqlLoggingHelper.AddParameter(command, "FormData", SqlDbType.NText, requestLogData.Form);
 
-                return (int)command.ExecuteScalar();
+                object eventId = command.ExecuteScalar();
+
+                if (!(eventId is int))
+                {
+                    throw new InvalidOperationException(SR.StoredProcedureReturnedInvalidValue(
+                        AddEventProcedure, eventId, typeof(int)));
+                }
+
+                return (int)eventId;
             }
         }
 
@@ -362,11 +375,22 @@ namespace CuttingEdge.Logging.Web
         /// <returns>
         /// The database's primary key of the saved exception.
         /// </returns>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="exception"/> or
+        /// <paramref name="transaction"/> are null (Nothing in VB) references.</exception>
         protected override int SaveExceptionToDatabase(SqlTransaction transaction, Exception exception,
             int parentEventId, int? parentExceptionId)
         {
-            using (var command =
-                new SqlCommand("dbo.logging_AddException", transaction.Connection, transaction))
+            if (exception == null)
+            {
+                throw new ArgumentNullException("exception");
+            }
+
+            if (transaction == null)
+            {
+                throw new ArgumentNullException("transaction");
+            }
+
+            using (var command = new SqlCommand(AddExceptionProcedure, transaction.Connection, transaction))
             {
                 command.CommandType = CommandType.StoredProcedure;
 
@@ -376,7 +400,15 @@ namespace CuttingEdge.Logging.Web
                 SqlLoggingHelper.AddParameter(command, "Message", SqlDbType.NText, exception.Message);
                 SqlLoggingHelper.AddParameter(command, "StackTrace", SqlDbType.NText, exception.StackTrace);
 
-                return (int)command.ExecuteScalar();
+                object exceptionId = command.ExecuteScalar();
+
+                if (!(exceptionId is int))
+                {
+                    throw new InvalidOperationException(SR.StoredProcedureReturnedInvalidValue(
+                        AddExceptionProcedure, exceptionId, typeof(int)));
+                }
+
+                return (int)exceptionId;
             }
         }
 

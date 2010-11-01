@@ -516,6 +516,8 @@ namespace CuttingEdge.Logging
         /// <remarks>Implementations of this method must guarantee it to be thread safe.</remarks>
         /// <param name="entry">The entry to log.</param>
         /// <returns>The id of the logged event or null when an id is inappropriate.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="entry"/> is a null (Nothing in
+        /// VB) reference.</exception>
         protected abstract object LogInternal(LogEntry entry);
 
         /// <summary>Checks for unrecognized attributes and throws an <see cref="ProviderException"/> when

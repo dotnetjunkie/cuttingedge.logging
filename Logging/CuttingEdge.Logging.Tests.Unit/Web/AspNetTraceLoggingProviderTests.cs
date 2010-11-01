@@ -64,9 +64,28 @@ namespace CuttingEdge.Logging.Tests.Unit.Web
             Assert.AreEqual(expectedDescription, provider.Description);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void LogInternal_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeAspNetTraceLoggingProvider();
+
+            // Act
+            provider.LogInternal(null);
+        }
+
         private static NameValueCollection CreateValidConfiguration()
         {
             return new NameValueCollection();
+        }
+
+        private sealed class FakeAspNetTraceLoggingProvider : AspNetTraceLoggingProvider
+        {
+            public new object LogInternal(LogEntry entry)
+            {
+                return base.LogInternal(entry);
+            }
         }
     }
 }

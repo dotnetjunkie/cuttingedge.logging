@@ -231,6 +231,9 @@
   <data name="SqlProviderAlreadyInitialized" xml:space="preserve">
     <value>The provider '{0}' has already been initialized. Please remove the 'initializeSchema' attribute from the provider configuration.</value>
   </data>
+  <data name="StoredProcedureReturnedInvalidValue" xml:space="preserve">
+    <value>The stored procedure '{0}' returned the value {1} which is not valid. Make sure the stored procedure returns a value of type {2} and never null.</value>
+  </data>
   <data name="TypeCouldNotBeCreatedForProvider" xml:space="preserve">
     <value>The type attribute of the provider '{0}' has an invalid value. The type '{1}' could not created. {2}</value>
   </data>

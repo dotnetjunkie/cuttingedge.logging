@@ -107,6 +107,19 @@ namespace CuttingEdge.Logging.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
+        public void LogInternal_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var provider = new FakeWindowsEventLogLoggingProvider();
+
+            LogEntry invalidEntry = null;
+
+            // Act
+            provider.Public_LogInternal(invalidEntry);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void Constructor_WithNullSource_ThrowsException()
         {
             // Arrange
@@ -520,6 +533,11 @@ namespace CuttingEdge.Logging.Tests.Unit
             }
 
             public EventLogEntryType? LoggedType { get; private set; }
+
+            public object Public_LogInternal(LogEntry entry)
+            {
+                return this.LogInternal(entry);
+            }
 
             // A public method that can be called.
             public new string BuildEventLogMessage(LogEntry entry)
