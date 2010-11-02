@@ -341,6 +341,7 @@ namespace CuttingEdge.Logging
             writer.WriteStartElement(elementName);
 
             WriteElement(writer, "Message", exception.Message);
+            WriteElement(writer, "ExceptionType", exception.GetType().FullName);
             WriteElement(writer, "StackTrace", exception.StackTrace);
 
             WriteInnerExceptionsRecursive(writer, exception);
