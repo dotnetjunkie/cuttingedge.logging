@@ -347,6 +347,34 @@ namespace CuttingEdge.Logging.Tests.Unit
         }
 
         [TestMethod]
+        public void Log_ValidEvent_LogsExpectedExceptionType()
+        {
+            // Arrange
+            string expectedType = "System.InvalidOperationException";
+
+            var provider = CreateValidXmlFileLogger();
+
+            Exception exceptionToLog;
+
+            try
+            {
+                throw new InvalidOperationException("Bad bad!");
+            }
+            catch (Exception ex)
+            {
+                exceptionToLog = ex;
+            }
+
+            // Act
+            provider.Log(exceptionToLog);
+
+            var xml = XDocument.Parse(provider.LoggedText);
+
+            // Assert
+            Assert.AreEqual(expectedType, xml.Root.Element("Exception").Element("ExceptionType").Value);
+        }
+
+        [TestMethod]
         public void Log_ValidEventWithoutException_DoesNotIncludeExceptionElementInOutput()
         {
             // Arrange

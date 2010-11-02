@@ -6,6 +6,7 @@ Version vNext
 	Code changes:
 	
     Bug fixes:
+        -XmlFileLoggingProvider did not log the exception type. Work item 7531.
         -Logging events without an exception to the SqlLoggingProvider and AspNetSqlLoggingProvider failed. 
          Work item 7534.
         -Several methods in the public API did not check arguments for null. Work item 7533.
