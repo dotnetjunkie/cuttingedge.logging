@@ -901,7 +901,8 @@ namespace CuttingEdge.Logging.Tests.Unit
                 catch (ConfigurationErrorsException ex)
                 {
                     Assert.IsInstanceOfType(ex, typeof(ConfigurationErrorsException));
-                    Assert.IsTrue(ex.Message.Contains("'host'"), "Message should contain the text 'host'.");
+                    Assert.IsTrue(ex.Message.Contains("host"), 
+                        "Message should contain the text 'host'. Actual message: " + ex.Message);
                 }
             }
         }
@@ -1085,9 +1086,10 @@ namespace CuttingEdge.Logging.Tests.Unit
         {
             public bool IsDisposed { get; private set; }
 
-            public void Dispose()
+            protected override void Dispose(bool disposing)
             {
                 this.IsDisposed = true;
+                base.Dispose(disposing);
             }
         }
 #endif
