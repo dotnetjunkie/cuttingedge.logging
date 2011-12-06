@@ -42,8 +42,7 @@ namespace CuttingEdge.Logging
     /// <code lang="xml"><![CDATA[
     /// <configuration>
     ///     <configSections>
-    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" />
+    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging" />
     ///     </configSections>
     ///     <logging defaultProvider="EventLogLoggingProvider">
     ///         <providers>
