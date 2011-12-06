@@ -1,14 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging", "CuttingEdge.Logging\CuttingEdge.Logging.csproj", "{740C36FE-5353-4862-907A-693511194CC1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging.Tests.Unit", "CuttingEdge.Logging.Tests.Unit\CuttingEdge.Logging.Tests.Unit.csproj", "{2E3ED9A6-9377-4260-8561-498AFE03C90E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging.Tests.Integration", "CuttingEdge.Logging.Tests.Integration\CuttingEdge.Logging.Tests.Integration.csproj", "{6869A971-ADEC-4F74-B572-10A1A90751EC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging.Tests.Common", "CuttingEdge.Logging.Tests.Common\CuttingEdge.Logging.Tests.Common.csproj", "{119C5660-11E3-4DE3-855E-FA610542715E}"
-EndProject
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SharedAssemblies", "SharedAssemblies", "{BEABBE67-5EFE-4383-8161-C7E92E24CB3F}"
 	ProjectSection(SolutionItems) = preProject
 		SharedAssemblies\Common.Logging.dll = SharedAssemblies\Common.Logging.dll
@@ -27,6 +19,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Settings.StyleCop = Settings.StyleCop
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging", "CuttingEdge.Logging\CuttingEdge.Logging.csproj", "{740C36FE-5353-4862-907A-693511194CC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging.Tests.Unit", "CuttingEdge.Logging.Tests.Unit\CuttingEdge.Logging.Tests.Unit.csproj", "{2E3ED9A6-9377-4260-8561-498AFE03C90E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging.Tests.Integration", "CuttingEdge.Logging.Tests.Integration\CuttingEdge.Logging.Tests.Integration.csproj", "{6869A971-ADEC-4F74-B572-10A1A90751EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.Logging.Tests.Common", "CuttingEdge.Logging.Tests.Common\CuttingEdge.Logging.Tests.Common.csproj", "{119C5660-11E3-4DE3-855E-FA610542715E}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Logging.CuttingEdge", "Common.Logging.CuttingEdge\Common.Logging.CuttingEdge.csproj", "{A581BD2E-5023-4E65-8B0B-42686371F2E5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Logging.CuttingEdge.Tests.Unit", "Common.Logging.CuttingEdge.Tests.Unit\Common.Logging.CuttingEdge.Tests.Unit.csproj", "{007B686B-1D89-4CAE-8BA7-1A0DE1FAC3F4}"
@@ -35,7 +35,7 @@ Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 7
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs08.codeplex.com/
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs08
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = CuttingEdge.Logging\\CuttingEdge.Logging.csproj
 		SccProjectName1 = CuttingEdge.Logging
