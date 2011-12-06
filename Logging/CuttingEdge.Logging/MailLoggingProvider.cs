@@ -37,142 +37,141 @@ using System.Security;
 
 namespace CuttingEdge.Logging
 {
-    /// <summary>
-    /// Manages sending of logging information by mail.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// Returning an identifier for the logged event is not appropriate for this provider. This provider will
-    /// always return null (Nothing in VB) from the <see cref="ILogger.Log(LogEntry)">Log</see> method.
-    /// </para>
-    /// <para>
-    /// This class is used by the <see cref="Logger"/> class to provide Logging services for an 
-    /// application that can connect to a configured SMTP Server. The <see cref="MailLoggingProvider"/> uses
-    /// the configuration of the &lt;system.net&gt;/&lt;mailSettings&gt; section on the application 
-    /// configuration file.
-    /// </para>
-    /// <para>
-    /// The table below shows the list of valid attributes for the <see cref="MailLoggingProvider"/>
-    /// configuration:
-    /// <list type="table">
-    /// <listheader>
-    ///     <attribute>Attribute</attribute>
-    ///     <description>Description</description>
-    /// </listheader>
-    /// <item>
-    ///     <attribute>name</attribute>
-    ///     <description>
-    ///         The name of the provider. This attribute is mandatory.
-    ///     </description>
-    /// </item>
-    /// <item>
-    ///     <attribute>description</attribute>
-    ///     <description>
-    ///         A description of the provider. This attribute is optional.
-    ///     </description>
-    /// </item>
-    /// <item>
-    ///     <attribute>fallbackProvider</attribute>
-    ///     <description>
-    ///         A fallback provider that this provider will use when logging failed. The value must contain 
-    ///         the name of an existing logging provider. This attribute is optional.
-    ///     </description>
-    /// </item>  
-    /// <item>
-    ///     <attribute>threshold</attribute>
-    ///     <description>
-    ///         The logging threshold. The threshold limits the number of events logged. The threshold can be
-    ///         defined as follows: Debug &lt; Information &lt; Warning &lt; Error &lt; Critical. i.e., When
-    ///         the threshold is set to Information, events with a severity of Debug  will not be logged. When
-    ///         no value is specified, all events are logged. This attribute is optional.
-    ///      </description>
-    /// </item>  
-    /// <item>
-    ///     <attribute>to</attribute>
-    ///     <description>
-    ///         A list of mail addresses, separated by a semicolon (;). This attribute is mandatory.
-    ///     </description>
-    /// </item>
-    /// <item>
-    ///     <attribute>subjectFormatString</attribute>
-    ///     <description>
-    ///         A format string that will be used to build the subject. The following indexed placeholders can
-    ///         be used to format the subject.
-    ///         <list type="table">
-    ///             <listheader>
-    ///                 <placeholder>Placeholder</placeholder>
-    ///                 <description>Description</description>
-    ///             </listheader>
-    ///             <item>
-    ///                 <placeholder>{0}</placeholder>
-    ///                 <description>The severity of the event.</description>
-    ///             </item>
-    ///             <item>
-    ///                 <placeholder>{1}</placeholder>
-    ///                 <description>The message of the event</description>
-    ///             </item>
-    ///             <item>
-    ///                 <placeholder>{2}</placeholder>
-    ///                 <description>The source of the event</description>
-    ///             </item>
-    ///             <item>
-    ///                 <placeholder>{3}</placeholder>
-    ///                 <description>The type of the exception that caused the event (if any)</description>
-    ///             </item>
-    ///             <item>
-    ///                 <placeholder>{4}</placeholder>
-    ///                 <description>The current DateTime.</description>
-    ///             </item>
-    ///         </list>
-    ///         This attribute is optional and "<b>{0}: {1}</b>" by default, which means it will be formatted
-    ///         as "{severity}: {event message}".
-    ///     </description>
-    /// </item>
-    /// </list>
-    /// The attributes can be specified within the provider configuration. See the example below on how to
-    /// use.
-    /// </para>
-    /// </remarks>
-    /// <example>
-    /// This example demonstrates how to specify values declaratively for several attributes of the
-    /// Logging section, which can also be accessed as members of the <see cref="LoggingSection"/> class.
-    /// The following configuration file example shows how to specify values declaratively for the
-    /// Logging section.
-    /// <code lang="xml"><![CDATA[
-    /// <?xml version="1.0"?>
-    /// <configuration>
-    ///     <configSections>
-    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" />
-    ///     </configSections>
-    ///     <logging defaultProvider="MailLoggingProvider">
-    ///         <providers>
-    ///             <add 
-    ///                 name="MailLoggingProvider"
-    ///                 type="CuttingEdge.Logging.MailLoggingProvider, CuttingEdge.Logging"
-    ///                 description="Mail logging provider"
-    ///                 threshold="Information"
-    ///                 to="developer1@cuttingedge.it;developer2@cuttingedge.it"
-    ///                 subjectFormatString="Application error. {1} (Severity: {0})"
-    ///             />
-    ///         </providers>
-    ///     </logging>
-    ///     <system.net>
-    ///         <mailSettings>
-    ///             <smtp from="test@foo.com">
-    ///                 <network
-    ///                     host="smtpserver1" 
-    ///                     port="25" 
-    ///                     userName="john" 
-    ///                     password="secret" 
-    ///                     defaultCredentials="true"
-    ///                 />
-    ///             </smtp>
-    ///         </mailSettings>
-    ///     </system.net>   
-    /// </configuration>
-    /// ]]></code>
-    /// </example> 
+        /// <summary>
+        /// Manages sending of logging information by mail.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Returning an identifier for the logged event is not appropriate for this provider. This provider will
+        /// always return null (Nothing in VB) from the <see cref="ILogger.Log(LogEntry)">Log</see> method.
+        /// </para>
+        /// <para>
+        /// This class is used by the <see cref="Logger"/> class to provide Logging services for an 
+        /// application that can connect to a configured SMTP Server. The <see cref="MailLoggingProvider"/> uses
+        /// the configuration of the &lt;system.net&gt;/&lt;mailSettings&gt; section on the application 
+        /// configuration file.
+        /// </para>
+        /// <para>
+        /// The table below shows the list of valid attributes for the <see cref="MailLoggingProvider"/>
+        /// configuration:
+        /// <list type="table">
+        /// <listheader>
+        ///     <attribute>Attribute</attribute>
+        ///     <description>Description</description>
+        /// </listheader>
+        /// <item>
+        ///     <attribute>name</attribute>
+        ///     <description>
+        ///         The name of the provider. This attribute is mandatory.
+        ///     </description>
+        /// </item>
+        /// <item>
+        ///     <attribute>description</attribute>
+        ///     <description>
+        ///         A description of the provider. This attribute is optional.
+        ///     </description>
+        /// </item>
+        /// <item>
+        ///     <attribute>fallbackProvider</attribute>
+        ///     <description>
+        ///         A fallback provider that this provider will use when logging failed. The value must contain 
+        ///         the name of an existing logging provider. This attribute is optional.
+        ///     </description>
+        /// </item>  
+        /// <item>
+        ///     <attribute>threshold</attribute>
+        ///     <description>
+        ///         The logging threshold. The threshold limits the number of events logged. The threshold can be
+        ///         defined as follows: Debug &lt; Information &lt; Warning &lt; Error &lt; Critical. i.e., When
+        ///         the threshold is set to Information, events with a severity of Debug  will not be logged. When
+        ///         no value is specified, all events are logged. This attribute is optional.
+        ///      </description>
+        /// </item>  
+        /// <item>
+        ///     <attribute>to</attribute>
+        ///     <description>
+        ///         A list of mail addresses, separated by a semicolon (;). This attribute is mandatory.
+        ///     </description>
+        /// </item>
+        /// <item>
+        ///     <attribute>subjectFormatString</attribute>
+        ///     <description>
+        ///         A format string that will be used to build the subject. The following indexed placeholders can
+        ///         be used to format the subject.
+        ///         <list type="table">
+        ///             <listheader>
+        ///                 <placeholder>Placeholder</placeholder>
+        ///                 <description>Description</description>
+        ///             </listheader>
+        ///             <item>
+        ///                 <placeholder>{0}</placeholder>
+        ///                 <description>The severity of the event.</description>
+        ///             </item>
+        ///             <item>
+        ///                 <placeholder>{1}</placeholder>
+        ///                 <description>The message of the event</description>
+        ///             </item>
+        ///             <item>
+        ///                 <placeholder>{2}</placeholder>
+        ///                 <description>The source of the event</description>
+        ///             </item>
+        ///             <item>
+        ///                 <placeholder>{3}</placeholder>
+        ///                 <description>The type of the exception that caused the event (if any)</description>
+        ///             </item>
+        ///             <item>
+        ///                 <placeholder>{4}</placeholder>
+        ///                 <description>The current DateTime.</description>
+        ///             </item>
+        ///         </list>
+        ///         This attribute is optional and "<b>{0}: {1}</b>" by default, which means it will be formatted
+        ///         as "{severity}: {event message}".
+        ///     </description>
+        /// </item>
+        /// </list>
+        /// The attributes can be specified within the provider configuration. See the example below on how to
+        /// use.
+        /// </para>
+        /// </remarks>
+        /// <example>
+        /// This example demonstrates how to specify values declaratively for several attributes of the
+        /// Logging section, which can also be accessed as members of the <see cref="LoggingSection"/> class.
+        /// The following configuration file example shows how to specify values declaratively for the
+        /// Logging section.
+        /// <code lang="xml"><![CDATA[
+        /// <?xml version="1.0"?>
+        /// <configuration>
+        ///     <configSections>
+        ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging" />
+        ///     </configSections>
+        ///     <logging defaultProvider="MailLoggingProvider">
+        ///         <providers>
+        ///             <add 
+        ///                 name="MailLoggingProvider"
+        ///                 type="CuttingEdge.Logging.MailLoggingProvider, CuttingEdge.Logging"
+        ///                 description="Mail logging provider"
+        ///                 threshold="Information"
+        ///                 to="developer1@cuttingedge.it;developer2@cuttingedge.it"
+        ///                 subjectFormatString="Application error. {1} (Severity: {0})"
+        ///             />
+        ///         </providers>
+        ///     </logging>
+        ///     <system.net>
+        ///         <mailSettings>
+        ///             <smtp from="test@foo.com">
+        ///                 <network
+        ///                     host="smtpserver1" 
+        ///                     port="25" 
+        ///                     userName="john" 
+        ///                     password="secret" 
+        ///                     defaultCredentials="true"
+        ///                 />
+        ///             </smtp>
+        ///         </mailSettings>
+        ///     </system.net>   
+        /// </configuration>
+        /// ]]></code>
+        /// </example> 
     public class MailLoggingProvider : LoggingProviderBase
     {
         private const string SubjectFormatStringAttribute = "subjectFormatString";

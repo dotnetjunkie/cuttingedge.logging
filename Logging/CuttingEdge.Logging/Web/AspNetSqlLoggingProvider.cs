@@ -158,8 +158,7 @@ namespace CuttingEdge.Logging.Web
     /// <?xml version="1.0"?>
     /// <configuration>
     ///     <configSections>
-    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging"
-    ///             allowDefinition="MachineToApplication" />
+    ///         <section name="logging" type="CuttingEdge.Logging.LoggingSection, CuttingEdge.Logging" />
     ///     </configSections>
     ///     <connectionStrings>
     ///         <add name="SqlLogging" 
